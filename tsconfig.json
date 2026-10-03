@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "files": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "packages/contracts" },
+    { "path": "packages/domain" },
+    { "path": "packages/data" },
+    { "path": "packages/events-client" },
+    { "path": "services/api" },
+    { "path": "apps/client" },
+    { "path": "ai/contracts" },
+    { "path": "ai/knowledge" },
+    { "path": "ai/tools" },
+    { "path": "ai/agents" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@pathfinder/client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "echo \"(dev pendiente: WI UI client)\"",
+    "lint": "echo \"(lint pendiente: WI tooling)\"",
+    "test": "echo \"(test pendiente: WI tooling)\""
+  }
+}

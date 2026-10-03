@@ -1,0 +1,276 @@
+{
+  "generated_at": "2026-10-03T06:00:22.556Z",
+  "project": {
+    "name": "pathfinder",
+    "state": "new",
+    "structure": "monorepo"
+  },
+  "scope": "all",
+  "scope_reason": "All supported Work Item statuses are included.",
+  "included_statuses": [
+    "draft",
+    "ready",
+    "in-progress",
+    "blocked",
+    "completed"
+  ],
+  "excluded_statuses": [
+    "archived"
+  ],
+  "nodes": [
+    {
+      "id": "business:business",
+      "type": "business",
+      "label": "Business",
+      "path": "knowledge/business/business.md"
+    },
+    {
+      "id": "product:product",
+      "type": "product",
+      "label": "Product",
+      "path": "knowledge/product/product.md"
+    },
+    {
+      "id": "tech:tech",
+      "type": "tech",
+      "label": "Tech",
+      "path": "knowledge/tech/current-state.md"
+    },
+    {
+      "id": "delivery:delivery",
+      "type": "delivery",
+      "label": "Delivery",
+      "path": "knowledge/delivery/roadmap.md"
+    },
+    {
+      "id": "initiative:ini-001",
+      "type": "initiative",
+      "label": "INI-001 Fundación técnica del monorepo",
+      "path": "knowledge/delivery/initiatives/INI-001-fundaci-n-t-cnica-del-monorepo.md",
+      "status": "planned"
+    },
+    {
+      "id": "candidate:WI-CANDIDATE-001",
+      "type": "roadmap-candidate",
+      "label": "WI-CANDIDATE-001"
+    },
+    {
+      "id": "candidate:WI-CANDIDATE-002",
+      "type": "roadmap-candidate",
+      "label": "WI-CANDIDATE-002"
+    },
+    {
+      "id": "candidate:WI-CANDIDATE-003",
+      "type": "roadmap-candidate",
+      "label": "WI-CANDIDATE-003"
+    },
+    {
+      "id": "initiative:ini-002",
+      "type": "initiative",
+      "label": "INI-002 Integración con AWS Events",
+      "path": "knowledge/delivery/initiatives/INI-002-integraci-n-con-aws-events.md",
+      "status": "planned"
+    },
+    {
+      "id": "initiative:ini-003",
+      "type": "initiative",
+      "label": "INI-003 Motor de conocimiento y recomendaciones",
+      "path": "knowledge/delivery/initiatives/INI-003-motor-de-conocimiento-y-recomendaciones.md",
+      "status": "planned"
+    },
+    {
+      "id": "candidate:WI-CANDIDATE-004",
+      "type": "roadmap-candidate",
+      "label": "WI-CANDIDATE-004"
+    },
+    {
+      "id": "initiative:ini-004",
+      "type": "initiative",
+      "label": "INI-004 Experiencia Learning Path y reflexión",
+      "path": "knowledge/delivery/initiatives/INI-004-experiencia-learning-path-y-reflexi-n.md",
+      "status": "planned"
+    },
+    {
+      "id": "initiative:ini-005",
+      "type": "initiative",
+      "label": "INI-005 Cierre de ciclo y exposición",
+      "path": "knowledge/delivery/initiatives/INI-005-cierre-de-ciclo-y-exposici-n.md",
+      "status": "planned"
+    },
+    {
+      "id": "wi:WI-001",
+      "type": "work-item",
+      "label": "WI-001 Scaffolding del monorepo (pnpm workspace, estructura apps/services/ai/packages)",
+      "path": "knowledge/delivery/work-items/completed/WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
+      "status": "completed",
+      "knowledge_level": "K1"
+    },
+    {
+      "id": "code:package.json",
+      "type": "code-glob",
+      "label": "package.json"
+    },
+    {
+      "id": "code:pnpm-workspace.yaml",
+      "type": "code-glob",
+      "label": "pnpm-workspace.yaml"
+    },
+    {
+      "id": "code:apps/**",
+      "type": "code-glob",
+      "label": "apps/**"
+    },
+    {
+      "id": "code:services/**",
+      "type": "code-glob",
+      "label": "services/**"
+    },
+    {
+      "id": "code:ai/**",
+      "type": "code-glob",
+      "label": "ai/**"
+    },
+    {
+      "id": "code:packages/**",
+      "type": "code-glob",
+      "label": "packages/**"
+    }
+  ],
+  "edges": [
+    {
+      "from": "business:business",
+      "to": "product:product",
+      "type": "informs"
+    },
+    {
+      "from": "product:product",
+      "to": "tech:tech",
+      "type": "informs"
+    },
+    {
+      "from": "tech:tech",
+      "to": "delivery:delivery",
+      "type": "informs"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-001",
+      "to": "initiative:ini-001",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-001",
+      "to": "wi:WI-001",
+      "type": "materialized_as"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-002",
+      "to": "initiative:ini-001",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-003",
+      "to": "initiative:ini-001",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-001",
+      "to": "initiative:ini-002",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-002",
+      "to": "initiative:ini-002",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-003",
+      "to": "initiative:ini-002",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-001",
+      "to": "initiative:ini-003",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-002",
+      "to": "initiative:ini-003",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-003",
+      "to": "initiative:ini-003",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-004",
+      "to": "initiative:ini-003",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-001",
+      "to": "initiative:ini-004",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-002",
+      "to": "initiative:ini-004",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-003",
+      "to": "initiative:ini-004",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-001",
+      "to": "initiative:ini-005",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-002",
+      "to": "initiative:ini-005",
+      "type": "belongs_to"
+    },
+    {
+      "from": "candidate:WI-CANDIDATE-003",
+      "to": "initiative:ini-005",
+      "type": "belongs_to"
+    },
+    {
+      "from": "wi:WI-001",
+      "to": "code:package.json",
+      "type": "owns"
+    },
+    {
+      "from": "wi:WI-001",
+      "to": "code:pnpm-workspace.yaml",
+      "type": "owns"
+    },
+    {
+      "from": "wi:WI-001",
+      "to": "code:apps/**",
+      "type": "owns"
+    },
+    {
+      "from": "wi:WI-001",
+      "to": "code:services/**",
+      "type": "owns"
+    },
+    {
+      "from": "wi:WI-001",
+      "to": "code:ai/**",
+      "type": "owns"
+    },
+    {
+      "from": "wi:WI-001",
+      "to": "code:packages/**",
+      "type": "owns"
+    },
+    {
+      "from": "wi:WI-001",
+      "to": "initiative:ini-001",
+      "type": "belongs_to"
+    }
+  ]
+}

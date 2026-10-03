@@ -1,0 +1,211 @@
+# System Topology — pathfinder
+#
+# Evidence-backed semantic topology. Reconstructed from direct repository inspection
+# (not inferred from filenames). The repository currently contains SCAFFOLDING ONLY:
+# 11 pnpm workspace packages whose src files are empty placeholders (`export {};`),
+# with no imports and no declared dependencies. The only evidence-backed relationship
+# is `contains` (workspace membership + root tsconfig project references).
+#
+# Runtime architecture described in knowledge/tech/codebase.md and current-state.md
+# (AWS Events, Bedrock, DynamoDB, Lambda, API Gateway, AgentCore, inter-package calls)
+# is INTENT, not implemented. It is intentionally left as Unknown below and must be
+# asserted only when the corresponding Work Items (INI-002, INI-003) land real code.
+#
+# Structure: single-repo pnpm monorepo (one git repository). Not multirepo —
+# modules_discover found no sibling repositories; the repo registers itself in
+# .kaddo/modules.yml with path ".".
+version: 1
+
+metadata:
+  project: pathfinder
+  structure: monorepo
+  evidence_basis: >-
+    Repository inspection on 2026-10-03: pnpm-workspace.yaml, root tsconfig.json
+    references, per-package package.json, and grep over **/src/**/*.ts (no imports)
+    and **/package.json (no dependencies).
+  confidence: >-
+    High for `contains` edges; runtime relationships are Unknown (not yet implemented).
+
+entities:
+  - id: pathfinder-monorepo
+    kind: application
+    purpose: >-
+      Monorepo raíz que agrupa y orquesta el build de los paquetes del workspace.
+    module: reinvent-pathfinder
+    implementation:
+      - package.json
+      - pnpm-workspace.yaml
+      - tsconfig.json
+      - tsconfig.base.json
+    knowledge: []
+    provenance: workspace manifest + root tsconfig references
+
+  - id: pkg-domain
+    kind: component
+    purpose: Modelo de dominio del producto (placeholder, sin lógica implementada).
+    module: reinvent-pathfinder
+    implementation:
+      - packages/domain/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: pkg-contracts
+    kind: component
+    purpose: DTOs y schemas compartidos (placeholder, sin lógica implementada).
+    module: reinvent-pathfinder
+    implementation:
+      - packages/contracts/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: pkg-shared
+    kind: component
+    purpose: Utilidades compartidas (placeholder, sin lógica implementada).
+    module: reinvent-pathfinder
+    implementation:
+      - packages/shared/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: pkg-data
+    kind: component
+    purpose: Repositorios y contratos de persistencia (placeholder, sin lógica).
+    module: reinvent-pathfinder
+    implementation:
+      - packages/data/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: pkg-events-client
+    kind: component
+    purpose: Adapter de AWS Events REST API (placeholder, sin lógica implementada).
+    module: reinvent-pathfinder
+    implementation:
+      - packages/events-client/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: svc-api
+    kind: component
+    purpose: >-
+      Backend serverless previsto (placeholder, sin handlers ni runtime todavía).
+      Modelado como component, no service, hasta que exista entrypoint/deployment.
+    module: reinvent-pathfinder
+    implementation:
+      - services/api/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: app-client
+    kind: component
+    purpose: >-
+      Experiencia local-first prevista (placeholder, sin UI todavía). Modelado como
+      component, no application, hasta que exista UI/entrypoint real.
+    module: reinvent-pathfinder
+    implementation:
+      - apps/client/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: ai-agents
+    kind: component
+    purpose: Agentes Strands previstos (placeholder, sin agentes implementados).
+    module: reinvent-pathfinder
+    implementation:
+      - ai/agents/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: ai-tools
+    kind: component
+    purpose: Tools expuestas a los agentes (placeholder, sin lógica implementada).
+    module: reinvent-pathfinder
+    implementation:
+      - ai/tools/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: ai-knowledge
+    kind: component
+    purpose: Ingesta/acceso a Managed Knowledge Bases (placeholder, sin lógica).
+    module: reinvent-pathfinder
+    implementation:
+      - ai/knowledge/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+  - id: ai-contracts
+    kind: component
+    purpose: Schemas de entradas/salidas agentic (placeholder, sin lógica).
+    module: reinvent-pathfinder
+    implementation:
+      - ai/contracts/
+    knowledge: []
+    provenance: package.json present; src is empty placeholder
+
+relationships:
+  # Only `contains` is evidence-backed: pnpm-workspace.yaml globs + root tsconfig references.
+  - from: pathfinder-monorepo
+    to: pkg-shared
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: pkg-contracts
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: pkg-domain
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: pkg-data
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: pkg-events-client
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: svc-api
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: app-client
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: ai-contracts
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: ai-knowledge
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: ai-tools
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+  - from: pathfinder-monorepo
+    to: ai-agents
+    type: contains
+    provenance: pnpm-workspace.yaml + tsconfig.json references
+
+# Explicitly Unknown — insufficient evidence, NOT asserted (no imports, no deps, no infra):
+#   - depends-on / calls between packages
+#   - svc-api reads-from/writes-to a DynamoDB datastore
+#   - ai-* integrates-with Amazon Bedrock / Managed KB
+#   - pkg-events-client integrates-with AWS Events API (external-system)
+#   - svc-api / ai-agents runs-on API Gateway+Lambda / AgentCore
+# External systems (AWS Events, Bedrock, DynamoDB, AgentCore) are intent-only and are
+# NOT created as entities yet. Add them when INI-002/INI-003 implement real code.
+unknown:
+  - subject: inter-package depends-on / calls
+    reason: no source imports and no declared dependencies in any package.json
+  - subject: svc-api -> datastore (DynamoDB) reads-from/writes-to
+    reason: no datastore entity and no persistence client code
+  - subject: ai-* -> Amazon Bedrock / Managed KB integrates-with
+    reason: no AWS SDK / Bedrock usage in code
+  - subject: pkg-events-client -> AWS Events API integrates-with
+    reason: no HTTP client implementation
+  - subject: svc-api / ai-agents -> infrastructure runs-on
+    reason: no serverless/IaC definitions present

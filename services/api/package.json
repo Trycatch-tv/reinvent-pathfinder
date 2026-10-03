@@ -1,0 +1,14 @@
+{
+  "name": "@pathfinder/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "echo \"(dev pendiente: WI servicio API)\"",
+    "lint": "echo \"(lint pendiente: WI tooling)\"",
+    "test": "echo \"(test pendiente: WI tooling)\""
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "generated_at": "2026-10-03T06:00:22.647Z",
+  "scope": "all",
+  "scope_reason": "All supported Work Item statuses are included.",
+  "quality": "partial",
+  "summary": {
+    "nodes": 20,
+    "edges": 27,
+    "hints": 4
+  },
+  "metrics": {
+    "nodes_count": 20,
+    "edges_count": 27,
+    "connected_nodes_count": 20,
+    "isolated_nodes_count": 0,
+    "active_work_items_without_code": 0,
+    "active_work_items_without_capabilities": 0,
+    "work_items_without_source": 0,
+    "adrs_without_code": 0,
+    "capsules_without_related_work_items": 0
+  },
+  "hints": [
+    {
+      "artifact_id": "Planned capabilities",
+      "artifact_type": "capability",
+      "severity": "info",
+      "missing": [
+        "work-item"
+      ],
+      "reason": "This capability is declared but no Work Item references it yet.",
+      "message": "Capability \"Planned capabilities\" is not linked to any Work Item."
+    },
+    {
+      "artifact_id": "Capacidades condicionadas / extendidas",
+      "artifact_type": "capability",
+      "severity": "info",
+      "missing": [
+        "work-item"
+      ],
+      "reason": "This capability is declared but no Work Item references it yet.",
+      "message": "Capability \"Capacidades condicionadas / extendidas\" is not linked to any Work Item."
+    },
+    {
+      "artifact_id": "Capability map",
+      "artifact_type": "capability",
+      "severity": "info",
+      "missing": [
+        "work-item"
+      ],
+      "reason": "This capability is declared but no Work Item references it yet.",
+      "message": "Capability \"Capability map\" is not linked to any Work Item."
+    },
+    {
+      "artifact_id": "Open questions",
+      "artifact_type": "capability",
+      "severity": "info",
+      "missing": [
+        "work-item"
+      ],
+      "reason": "This capability is declared but no Work Item references it yet.",
+      "message": "Capability \"Open questions\" is not linked to any Work Item."
+    }
+  ]
+}

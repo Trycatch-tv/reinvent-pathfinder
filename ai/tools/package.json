@@ -1,0 +1,13 @@
+{
+  "name": "@pathfinder/ai-tools",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "echo \"(lint pendiente: WI tooling)\"",
+    "test": "echo \"(test pendiente: WI tooling)\""
+  }
+}

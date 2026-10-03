@@ -1,0 +1,667 @@
+{
+  "project": {
+    "name": "pathfinder",
+    "state": "new",
+    "teamSize": "small",
+    "structure": "monorepo",
+    "language": "Spanish"
+  },
+  "stack": {
+    "sourceDirectories": [],
+    "migrationDirectories": [],
+    "contractFiles": [],
+    "infrastructureFiles": []
+  },
+  "knowledge": {
+    "hasScan": true,
+    "hasInventory": true,
+    "hasContextPack": true,
+    "hasUnderstand": false,
+    "hasBusiness": true,
+    "hasProduct": true,
+    "hasCapabilities": true,
+    "hasArchitecture": true,
+    "hasRoadmap": true,
+    "hasAgents": true,
+    "hasSkills": true
+  },
+  "workItems": {
+    "total": 1,
+    "inProgress": 0,
+    "done": 0,
+    "cancelled": 0,
+    "byState": {
+      "draft": 0,
+      "ready": 0,
+      "in-progress": 0,
+      "blocked": 0,
+      "completed": 1,
+      "archived": 0
+    },
+    "byType": {
+      "chore": 1
+    },
+    "initiatives": [
+      {
+        "name": "INI-001",
+        "states": {
+          "draft": 0,
+          "ready": 0,
+          "in-progress": 0,
+          "blocked": 0,
+          "completed": 1,
+          "archived": 0
+        }
+      }
+    ],
+    "items": [
+      {
+        "id": "WI-001",
+        "title": "Scaffolding del monorepo (pnpm workspace, estructura apps/services/ai/packages)",
+        "type": "chore",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-001",
+        "knowledgeLevel": "K1",
+        "hasOwnership": true,
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true
+        }
+      }
+    ]
+  },
+  "ownership": {
+    "workItemsTotal": 1,
+    "workItemsWithOwnership": 1,
+    "workItemsMissingOwnership": 0
+  },
+  "domains": [
+    "platform",
+    "tech"
+  ],
+  "duplicateWorkItems": [],
+  "externalCapsules": [],
+  "graph": {
+    "generatedAt": "2026-10-03T05:04:40.757Z",
+    "scope": "all",
+    "scopeReason": "All supported Work Item statuses are included.",
+    "includedStatuses": [
+      "draft",
+      "ready",
+      "in-progress",
+      "blocked",
+      "completed"
+    ],
+    "excludedStatuses": [
+      "archived"
+    ],
+    "nodes": 4,
+    "edges": 3,
+    "activeWorkItemsConnectedToCode": 0
+  },
+  "graphHints": {
+    "scope": "all",
+    "scopeReason": "All supported Work Item statuses are included.",
+    "quality": "empty",
+    "totalHints": 4,
+    "activeWorkItemHints": 0,
+    "messages": [
+      "Capability \"Planned capabilities\" is not linked to any Work Item.",
+      "Capability \"Capacidades condicionadas / extendidas\" is not linked to any Work Item.",
+      "Capability \"Capability map\" is not linked to any Work Item.",
+      "Capability \"Open questions\" is not linked to any Work Item."
+    ]
+  },
+  "skills": {
+    "total": 9,
+    "byGroup": {
+      "tech": 4,
+      "delivery": 5
+    }
+  },
+  "layers": [
+    {
+      "layer": "Business",
+      "status": "Consolidated",
+      "detected": [
+        "business.md"
+      ]
+    },
+    {
+      "layer": "Product",
+      "status": "Structured",
+      "detected": [
+        "capabilities.md",
+        "product.md"
+      ]
+    },
+    {
+      "layer": "Tech",
+      "status": "Structured",
+      "detected": [
+        "codebase.md",
+        "current-state.md",
+        "knowledge.md"
+      ]
+    },
+    {
+      "layer": "Delivery",
+      "status": "Traceable",
+      "detected": [
+        "INI-001-fundaci-n-t-cnica-del-monorepo.md",
+        "INI-002-integraci-n-con-aws-events.md",
+        "INI-003-motor-de-conocimiento-y-recomendaciones.md",
+        "INI-004-experiencia-learning-path-y-reflexi-n.md",
+        "INI-005-cierre-de-ciclo-y-exposici-n.md",
+        "WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
+        "roadmap.md"
+      ]
+    }
+  ],
+  "roadmap": {
+    "present": true,
+    "initiatives": 0,
+    "work_item_candidates": 0,
+    "materialized_work_items": 1,
+    "remaining_work_item_candidates": 0,
+    "candidates": 0,
+    "materialized": 1,
+    "remaining": 0
+  },
+  "missingKnowledge": [],
+  "suggestedNextSteps": [],
+  "readiness": {
+    "project_name": "pathfinder",
+    "project_type": "new",
+    "overall": "not-applicable",
+    "signals": {
+      "scan": "missing",
+      "understand": "missing",
+      "bootstrap_baseline": "incomplete",
+      "agents": "missing",
+      "skills": "missing",
+      "current_state": "missing",
+      "codebase": "missing",
+      "capabilities": "missing",
+      "product": "missing",
+      "business": "missing",
+      "roadmap": "missing",
+      "work_items": "none",
+      "adapters": [],
+      "blocking_open_questions": 0,
+      "assumed_questions": 0,
+      "resolved_questions": 0,
+      "deferred_questions": 0
+    },
+    "recommended_next_step": {
+      "label": "This project uses the standard new-project Kaddo flow."
+    },
+    "nextStepRecommendation": {
+      "id": "understand",
+      "phase": "Discovery",
+      "label": "Run `kaddo understand` to summarize the project context.",
+      "command": "kaddo understand",
+      "reason": "No understand handoff has been generated yet."
+    }
+  },
+  "nextStepRecommendation": {
+    "id": "understand",
+    "phase": "Discovery",
+    "label": "Run `kaddo understand` to summarize the project context.",
+    "command": "kaddo understand",
+    "reason": "No understand handoff has been generated yet."
+  },
+  "techDecisions": {
+    "status": "none",
+    "candidates": 0,
+    "adrs": 0,
+    "draft_adrs": 0,
+    "accepted_adrs": 0,
+    "candidate_list": [],
+    "candidates_source": null,
+    "candidates_legacy_location": false,
+    "candidates_both_exist": false
+  },
+  "techKnowledge": {
+    "core": {
+      "currentState": true,
+      "codebase": true
+    },
+    "discovery": {
+      "architectureNotes": false,
+      "decisionCandidates": false,
+      "legacyLocation": false
+    }
+  },
+  "installedAssets": {
+    "version": "3.109.0",
+    "agents": {
+      "total": 20,
+      "up_to_date": 11,
+      "outdated": 0,
+      "missing": 9,
+      "unknown_version": 0,
+      "modified": 0,
+      "items": [
+        {
+          "name": "capability-agent",
+          "path": "knowledge/agents/product/capability-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "architecture-agent",
+          "path": "knowledge/agents/tech/architecture-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "roadmap-agent",
+          "path": "knowledge/agents/delivery/roadmap-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "legacy-agent",
+          "path": "knowledge/agents/utilities/legacy-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "adr-agent",
+          "path": "knowledge/agents/tech/adr-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "work-item-agent",
+          "path": "knowledge/agents/delivery/work-item-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "git-strategy-agent",
+          "path": "knowledge/agents/delivery/git-strategy-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "security-agent",
+          "path": "knowledge/agents/tech/security-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "standards-agent",
+          "path": "knowledge/agents/tech/standards-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "stack-agent",
+          "path": "knowledge/agents/tech/stack-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "module-design-agent",
+          "path": "knowledge/agents/tech/module-design-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "module-context-agent",
+          "path": "knowledge/agents/tech/module-context-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "business-agent",
+          "path": "knowledge/agents/business/business-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "bootstrap-agent",
+          "path": "knowledge/agents/product/bootstrap-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "codebase-agent",
+          "path": "knowledge/agents/tech/codebase-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "implementation-agent",
+          "path": "knowledge/agents/delivery/implementation-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "backlog-agent",
+          "path": "knowledge/agents/delivery/backlog-agent.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "ownership-agent",
+          "path": "knowledge/agents/delivery/ownership-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "capsule-agent",
+          "path": "knowledge/agents/tech/capsule-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "graph-agent",
+          "path": "knowledge/agents/tech/graph-agent.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        }
+      ]
+    },
+    "skills": {
+      "total": 10,
+      "up_to_date": 9,
+      "outdated": 0,
+      "missing": 1,
+      "unknown_version": 0,
+      "modified": 0,
+      "items": [
+        {
+          "name": "adr-writing",
+          "path": "knowledge/skills/adr-writing/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "work-item-refinement",
+          "path": "knowledge/skills/work-item-refinement/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "ownership-suggestion",
+          "path": "knowledge/skills/ownership-suggestion/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "graph-metadata-review",
+          "path": "knowledge/skills/graph-metadata-review/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "capsule-writing",
+          "path": "knowledge/skills/capsule-writing/skill.md",
+          "available": "3.109.0",
+          "installed": null,
+          "state": "missing"
+        },
+        {
+          "name": "learning-capture",
+          "path": "knowledge/skills/learning-capture/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "implementation-planning",
+          "path": "knowledge/skills/implementation-planning/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "module-context-refinement",
+          "path": "knowledge/skills/module-context-refinement/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "evidence-verification",
+          "path": "knowledge/skills/evidence-verification/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        },
+        {
+          "name": "legacy-risk-assessment",
+          "path": "knowledge/skills/legacy-risk-assessment/skill.md",
+          "available": "3.109.0",
+          "installed": "3.109.0",
+          "state": "up-to-date"
+        }
+      ]
+    }
+  },
+  "roadmapQuality": {
+    "initiatives": {
+      "total": 0,
+      "grounded": 0,
+      "with_related_domain": 0,
+      "with_related_capability": 0,
+      "with_source_signals": 0,
+      "needs_refinement": false,
+      "items": []
+    },
+    "work_item_candidates": {
+      "total": 0,
+      "with_source_initiative": 0,
+      "with_related_domain": 0,
+      "with_related_capability": 0
+    }
+  },
+  "projectRoute": {
+    "type": "new",
+    "currentStep": "create-work-source",
+    "completed": 10,
+    "total": 12,
+    "progressPercent": 83,
+    "steps": [
+      {
+        "id": "enable-kaddo",
+        "label": "Enable Kaddo",
+        "status": "done",
+        "evidence": [
+          ".kaddo/config.yml"
+        ]
+      },
+      {
+        "id": "define-business",
+        "label": "Define business context",
+        "status": "done",
+        "evidence": [
+          "knowledge/business/business.md"
+        ]
+      },
+      {
+        "id": "define-product",
+        "label": "Define product context",
+        "status": "done",
+        "evidence": [
+          "knowledge/product/product.md"
+        ]
+      },
+      {
+        "id": "discover-capabilities",
+        "label": "Define initial capabilities",
+        "status": "done",
+        "evidence": [
+          "knowledge/product/capabilities.md"
+        ]
+      },
+      {
+        "id": "describe-architecture",
+        "label": "Define initial architecture",
+        "status": "done",
+        "evidence": [
+          "knowledge/tech/current-state.md",
+          "knowledge/tech/codebase.md"
+        ]
+      },
+      {
+        "id": "create-work-source",
+        "label": "Create initial work source",
+        "status": "warning",
+        "evidence": [
+          "Work Items with unknown source"
+        ],
+        "reason": "Some Work Items have no source metadata."
+      },
+      {
+        "id": "materialize-work-item",
+        "label": "Create first Work Item",
+        "status": "done",
+        "evidence": [
+          "knowledge/delivery/work-items/"
+        ]
+      },
+      {
+        "id": "refine-work-item",
+        "label": "Refine Work Item",
+        "status": "done"
+      },
+      {
+        "id": "suggest-ownership",
+        "label": "Suggest ownership",
+        "status": "done"
+      },
+      {
+        "id": "prepare-implementation",
+        "label": "Prepare implementation",
+        "status": "done"
+      },
+      {
+        "id": "run-guard",
+        "label": "Run guard",
+        "status": "pending"
+      },
+      {
+        "id": "capture-learning",
+        "label": "Capture learning",
+        "status": "done"
+      }
+    ]
+  },
+  "scanSignals": {
+    "auth": [],
+    "payments": [],
+    "webhooks": [],
+    "storage": [],
+    "background_jobs": [],
+    "email": [],
+    "database": [],
+    "migrations": [],
+    "api_routes": [],
+    "tests": [
+      {
+        "type": "tests",
+        "label": "No test directory detected",
+        "confidence": "high",
+        "evidence": [],
+        "recommended_review": "Confirm how this project is validated before production changes."
+      }
+    ],
+    "security": [],
+    "infrastructure": [],
+    "external_integrations": [],
+    "environment": []
+  },
+  "metadataHealth": {
+    "findings": [
+      {
+        "file": "knowledge/delivery/roadmap.md",
+        "field": "generated_by",
+        "issue": "missing",
+        "detail": "Missing `generated_by` in frontmatter."
+      },
+      {
+        "file": "knowledge/delivery/roadmap.md",
+        "field": "template_version",
+        "issue": "missing",
+        "detail": "Missing `template_version` in frontmatter."
+      }
+    ],
+    "healthy": 5,
+    "drifted": 1
+  },
+  "isModuleRepo": false,
+  "deliverySummary": {
+    "completedWorkItems": 1,
+    "archivedWorkItems": 0,
+    "activeWorkItems": 0,
+    "implementationCompleted": 0,
+    "releaseBlocked": 0,
+    "releaseReady": 0
+  },
+  "scopeCoverage": [],
+  "implementationEvidence": [
+    {
+      "id": "WI-001",
+      "lifecycle": "completed",
+      "implementationStatus": "not-assessed",
+      "validationStatus": "not-assessed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {}
+    }
+  ],
+  "mapped_modules": [
+    {
+      "id": "reinvent-pathfinder",
+      "repoPath": ".",
+      "capabilities": [],
+      "code": [],
+      "artifacts": {
+        "moduleDesign": false,
+        "stack": false,
+        "security": false,
+        "standards": false,
+        "diagrams": false,
+        "adrs": false
+      }
+    }
+  ]
+}

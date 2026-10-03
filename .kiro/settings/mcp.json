@@ -1,0 +1,12 @@
+﻿{
+  "mcpServers": {
+    "kaddo": {
+      "command": "npx",
+      "args": ["-y", "@kaddo/mcp@latest"],
+      "cwd": "c:\\Users\\julia\\Documents\\repos\\pathfinder-ws\\reinvent-pathfinder",
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

@@ -1,0 +1,49 @@
+flowchart LR
+  business_business["Business"]
+  product_product["Product"]
+  tech_tech["Tech"]
+  delivery_delivery["Delivery"]
+  initiative_ini_001["INI-001 Fundación técnica del monorepo"]
+  candidate_WI_CANDIDATE_001["WI-CANDIDATE-001"]
+  candidate_WI_CANDIDATE_002["WI-CANDIDATE-002"]
+  candidate_WI_CANDIDATE_003["WI-CANDIDATE-003"]
+  initiative_ini_002["INI-002 Integración con AWS Events"]
+  initiative_ini_003["INI-003 Motor de conocimiento y recomendaciones"]
+  candidate_WI_CANDIDATE_004["WI-CANDIDATE-004"]
+  initiative_ini_004["INI-004 Experiencia Learning Path y reflexión"]
+  initiative_ini_005["INI-005 Cierre de ciclo y exposición"]
+  wi_WI_001["WI-001 Scaffolding del monorepo (pnpm workspace, estructura apps/services/ai/packages)"]
+  code_package_json["package.json"]
+  code_pnpm_workspace_yaml["pnpm-workspace.yaml"]
+  code_apps["apps/**"]
+  code_services["services/**"]
+  code_ai["ai/**"]
+  code_packages["packages/**"]
+
+  business_business -->|informs| product_product
+  product_product -->|informs| tech_tech
+  tech_tech -->|informs| delivery_delivery
+  candidate_WI_CANDIDATE_001 -->|belongs_to| initiative_ini_001
+  candidate_WI_CANDIDATE_001 -->|materialized_as| wi_WI_001
+  candidate_WI_CANDIDATE_002 -->|belongs_to| initiative_ini_001
+  candidate_WI_CANDIDATE_003 -->|belongs_to| initiative_ini_001
+  candidate_WI_CANDIDATE_001 -->|belongs_to| initiative_ini_002
+  candidate_WI_CANDIDATE_002 -->|belongs_to| initiative_ini_002
+  candidate_WI_CANDIDATE_003 -->|belongs_to| initiative_ini_002
+  candidate_WI_CANDIDATE_001 -->|belongs_to| initiative_ini_003
+  candidate_WI_CANDIDATE_002 -->|belongs_to| initiative_ini_003
+  candidate_WI_CANDIDATE_003 -->|belongs_to| initiative_ini_003
+  candidate_WI_CANDIDATE_004 -->|belongs_to| initiative_ini_003
+  candidate_WI_CANDIDATE_001 -->|belongs_to| initiative_ini_004
+  candidate_WI_CANDIDATE_002 -->|belongs_to| initiative_ini_004
+  candidate_WI_CANDIDATE_003 -->|belongs_to| initiative_ini_004
+  candidate_WI_CANDIDATE_001 -->|belongs_to| initiative_ini_005
+  candidate_WI_CANDIDATE_002 -->|belongs_to| initiative_ini_005
+  candidate_WI_CANDIDATE_003 -->|belongs_to| initiative_ini_005
+  wi_WI_001 -->|owns| code_package_json
+  wi_WI_001 -->|owns| code_pnpm_workspace_yaml
+  wi_WI_001 -->|owns| code_apps
+  wi_WI_001 -->|owns| code_services
+  wi_WI_001 -->|owns| code_ai
+  wi_WI_001 -->|owns| code_packages
+  wi_WI_001 -->|belongs_to| initiative_ini_001
