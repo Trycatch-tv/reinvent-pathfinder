@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-03T05:04:44.731Z",
+  "generatedAt": "2026-10-04T23:24:46.739Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -24,10 +24,137 @@
     "inventoryAvailable": true,
     "workItems": [],
     "activeWorkItems": [],
-    "completedWorkItems": [],
+    "completedWorkItems": [
+      {
+        "id": "WI-001",
+        "type": "chore",
+        "title": "Scaffolding del monorepo (pnpm workspace, estructura apps/services/ai/packages)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K1",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-002",
+        "type": "chore",
+        "title": "Tooling de calidad y CI (lint, typecheck, Vitest, pipeline de PR)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      }
+    ],
     "archivedWorkItems": [],
-    "allWorkItems": [],
-    "artifacts": []
+    "allWorkItems": [
+      {
+        "id": "WI-001",
+        "type": "chore",
+        "title": "Scaffolding del monorepo (pnpm workspace, estructura apps/services/ai/packages)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K1",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-002",
+        "type": "chore",
+        "title": "Tooling de calidad y CI (lint, typecheck, Vitest, pipeline de PR)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "WI-001",
+        "type": "chore",
+        "title": "Scaffolding del monorepo (pnpm workspace, estructura apps/services/ai/packages)",
+        "summary": "",
+        "codeGlobs": [
+          "package.json",
+          "pnpm-workspace.yaml",
+          "apps/**",
+          "services/**",
+          "ai/**",
+          "packages/**"
+        ]
+      },
+      {
+        "id": "WI-002",
+        "type": "chore",
+        "title": "Tooling de calidad y CI (lint, typecheck, Vitest, pipeline de PR)",
+        "summary": "",
+        "codeGlobs": [
+          "package.json",
+          "tsconfig.json",
+          "tsconfig.base.json",
+          "eslint.config.mjs",
+          "vitest.config.ts",
+          ".github/workflows/ci.yml"
+        ]
+      }
+    ]
   },
   "layers": [
     {
@@ -56,8 +183,15 @@
     },
     {
       "layer": "Delivery",
-      "status": "Partial",
+      "status": "Traceable",
       "detected": [
+        "INI-001-fundaci-n-t-cnica-del-monorepo.md",
+        "INI-002-integraci-n-con-aws-events.md",
+        "INI-003-motor-de-conocimiento-y-recomendaciones.md",
+        "INI-004-experiencia-learning-path-y-reflexi-n.md",
+        "INI-005-cierre-de-ciclo-y-exposici-n.md",
+        "WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
+        "WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md",
         "roadmap.md"
       ]
     }
@@ -84,9 +218,9 @@
       }
     },
     "delivery": {
-      "status": "Partial",
+      "status": "Traceable",
       "artifacts": {
-        "knowledge/delivery/roadmap.md": "placeholder"
+        "knowledge/delivery/roadmap.md": "useful"
       }
     }
   },
@@ -94,37 +228,37 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 0,
+    "materialized_work_items": 2,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 0,
+    "materialized": 2,
     "remaining": 0
   },
   "phase": {
-    "phase": "Planning",
+    "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "0 materialized work item(s)"
+      "2 materialized work item(s)",
+      "Ownership coverage 100%"
     ],
     "recommendedAgents": [
       "roadmap-agent"
     ],
-    "nextStep": "Run `kaddo context` to prepare the LLM context pack.",
+    "nextStep": "Use the roadmap-agent to plan the next initiative.",
     "llmInstructions": [
-      "Use the roadmap-agent.",
-      "Do not write code.",
-      "Generate roadmap candidates."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ]
   },
   "nextStepRecommendation": {
-    "id": "context",
-    "phase": "Discovery",
-    "label": "Run `kaddo context` to prepare the LLM context pack.",
-    "command": "kaddo context",
-    "reason": "No context pack has been generated yet."
+    "id": "plan-next",
+    "phase": "Maintenance",
+    "label": "Use the roadmap-agent to plan the next initiative.",
+    "agent": "roadmap-agent",
+    "reason": "No active Work Items and no remaining roadmap candidates."
   },
   "deliveryState": {
-    "phase": "Discovery",
+    "phase": "Maintenance",
     "draft_work_items": 0,
     "refined_draft_work_items": 0,
     "refined_draft_ids": [],
@@ -133,12 +267,12 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 0,
-    "ownership_coverage": "0/0",
+    "total_work_items": 2,
+    "ownership_coverage": "2/2",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
-    "adapters_installed": 0
+    "adapters_installed": 1
   },
   "techDecisions": {
     "status": "none",
@@ -187,34 +321,34 @@
     "version": "3.109.0",
     "agents": {
       "total": 20,
-      "installed": 11,
+      "installed": 20,
       "outdated": 0,
       "unknown_version": 0,
       "modified": 0
     },
     "skills": {
       "total": 10,
-      "installed": 9,
+      "installed": 10,
       "outdated": 0,
       "unknown_version": 0,
       "modified": 0
     }
   },
   "workItemSummary": {
-    "total": 0,
+    "total": 2,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 0,
+    "completed": 2,
     "archived": 0,
-    "summary": "none"
+    "summary": "completed-only"
   },
   "deliveryMix": {},
   "external": [],
   "graph": {
-    "generatedAt": "2026-10-03T05:04:40.757Z",
+    "generatedAt": "2026-10-03T06:00:22.556Z",
     "scope": "all",
     "scopeReason": "All supported Work Item statuses are included.",
     "includedStatuses": [
@@ -227,14 +361,14 @@
     "excludedStatuses": [
       "archived"
     ],
-    "nodes": 4,
-    "edges": 3,
+    "nodes": 20,
+    "edges": 27,
     "activeWorkItemsConnectedToCode": 0
   },
   "graphHints": {
     "scope": "all",
     "scopeReason": "All supported Work Item statuses are included.",
-    "quality": "empty",
+    "quality": "partial",
     "totalHints": 4,
     "activeWorkItemHints": 0,
     "messages": [
@@ -246,6 +380,7 @@
   },
   "skills": [
     "adr-writing",
+    "capsule-writing",
     "evidence-verification",
     "graph-metadata-review",
     "implementation-planning",
@@ -281,10 +416,10 @@
   },
   "projectRoute": {
     "type": "new",
-    "currentStep": "materialize-work-item",
-    "completed": 6,
+    "currentStep": "create-work-source",
+    "completed": 10,
     "total": 12,
-    "progressPercent": 50,
+    "progressPercent": 83,
     "steps": [
       {
         "id": "enable-kaddo",
@@ -330,30 +465,34 @@
       {
         "id": "create-work-source",
         "label": "Create initial work source",
-        "status": "done",
+        "status": "warning",
         "evidence": [
-          "knowledge/delivery/roadmap.md"
-        ]
+          "Work Items with unknown source"
+        ],
+        "reason": "Some Work Items have no source metadata."
       },
       {
         "id": "materialize-work-item",
         "label": "Create first Work Item",
-        "status": "pending"
+        "status": "done",
+        "evidence": [
+          "knowledge/delivery/work-items/"
+        ]
       },
       {
         "id": "refine-work-item",
         "label": "Refine Work Item",
-        "status": "pending"
+        "status": "done"
       },
       {
         "id": "suggest-ownership",
         "label": "Suggest ownership",
-        "status": "pending"
+        "status": "done"
       },
       {
         "id": "prepare-implementation",
         "label": "Prepare implementation",
-        "status": "pending"
+        "status": "done"
       },
       {
         "id": "run-guard",
@@ -363,8 +502,7 @@
       {
         "id": "capture-learning",
         "label": "Capture learning",
-        "status": "optional",
-        "reason": "Project is still in early discovery."
+        "status": "done"
       }
     ]
   },
@@ -386,24 +524,46 @@
     "healthy": 5,
     "drifted": 1
   },
-  "mappedModules": [],
-  "moduleStatuses": {},
+  "mappedModules": [
+    {
+      "id": "reinvent-pathfinder",
+      "repoPath": ".",
+      "capabilities": [],
+      "code": [],
+      "artifacts": {
+        "moduleDesign": false,
+        "stack": false,
+        "security": false,
+        "standards": false,
+        "diagrams": false,
+        "adrs": false
+      }
+    }
+  ],
+  "moduleStatuses": {
+    "reinvent-pathfinder": {
+      "status": "invalid",
+      "configured": true,
+      "role": "core",
+      "moduleContext": false,
+      "currentState": false,
+      "codebase": false,
+      "warning": "Repository has Kaddo configured but project.role is not module."
+    }
+  },
   "affectedModuleContexts": {},
   "isModuleRepo": false,
-  "missing": [
-    "No work items found."
-  ],
+  "missing": [],
   "handoff": {
     "recommendedAgents": [
       "roadmap-agent"
     ],
     "nextSteps": [
-      "Run `kaddo context` to prepare the LLM context pack."
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "instructions": [
-      "Use the roadmap-agent.",
-      "Do not write code.",
-      "Generate roadmap candidates."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "operatingRules": [
       "**Never run `git commit`, `git push` or `git merge` without explicit human confirmation.**",

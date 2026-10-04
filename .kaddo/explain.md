@@ -84,16 +84,17 @@ Affected modules: reinvent-pathfinder
 
 ## Knowledge Graph
 - Scope: all
-- Nodes: 4
-- Edges: 3
-- Quality: empty
+- Nodes: 20
+- Edges: 27
+- Quality: partial
 - Hints: 4
 - Reason: All supported Work Item statuses are included.
-- Last exported: 2026-10-03T05:04:40.757Z
+- Last exported: 2026-10-03T06:00:22.556Z
 
-## Skills installed: 9
+## Skills installed: 10
 Groups:
 - delivery: 5
+- integration: 1
 - tech: 4
 
 ## Project Route
@@ -150,8 +151,8 @@ Discovery:
 
 ## Installed Assets
 - CLI version: 3.109.0
-- Agents: 11 installed
-- Skills: 9 installed
+- Agents: 20 installed
+- Skills: 10 installed
 
 ## Metadata Health
 - `knowledge/delivery/roadmap.md`: Missing `generated_by` in frontmatter.

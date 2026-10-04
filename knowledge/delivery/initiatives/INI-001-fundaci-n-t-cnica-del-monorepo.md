@@ -24,6 +24,7 @@ candidates:
     type: chore
     suggested_knowledge_level: K2
     expected_value: Garantiza trazabilidad y calidad desde el primer PR.
+    materialized_as: WI-002
   - id: WI-CANDIDATE-003
     title: Modelo de dominio base en packages/domain
     type: feature

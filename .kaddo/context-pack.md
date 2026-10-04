@@ -20,42 +20,46 @@
 
 ## Current Phase
 
-Phase: Planning
+Phase: Maintenance
 
 Reason:
 
 - Roadmap available
-- 0 materialized work item(s)
+- 2 materialized work item(s)
+- Ownership coverage 100%
 
 Recommended next: roadmap-agent
 
-Next step: Run `kaddo context` to prepare the LLM context pack.
+Next step: Use the roadmap-agent to plan the next initiative.
 
 ## Delivery State
 
-- Phase: Discovery
+- Phase: Maintenance
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 0/0
+- Ownership coverage: 2/2
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Run `kaddo context` to prepare the LLM context pack.
-  - id: context
-  - reason: No context pack has been generated yet.
-  - command: `kaddo context`
+- Use the roadmap-agent to plan the next initiative.
+  - id: plan-next
+  - reason: No active Work Items and no remaining roadmap candidates.
+  - agent: roadmap-agent
 
 ## Project Route
 
-Route: new · Progress: 6/12
+Route: new · Progress: 10/12
+
+Warnings:
+- Create initial work source — Some Work Items have no source metadata.
 
 ## Knowledge Layers
 
 Project knowledge is organized in four layers: **Business → Product → Tech → Delivery**.
 
-Knowledge maturity — Business: Consolidated · Product: Structured · Tech: Structured · Delivery: Partial
+Knowledge maturity — Business: Consolidated · Product: Structured · Tech: Structured · Delivery: Traceable
 
 ### Business — Consolidated
 - ✓ business.md
@@ -69,7 +73,14 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ current-state.md
 - ✓ knowledge.md
 
-### Delivery — Partial
+### Delivery — Traceable
+- ✓ INI-001-fundaci-n-t-cnica-del-monorepo.md
+- ✓ INI-002-integraci-n-con-aws-events.md
+- ✓ INI-003-motor-de-conocimiento-y-recomendaciones.md
+- ✓ INI-004-experiencia-learning-path-y-reflexi-n.md
+- ✓ INI-005-cierre-de-ciclo-y-exposici-n.md
+- ✓ WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md
+- ✓ WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -90,7 +101,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 0
+- Materialized Work Items: 2
 - Remaining Work Item candidates: 0
 
 > What we intend to build and why.
@@ -101,15 +112,30 @@ No active work items found.
 
 ## Artifacts and Ownership
 
-No artifacts declare code ownership yet.
+- WI-001 [chore] owns: package.json, pnpm-workspace.yaml, apps/**, services/**, ai/**, packages/**
+- WI-002 [chore] owns: package.json, tsconfig.json, tsconfig.base.json, eslint.config.mjs, vitest.config.ts, .github/workflows/ci.yml
+
+## Mapped Modules
+
+This project has mapped modules registered in `.kaddo/modules.yml`.
+
+| Module | Type | Repo path | Owner | Capabilities | Artifacts |
+|---|---|---|---|---|---|
+| reinvent-pathfinder | — | . | — | — | none |
+
+Note: Kaddo does not scan secondary repositories during `context`. Mapped modules come from `.kaddo/modules.yml` and module artifacts only.
+
+### Module Warnings
+
+- **reinvent-pathfinder** (invalid): Repository has Kaddo configured but project.role is not module.
 
 ## Knowledge Graph
 
 - Available: yes
 - Scope: all
-- Nodes: 4
-- Edges: 3
-- Quality: empty
+- Nodes: 20
+- Edges: 27
+- Quality: partial
 - Active Work Items connected to code: 0
 - Reason: All supported Work Item statuses are included.
 
@@ -117,7 +143,7 @@ Full graph: `.kaddo/graph.json` / `.kaddo/graph.mmd` (run `kaddo graph export` t
 
 ## Graph Hints
 
-Graph relationship quality: empty
+Graph relationship quality: partial
 Active hints: 0
 Suggested agent: graph-agent
 
@@ -132,6 +158,7 @@ Suggested agent: graph-agent
 Available reusable skills (agents apply these; content is not inlined):
 
 - adr-writing
+- capsule-writing
 - evidence-verification
 - graph-metadata-review
 - implementation-planning
@@ -145,7 +172,7 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Missing Context
 
-- No work items found.
+_None — all expected context is present._
 
 
 ### Metadata Health
@@ -156,16 +183,15 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Planning** phase:
+Recommended next for the **Maintenance** phase:
 
 1. roadmap-agent
 
 Next step:
 
-- Run `kaddo context` to prepare the LLM context pack.
+- Use the roadmap-agent to plan the next initiative.
 
 ## Instructions for the LLM
 
-- Use the roadmap-agent.
-- Do not write code.
-- Generate roadmap candidates.
+- No active work.
+- Use the roadmap-agent to plan the next initiative.

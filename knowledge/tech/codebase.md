@@ -466,20 +466,37 @@ El deployment debe ocurrir desde pipeline y no depender de credenciales permanen
 
 ## Open questions
 
-- [open] **Topología de agentes.** Definir si el MVP tendrá un único `Pathfinder Agent` o una agrupación de máximo tres agentes. Evitar un agente por capacidad.
-- [open] **Agrupación propuesta de agentes.** Evaluar una división como `Knowledge Agent`, `Recommendation/Journey Agent` y `Event Experience Agent`.
-- [open] **IaC del bloque agentic.** Confirmar si `Amazon Bedrock AgentCore` se desplegará principalmente mediante `agentcore deploy`, CDK, SAM o una combinación. El bloque tradicional continuará con Serverless Framework.
-- [open] **Límite entre Lambda y AgentCore.** Definir qué operaciones pertenecen a `services/api` y cuáles se ejecutan directamente dentro del agent runtime.
-- [open] **Autenticación del backend de Pathfinder.** Definir cómo proteger endpoints con costo de Bedrock sin reutilizar indebidamente el access token de AWS Events.
-- [open] **Modelo de identidad.** Definir cómo correlacionar un journey persistido en DynamoDB con un usuario sin aumentar innecesariamente el alcance de autenticación.
-- [open] **Modelo DynamoDB.** Definir partition/sort keys y si se utilizará single-table design o tablas separadas.
-- [open] **Persistencia del catálogo.** Definir qué parte del catálogo vive únicamente en cache local, qué parte se almacena en DynamoDB y qué parte solo se representa en Managed Knowledge Bases.
-- [open] **Ingesta de Managed Knowledge Bases.** Definir formato de documentos, metadata, frecuencia de sincronización y mecanismo de actualización desde AWS Events API.
-- [open] **Candidate Filtering vs semantic retrieval.** Definir en qué orden y con qué señales se combinan filtros determinísticos, KB retrieval y ranking de Bedrock.
-- [open] **Modelo Bedrock.** Seleccionar el modelo inicial con base en calidad, latencia y costo; mantenerlo configurable.
-- [open] **Distribución local.** Definir si el MVP se ejecutará con `pnpm dev`, un launcher tipo `npx reinvent-pathfinder`, o una app desktop.
-- [open] **Public site.** Definir si `apps/site` será una aplicación separada o una vista pública dentro del mismo frontend.
-- [open] **Retención de datos.** Definir cuánto tiempo se conservarán journeys, profiles, reflections y recommendations.
-- [open] **Observabilidad de producto.** Definir eventos permitidos sin registrar información privada del proyecto del usuario.
-- [open] **Optimización logística.** Validar si los datos de venue disponibles permiten calcular una señal útil de desplazamiento.
-- [open] **Learning Report.** Definir si entra en el MVP del hackathon o queda como extensión post-event.
+- [resolved] **Topología de agentes.** Se define una topología de exactamente 2 agentes para el MVP.
+  - note: Se dividen las tareas en 2 agentes especializados (Knowledge Agent y Journey/Recommendation Agent) para evitar sobrecomplejidad sin concentrar todo en un único agente.
+- [resolved] **Agrupación propuesta de agentes.** Agrupación en 2 agentes: un agente enfocado en el conocimiento y catálogo (`Knowledge Agent`), y un segundo agente enfocado en la experiencia, recomendaciones y jornada del asistente (`Journey & Recommendation Agent`).
+  - note: Decisión alineada con la topología de 2 agentes para el MVP.
+- [resolved] **IaC del bloque agentic.** Confirmado: `Amazon Bedrock AgentCore` se desplegará mediante `agentcore deploy` para el bloque agentic, mientras que el bloque tradicional continuará con Serverless Framework.
+  - note: Separación limpia entre el ciclo de vida del agente y la infraestructura serverless convencional.
+- [assumed] **Límite entre Lambda y AgentCore.** Definir qué operaciones pertenecen a `services/api` y cuáles se ejecutan directamente dentro del agent runtime.
+  - note: `services/api` (Lambda) gestiona endpoints CRUD determinísticos y agregaciones rápidas; AgentCore ejecuta la orquestación semántica, el razonamiento de recomendaciones y las tools de Bedrock.
+- [assumed] **Autenticación del backend de Pathfinder.** Definir cómo proteger endpoints con costo de Bedrock sin reutilizar indebidamente el access token de AWS Events.
+  - note: En el MVP local los tokens de AWS Builder ID residen en memoria del cliente; los endpoints de Pathfinder se protegen con headers de sesión local / API key sin propagar credenciales externas.
+- [assumed] **Modelo de identidad.** Definir cómo correlacionar un journey persistido en DynamoDB con un usuario sin aumentar innecesariamente el alcance de autenticación.
+  - note: Se utiliza un UUID de perfil anónimo / identificador de dispositivo local para correlacionar el journey en DynamoDB, manteniendo la privacidad del asistente.
+- [assumed] **Modelo DynamoDB.** Definir partition/sort keys y si se utilizará single-table design o tablas separadas.
+  - note: Single-table design (`PK` = entity type + id, `SK` = sub-resource o timestamp) para journeys, reflexiones y perfiles de conocimiento.
+- [assumed] **Persistencia del catálogo.** Definir qué parte del catálogo vive únicamente en cache local, qué parte se almacena en DynamoDB y qué parte solo se representa en Managed Knowledge Bases.
+  - note: El catálogo crudo se cachea localmente para velocidad; las sesiones indexadas semánticamente se representan en Bedrock Knowledge Bases; DynamoDB almacena únicamente el estado y personalización del usuario.
+- [assumed] **Ingesta de Managed Knowledge Bases.** Definir formato de documentos, metadata, frecuencia de sincronización y mecanismo de actualización desde AWS Events API.
+  - note: Ingesta batch en JSON estructurado por sesión (con metadata de track, nivel, formato y venue) exportado a S3 como data source de Bedrock Knowledge Base.
+- [assumed] **Candidate Filtering vs semantic retrieval.** Definir en qué orden y con qué señales se combinan filtros determinísticos, KB retrieval y ranking de Bedrock.
+  - note: 1º Filtro determinístico (horario, conflictos de agenda, venue); 2º Retrieval semántico en Bedrock KB basado en Knowledge Gaps; 3º Re-ranking explicable final con Bedrock.
+- [assumed] **Modelo Bedrock.** Seleccionar el modelo inicial con base en calidad, latencia y costo; mantenerlo configurable.
+  - note: Modelo base Claude 3.5 Sonnet / Haiku en Bedrock con identificador parametrizable mediante variables de entorno.
+- [resolved] **Distribución local.** Confirmado: ejecución local mediante `pnpm dev` en el monorepo para el MVP.
+  - note: Desarrollo local estándar y rápido sin empaquetado de distribución adicional durante el hackathon.
+- [assumed] **Public site.** Definir si `apps/site` será una aplicación separada o una vista pública dentro del mismo frontend.
+  - note: Para el MVP se inicia como ruta/vista pública accesible dentro del mismo frontend (`apps/desktop` o web SPA) para maximizar reutilización de componentes.
+- [assumed] **Retención de datos.** Definir cuánto tiempo se conservarán journeys, profiles, reflections y recommendations.
+  - note: TTL de 30 días en DynamoDB para datos temporales de la conferencia.
+- [assumed] **Observabilidad de producto.** Definir eventos permitidos sin registrar información privada del proyecto del usuario.
+  - note: Métricas anonimizadas en CloudWatch (latencia de Bedrock, número de sesiones recomendadas, conteo de reflexiones) sin almacenar descripciones de proyectos privados.
+- [assumed] **Optimización logística.** Validar si los datos de venue disponibles permiten calcular una señal útil de desplazamiento.
+  - note: Considerar tiempo de traslado entre venues como penalización en el filtro determinístico cuando la información de sala/hotel esté disponible.
+- [resolved] **Learning Report.** Confirmado: se mantiene dentro del alcance del MVP del hackathon.
+  - note: Esencial para cerrar el ciclo completo de valor del participante: antes (contexto/gaps), durante (reflexión/re-ranking) y después (síntesis de aprendizaje y reporte de valor post-evento).

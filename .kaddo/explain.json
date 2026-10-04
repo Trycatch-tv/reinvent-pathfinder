@@ -88,7 +88,7 @@
   "duplicateWorkItems": [],
   "externalCapsules": [],
   "graph": {
-    "generatedAt": "2026-10-03T05:04:40.757Z",
+    "generatedAt": "2026-10-03T06:00:22.556Z",
     "scope": "all",
     "scopeReason": "All supported Work Item statuses are included.",
     "includedStatuses": [
@@ -101,14 +101,14 @@
     "excludedStatuses": [
       "archived"
     ],
-    "nodes": 4,
-    "edges": 3,
+    "nodes": 20,
+    "edges": 27,
     "activeWorkItemsConnectedToCode": 0
   },
   "graphHints": {
     "scope": "all",
     "scopeReason": "All supported Work Item statuses are included.",
-    "quality": "empty",
+    "quality": "partial",
     "totalHints": 4,
     "activeWorkItemHints": 0,
     "messages": [
@@ -119,9 +119,10 @@
     ]
   },
   "skills": {
-    "total": 9,
+    "total": 10,
     "byGroup": {
       "tech": 4,
+      "integration": 1,
       "delivery": 5
     }
   },
@@ -243,9 +244,9 @@
     "version": "3.109.0",
     "agents": {
       "total": 20,
-      "up_to_date": 11,
+      "up_to_date": 20,
       "outdated": 0,
-      "missing": 9,
+      "missing": 0,
       "unknown_version": 0,
       "modified": 0,
       "items": [
@@ -274,8 +275,8 @@
           "name": "legacy-agent",
           "path": "knowledge/agents/utilities/legacy-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "adr-agent",
@@ -295,36 +296,36 @@
           "name": "git-strategy-agent",
           "path": "knowledge/agents/delivery/git-strategy-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "security-agent",
           "path": "knowledge/agents/tech/security-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "standards-agent",
           "path": "knowledge/agents/tech/standards-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "stack-agent",
           "path": "knowledge/agents/tech/stack-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "module-design-agent",
           "path": "knowledge/agents/tech/module-design-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "module-context-agent",
@@ -372,30 +373,30 @@
           "name": "ownership-agent",
           "path": "knowledge/agents/delivery/ownership-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "capsule-agent",
           "path": "knowledge/agents/tech/capsule-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "graph-agent",
           "path": "knowledge/agents/tech/graph-agent.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         }
       ]
     },
     "skills": {
       "total": 10,
-      "up_to_date": 9,
+      "up_to_date": 10,
       "outdated": 0,
-      "missing": 1,
+      "missing": 0,
       "unknown_version": 0,
       "modified": 0,
       "items": [
@@ -431,8 +432,8 @@
           "name": "capsule-writing",
           "path": "knowledge/skills/capsule-writing/skill.md",
           "available": "3.109.0",
-          "installed": null,
-          "state": "missing"
+          "installed": "3.109.0",
+          "state": "up-to-date"
         },
         {
           "name": "learning-capture",
