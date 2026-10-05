@@ -1,7 +1,6 @@
 import {
   validateAnalyzeContextRequest,
   type AnalyzeContextRequest,
-  type AnalyzeContextResponse,
 } from '@pathfinder/contracts';
 import {
   HeuristicContextAnalyzer,
@@ -31,7 +30,7 @@ export class ContextAnalyzeHandler {
     );
   }
 
-  public async handle(request: ApiRequest): Promise<ApiResponse<AnalyzeContextResponse>> {
+  public async handle(request: ApiRequest): Promise<ApiResponse> {
     const corsHeaders = {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
