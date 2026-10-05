@@ -26,3 +26,10 @@ export class AwsEventsNotFoundError extends AwsEventsError {
     this.name = 'AwsEventsNotFoundError';
   }
 }
+
+export class AwsEventsUnauthorizedError extends AwsEventsError {
+  constructor(message = 'Authentication required. No valid access token provided.') {
+    super(message, 401, false);
+    this.name = 'AwsEventsUnauthorizedError';
+  }
+}

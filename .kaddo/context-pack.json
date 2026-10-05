@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-05T01:09:52.600Z",
+  "generatedAt": "2026-10-05T01:18:17.796Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -144,6 +144,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-006",
+        "type": "feature",
+        "title": "Agenda personal: GetSchedule, favoritos y detección de conflictos",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "integration"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -267,6 +291,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-006",
+        "type": "feature",
+        "title": "Agenda personal: GetSchedule, favoritos y detección de conflictos",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "integration"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -324,6 +372,15 @@
         "codeGlobs": [
           "packages/events-client/**"
         ]
+      },
+      {
+        "id": "WI-006",
+        "type": "feature",
+        "title": "Agenda personal: GetSchedule, favoritos y detección de conflictos",
+        "summary": "",
+        "codeGlobs": [
+          "packages/events-client/**"
+        ]
       }
     ]
   },
@@ -366,6 +423,7 @@
         "WI-003-modelo-de-dominio-base-en-packages-domain.md",
         "WI-004-events-client-adapter-base-de-aws-events-rest-api-.md",
         "WI-005-autenticaci-n-oauth-2-0-pkce-con-aws-builder-id-ca.md",
+        "WI-006-agenda-personal-getschedule-favoritos-y-detecci-n-.md",
         "roadmap.md"
       ]
     }
@@ -402,17 +460,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 5,
+    "materialized_work_items": 6,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 5,
+    "materialized": 6,
     "remaining": 0
   },
   "phase": {
     "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "5 materialized work item(s)",
+      "6 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
@@ -441,8 +499,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 5,
-    "ownership_coverage": "5/5",
+    "total_work_items": 6,
+    "ownership_coverage": "6/6",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -509,13 +567,13 @@
     }
   },
   "workItemSummary": {
-    "total": 5,
+    "total": 6,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 5,
+    "completed": 6,
     "archived": 0,
     "summary": "completed-only"
   },

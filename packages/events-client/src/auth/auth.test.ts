@@ -46,8 +46,8 @@ describe('OAuth 2.0 + PKCE with AWS Builder ID', () => {
       });
 
       const url = new URL(urlString);
-      expect(url.origin).toBe('https://oidc.signin.aws');
-      expect(url.pathname).toBe('/v1/authorize');
+      expect(url.origin).toBe('https://oauth.awsevents.com');
+      expect(url.pathname).toBe('/oauth2/authorize');
       expect(url.searchParams.get('response_type')).toBe('code');
       expect(url.searchParams.get('client_id')).toBe('test-client-123');
       expect(url.searchParams.get('redirect_uri')).toBe('http://localhost:3000/callback');
@@ -192,7 +192,7 @@ describe('OAuth 2.0 + PKCE with AWS Builder ID', () => {
 
       // Verify request payload
       const [calledUrl, calledInit] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(calledUrl).toBe('https://oidc.signin.aws/v1/token');
+      expect(calledUrl).toBe('https://oauth.awsevents.com/oauth2/token');
       expect(calledInit.method).toBe('POST');
       expect(calledInit.body?.toString()).toContain('grant_type=authorization_code');
       expect(calledInit.body?.toString()).toContain('code_verifier=my-verifier');

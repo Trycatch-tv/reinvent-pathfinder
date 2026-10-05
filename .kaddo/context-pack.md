@@ -25,7 +25,7 @@ Phase: Maintenance
 Reason:
 
 - Roadmap available
-- 5 materialized work item(s)
+- 6 materialized work item(s)
 - Ownership coverage 100%
 
 Recommended next: roadmap-agent
@@ -38,7 +38,7 @@ Next step: Use the roadmap-agent to plan the next initiative.
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 5/5
+- Ownership coverage: 6/6
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -84,6 +84,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-003-modelo-de-dominio-base-en-packages-domain.md
 - ✓ WI-004-events-client-adapter-base-de-aws-events-rest-api-.md
 - ✓ WI-005-autenticaci-n-oauth-2-0-pkce-con-aws-builder-id-ca.md
+- ✓ WI-006-agenda-personal-getschedule-favoritos-y-detecci-n-.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -104,7 +105,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 5
+- Materialized Work Items: 6
 - Remaining Work Item candidates: 0
 
 > What we intend to build and why.
@@ -120,6 +121,7 @@ No active work items found.
 - WI-003 [feature] owns: packages/domain/**
 - WI-004 [feature] owns: packages/events-client/**
 - WI-005 [feature] owns: packages/events-client/**
+- WI-006 [feature] owns: packages/events-client/**
 
 ## Mapped Modules
 

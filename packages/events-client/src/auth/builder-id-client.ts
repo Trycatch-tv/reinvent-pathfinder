@@ -10,8 +10,8 @@ import { AwsEventsError } from '../types/errors.js';
 export interface AwsBuilderIdAuthClientOptions {
   readonly tokenEndpoint?: string;
   readonly authorizationEndpoint?: string;
-  readonly clientId: string;
-  readonly redirectUri: string;
+  readonly clientId?: string;
+  readonly redirectUri?: string;
   readonly defaultScope?: string;
   readonly mockMode?: boolean;
   readonly tokenStore?: TokenStore;
@@ -42,19 +42,19 @@ interface RawTokenResponse {
 
 export class AwsBuilderIdAuthClient {
   private readonly tokenEndpoint: string;
-  private readonly authorizationEndpoint?: string;
+  private readonly authorizationEndpoint: string;
   private readonly clientId: string;
   private readonly redirectUri: string;
   private readonly defaultScope: string;
   private readonly mockMode: boolean;
   private readonly tokenStore: TokenStore;
 
-  constructor(options: AwsBuilderIdAuthClientOptions) {
-    this.tokenEndpoint = options.tokenEndpoint ?? 'https://oidc.signin.aws/v1/token';
-    this.authorizationEndpoint = options.authorizationEndpoint;
-    this.clientId = options.clientId;
-    this.redirectUri = options.redirectUri;
-    this.defaultScope = options.defaultScope ?? 'openid email profile aws.events:read';
+  constructor(options: AwsBuilderIdAuthClientOptions = {}) {
+    this.tokenEndpoint = options.tokenEndpoint ?? 'https://oauth.awsevents.com/oauth2/token';
+    this.authorizationEndpoint = options.authorizationEndpoint ?? 'https://oauth.awsevents.com/oauth2/authorize';
+    this.clientId = options.clientId ?? '7vmom55m1qstvq8i71ph127bfq';
+    this.redirectUri = options.redirectUri ?? 'http://localhost:8484/callback';
+    this.defaultScope = options.defaultScope ?? 'openid email events/access';
     this.mockMode = options.mockMode ?? false;
     this.tokenStore = options.tokenStore ?? new InMemoryTokenStore();
   }

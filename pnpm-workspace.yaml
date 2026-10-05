@@ -3,3 +3,5 @@ packages:
   - 'services/*'
   - 'ai/*'
   - 'packages/*'
+allowBuilds:
+  esbuild: true
