@@ -192,13 +192,24 @@ importers:
 
   ai/contracts: {}
 
-  ai/knowledge: {}
+  ai/knowledge:
+    dependencies:
+      '@pathfinder/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@pathfinder/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
 
   ai/tools: {}
 
   apps/client: {}
 
-  packages/contracts: {}
+  packages/contracts:
+    dependencies:
+      '@pathfinder/domain':
+        specifier: workspace:*
+        version: link:../domain
 
   packages/data: {}
 
@@ -212,7 +223,17 @@ importers:
 
   packages/shared: {}
 
-  services/api: {}
+  services/api:
+    dependencies:
+      '@pathfinder/ai-knowledge':
+        specifier: workspace:*
+        version: link:../../ai/knowledge
+      '@pathfinder/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@pathfinder/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
 
 packages:
 

@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-05T01:18:17.796Z",
+  "generatedAt": "2026-10-05T02:19:26.483Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -168,6 +168,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-007",
+        "type": "feature",
+        "title": "Análisis de contexto → Knowledge Profile + Knowledge Gaps",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "knowledge"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -315,6 +339,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-007",
+        "type": "feature",
+        "title": "Análisis de contexto → Knowledge Profile + Knowledge Gaps",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "knowledge"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -381,6 +429,17 @@
         "codeGlobs": [
           "packages/events-client/**"
         ]
+      },
+      {
+        "id": "WI-007",
+        "type": "feature",
+        "title": "Análisis de contexto → Knowledge Profile + Knowledge Gaps",
+        "summary": "",
+        "codeGlobs": [
+          "packages/contracts/**",
+          "ai/knowledge/**",
+          "services/api/**"
+        ]
       }
     ]
   },
@@ -424,6 +483,7 @@
         "WI-004-events-client-adapter-base-de-aws-events-rest-api-.md",
         "WI-005-autenticaci-n-oauth-2-0-pkce-con-aws-builder-id-ca.md",
         "WI-006-agenda-personal-getschedule-favoritos-y-detecci-n-.md",
+        "WI-007-an-lisis-de-contexto-knowledge-profile-knowledge-g.md",
         "roadmap.md"
       ]
     }
@@ -460,17 +520,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 6,
+    "materialized_work_items": 7,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 6,
+    "materialized": 7,
     "remaining": 0
   },
   "phase": {
     "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "6 materialized work item(s)",
+      "7 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
@@ -499,8 +559,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 6,
-    "ownership_coverage": "6/6",
+    "total_work_items": 7,
+    "ownership_coverage": "7/7",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -567,13 +627,13 @@
     }
   },
   "workItemSummary": {
-    "total": 6,
+    "total": 7,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 6,
+    "completed": 7,
     "archived": 0,
     "summary": "completed-only"
   },

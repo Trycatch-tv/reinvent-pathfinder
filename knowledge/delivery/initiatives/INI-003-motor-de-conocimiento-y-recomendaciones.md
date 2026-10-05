@@ -2,7 +2,7 @@
 type: initiative
 id: INI-003
 title: Motor de conocimiento y recomendaciones
-status: planned
+status: in-progress
 knowledge_level: K2
 domains:
   - ai
@@ -19,6 +19,7 @@ candidates:
     expected_value: >-
       Primera rebanada de valor de producto (Journey 1): del contexto al perfil
       con gaps revisables.
+    materialized_as: WI-007
   - id: WI-CANDIDATE-002
     title: Ingesta semántica del catálogo a Amazon Bedrock Managed Knowledge Bases
     type: feature
