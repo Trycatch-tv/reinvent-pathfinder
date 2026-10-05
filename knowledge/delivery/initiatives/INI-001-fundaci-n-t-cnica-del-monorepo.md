@@ -42,36 +42,48 @@ completed_at: '2026-10-05'
 
 ## Goal
 
-_What outcome does this Initiative pursue?_
+Establecer las bases estructurales, de calidad, tooling de CI y el modelo conceptual de dominio puro que sustentan el desarrollo ágil de Pathfinder para el hackathon.
 
 ## Expected Value
 
-_Why it matters._
+Garantiza un entorno de desarrollo estructurado y predecible, con verificación automática de calidad desde el primer commit y un modelo de dominio fuertemente tipado e independiente de los servicios de AWS.
 
 ## Scope
 
-_What this Initiative covers._
+- Scaffolding de monorepo con `pnpm workspace` (`apps/*`, `services/*`, `ai/*`, `packages/*`).
+- Configuración de TypeScript (`tsconfig.base.json` y project references).
+- Tooling de calidad unificado: ESLint 9 (flat config), Vitest 5 y scripts en `package.json`.
+- Pipeline de integración continua (CI) en GitHub Actions (`.github/workflows/ci.yml`).
+- Modelo de dominio agnóstico de AWS en `packages/domain`: entidades (`ProjectContext`, `KnowledgeProfile`, `KnowledgeGap`, `SessionCandidate`, `SessionRecommendation`, `LearningPath`, `Reflection`, `ScheduleConflict`, `AttendeeJourney`), lógica de transiciones puras y pruebas unitarias.
 
 ## Out of Scope
 
-_What it explicitly does not cover._
+- Implementación del adapter de AWS Events REST API (alcance de **INI-002**).
+- Infraestructura de backend en AWS Lambda / DynamoDB (alcance de **INI-002/003**).
+- Runtime de agentes en Amazon Bedrock AgentCore (alcance de **INI-003**).
+- Interfaces de usuario en React/Vite (alcance de **INI-004**).
 
 ## Success Criteria
 
-_Observable outcomes that define completion (not just "all Work Items done")._
+- [x] El monorepo contiene los paquetes workspace estructurados y reconocidos por pnpm.
+- [x] `pnpm lint`, `pnpm typecheck` y `pnpm test` se ejecutan localmente con código de salida 0.
+- [x] El pipeline `.github/workflows/ci.yml` ejecuta las validaciones en pull requests y pushes a `main`.
+- [x] `packages/domain` expone todas las entidades y funciones de dominio sin dependencias externas de AWS y con pruebas unitarias pasando al 100%.
 
 ## Dependencies
 
-_Other Initiatives, modules, or external work this depends on._
+- Ninguna dependencia técnica previa; es la iniciativa fundacional.
 
 ## Work Item Candidates
 
-_Candidates live in frontmatter `candidates`; summarize them here as they evolve._
+- `WI-CANDIDATE-001` → **WI-001**: Scaffolding del monorepo (completado).
+- `WI-CANDIDATE-002` → **WI-002**: Tooling de calidad y CI (completado).
+- `WI-CANDIDATE-003` → **WI-003**: Modelo de dominio base en packages/domain (completado).
 
 ## Open Questions
 
-_Unresolved questions for this Initiative._
+- Las preguntas abiertas de arquitectura e infraestructura relacionadas con el MVP fueron formalizadas como `[resolved]` o `[assumed]` en `knowledge/tech/codebase.md`.
 
 ## Learning
 
-_Captured on completion: what was delivered, what stayed out of scope, outcome reached._
+Se completó la fundación técnica con éxito, logrando un monorepo ESM puro con TypeScript strict, project references, suite de tests en Vitest, pipeline de CI en GitHub Actions y un modelo de dominio conceptual robusto y desacoplado, listo para ser consumido por el cliente de eventos y el runtime de agentes.

@@ -25,7 +25,7 @@ Phase: Maintenance
 Reason:
 
 - Roadmap available
-- 3 materialized work item(s)
+- 4 materialized work item(s)
 - Ownership coverage 100%
 
 Recommended next: roadmap-agent
@@ -38,7 +38,7 @@ Next step: Use the roadmap-agent to plan the next initiative.
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 3/3
+- Ownership coverage: 4/4
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -82,6 +82,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md
 - ✓ WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md
 - ✓ WI-003-modelo-de-dominio-base-en-packages-domain.md
+- ✓ WI-004-events-client-adapter-base-de-aws-events-rest-api-.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -102,7 +103,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 3
+- Materialized Work Items: 4
 - Remaining Work Item candidates: 0
 
 > What we intend to build and why.
@@ -116,6 +117,7 @@ No active work items found.
 - WI-001 [chore] owns: package.json, pnpm-workspace.yaml, apps/**, services/**, ai/**, packages/**
 - WI-002 [chore] owns: package.json, tsconfig.json, tsconfig.base.json, eslint.config.mjs, vitest.config.ts, .github/workflows/ci.yml
 - WI-003 [feature] owns: packages/domain/**
+- WI-004 [feature] owns: packages/events-client/**
 
 ## Mapped Modules
 

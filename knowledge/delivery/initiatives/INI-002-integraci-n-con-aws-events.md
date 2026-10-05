@@ -2,7 +2,7 @@
 type: initiative
 id: INI-002
 title: Integración con AWS Events
-status: planned
+status: in-progress
 knowledge_level: K2
 domains:
   - aws-events
@@ -20,6 +20,7 @@ candidates:
     expected_value: >-
       Adapter TypeScript que encapsula catalog, paginación, normalización,
       errores y retry/throttling. Fuente de verdad del catálogo.
+    materialized_as: WI-004
   - id: WI-CANDIDATE-002
     title: Autenticación OAuth 2.0 + PKCE con AWS Builder ID (callback local)
     type: feature
