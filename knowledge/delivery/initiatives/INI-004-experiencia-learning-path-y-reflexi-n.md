@@ -2,7 +2,7 @@
 type: initiative
 id: INI-004
 title: Experiencia Learning Path y reflexión
-status: planned
+status: in-progress
 knowledge_level: K2
 domains:
   - experience
@@ -18,6 +18,7 @@ candidates:
     expected_value: >-
       Experiencia local-first para capturar contexto y revisar/editar perfil y
       gaps.
+    materialized_as: WI-011
   - id: WI-CANDIDATE-002
     title: >-
       Construcción y visualización del Learning Path (con reconciliación de
