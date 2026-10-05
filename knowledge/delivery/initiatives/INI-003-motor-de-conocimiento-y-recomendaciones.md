@@ -37,6 +37,7 @@ candidates:
     expected_value: >-
       Filtros determinísticos + ranking Bedrock con explicación de por qué cada
       sesión es relevante y qué gap cubre.
+    materialized_as: WI-009
   - id: WI-CANDIDATE-004
     title: 'Runtime agentic (Strands + AgentCore): topología reducida y tools'
     type: spike
