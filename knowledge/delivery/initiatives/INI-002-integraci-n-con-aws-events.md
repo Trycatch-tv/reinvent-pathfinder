@@ -28,6 +28,7 @@ candidates:
     expected_value: >-
       Habilita la experiencia autenticada con AWS Builder ID; tokens solo en
       memoria, nunca enviados al backend.
+    materialized_as: WI-005
   - id: WI-CANDIDATE-003
     title: 'Agenda personal: GetSchedule, favoritos y detección de conflictos'
     type: feature

@@ -12,9 +12,12 @@ import {
 import { normalizeAwsSession } from '../normalizer/normalize-session.js';
 import { SAMPLE_RAW_SESSIONS } from '../fixtures/sample-sessions.js';
 
+import type { TokenStore } from '../auth/token-store.js';
+
 export interface AwsEventsClientOptions {
   readonly baseUrl?: string;
   readonly apiKey?: string;
+  readonly tokenStore?: TokenStore;
   readonly timeoutMs?: number;
   readonly maxRetries?: number;
   readonly baseBackoffMs?: number;
@@ -31,6 +34,7 @@ export interface CatalogPageResult {
 export class AwsEventsClient {
   private readonly baseUrl: string;
   private readonly apiKey?: string;
+  private readonly tokenStore?: TokenStore;
   private readonly timeoutMs: number;
   private readonly maxRetries: number;
   private readonly baseBackoffMs: number;
@@ -40,6 +44,7 @@ export class AwsEventsClient {
   constructor(options: AwsEventsClientOptions = {}) {
     this.baseUrl = options.baseUrl ?? 'https://events.reinvent.aws.amazon.com/api';
     this.apiKey = options.apiKey;
+    this.tokenStore = options.tokenStore;
     this.timeoutMs = options.timeoutMs ?? 5000;
     this.maxRetries = options.maxRetries ?? 3;
     this.baseBackoffMs = options.baseBackoffMs ?? 50; // default short backoff for tests
@@ -135,8 +140,9 @@ export class AwsEventsClient {
         const headers: Record<string, string> = {
           'Accept': 'application/json',
         };
-        if (this.apiKey) {
-          headers['Authorization'] = `Bearer ${this.apiKey}`;
+        const bearerToken = this.tokenStore?.getAccessToken() ?? this.apiKey;
+        if (bearerToken) {
+          headers['Authorization'] = `Bearer ${bearerToken}`;
         }
 
         const response = await fetch(url, {

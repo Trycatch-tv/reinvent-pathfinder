@@ -12,3 +12,8 @@ export * from './client/aws-events-client.js';
 
 // Fixtures for offline mode
 export * from './fixtures/sample-sessions.js';
+
+// Authentication (OAuth 2.0 + PKCE with AWS Builder ID)
+export * from './auth/pkce.js';
+export * from './auth/token-store.js';
+export * from './auth/builder-id-client.js';
