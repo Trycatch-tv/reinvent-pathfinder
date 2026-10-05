@@ -7,8 +7,15 @@
   "types": "./src/index.ts",
   "scripts": {
     "build": "tsc -b",
-    "dev": "echo \"(dev pendiente: WI runtime agentic)\"",
-    "lint": "echo \"(lint pendiente: WI tooling)\"",
-    "test": "echo \"(test pendiente: WI tooling)\""
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pathfinder/domain": "workspace:*",
+    "@pathfinder/contracts": "workspace:*",
+    "@pathfinder/ai-contracts": "workspace:*",
+    "@pathfinder/ai-tools": "workspace:*",
+    "@pathfinder/ai-knowledge": "workspace:*",
+    "@pathfinder/events-client": "workspace:*"
   }
 }

@@ -188,9 +188,35 @@ importers:
         specifier: ^5.0.3
         version: 5.0.3(@types/node@26.6.4)(vite@8.3.2(@types/node@26.6.4)(esbuild@0.28.2)(tsx@4.23.15))
 
-  ai/agents: {}
+  ai/agents:
+    dependencies:
+      '@pathfinder/ai-contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@pathfinder/ai-knowledge':
+        specifier: workspace:*
+        version: link:../knowledge
+      '@pathfinder/ai-tools':
+        specifier: workspace:*
+        version: link:../tools
+      '@pathfinder/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@pathfinder/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@pathfinder/events-client':
+        specifier: workspace:*
+        version: link:../../packages/events-client
 
-  ai/contracts: {}
+  ai/contracts:
+    dependencies:
+      '@pathfinder/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@pathfinder/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
 
   ai/knowledge:
     dependencies:
@@ -201,7 +227,23 @@ importers:
         specifier: workspace:*
         version: link:../../packages/domain
 
-  ai/tools: {}
+  ai/tools:
+    dependencies:
+      '@pathfinder/ai-contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@pathfinder/ai-knowledge':
+        specifier: workspace:*
+        version: link:../knowledge
+      '@pathfinder/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@pathfinder/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@pathfinder/events-client':
+        specifier: workspace:*
+        version: link:../../packages/events-client
 
   apps/client: {}
 
