@@ -27,6 +27,7 @@ candidates:
     expected_value: >-
       Ingesta del catálogo a Managed KB para recuperación semántica; AWS Events
       sigue siendo fuente de verdad.
+    materialized_as: WI-008
   - id: WI-CANDIDATE-003
     title: >-
       Recomendaciones explicables: candidate filtering + ranking contextual con

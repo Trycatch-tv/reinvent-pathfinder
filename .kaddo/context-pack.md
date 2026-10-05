@@ -25,7 +25,7 @@ Phase: Maintenance
 Reason:
 
 - Roadmap available
-- 7 materialized work item(s)
+- 8 materialized work item(s)
 - Ownership coverage 100%
 
 Recommended next: roadmap-agent
@@ -38,7 +38,7 @@ Next step: Use the roadmap-agent to plan the next initiative.
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 7/7
+- Ownership coverage: 8/8
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -86,6 +86,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-005-autenticaci-n-oauth-2-0-pkce-con-aws-builder-id-ca.md
 - ✓ WI-006-agenda-personal-getschedule-favoritos-y-detecci-n-.md
 - ✓ WI-007-an-lisis-de-contexto-knowledge-profile-knowledge-g.md
+- ✓ WI-008-ingesta-sem-ntica-del-cat-logo-a-amazon-bedrock-ma.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -106,7 +107,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 7
+- Materialized Work Items: 8
 - Remaining Work Item candidates: 0
 
 > What we intend to build and why.
@@ -124,6 +125,7 @@ No active work items found.
 - WI-005 [feature] owns: packages/events-client/**
 - WI-006 [feature] owns: packages/events-client/**
 - WI-007 [feature] owns: packages/contracts/**, ai/knowledge/**, services/api/**
+- WI-008 [feature] owns: ai/knowledge/**
 
 ## Mapped Modules
 
