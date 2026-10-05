@@ -2,7 +2,7 @@
 type: initiative
 id: INI-001
 title: Fundación técnica del monorepo
-status: planned
+status: completed
 knowledge_level: K2
 domains:
   - platform
@@ -32,8 +32,10 @@ candidates:
     expected_value: >-
       Define AttendeeJourney, ProjectContext, KnowledgeProfile, KnowledgeGap,
       etc. independiente de AWS.
+    materialized_as: WI-003
 horizon: now
 priority: high
+completed_at: '2026-10-05'
 ---
 
 # Fundación técnica del monorepo

@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-04T23:24:46.739Z",
+  "generatedAt": "2026-10-05T00:04:25.629Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -72,6 +72,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-003",
+        "type": "feature",
+        "title": "Modelo de dominio base en packages/domain",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -123,6 +147,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-003",
+        "type": "feature",
+        "title": "Modelo de dominio base en packages/domain",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -152,6 +200,15 @@
           "eslint.config.mjs",
           "vitest.config.ts",
           ".github/workflows/ci.yml"
+        ]
+      },
+      {
+        "id": "WI-003",
+        "type": "feature",
+        "title": "Modelo de dominio base en packages/domain",
+        "summary": "",
+        "codeGlobs": [
+          "packages/domain/**"
         ]
       }
     ]
@@ -192,6 +249,7 @@
         "INI-005-cierre-de-ciclo-y-exposici-n.md",
         "WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
         "WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md",
+        "WI-003-modelo-de-dominio-base-en-packages-domain.md",
         "roadmap.md"
       ]
     }
@@ -228,17 +286,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 2,
+    "materialized_work_items": 3,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 2,
+    "materialized": 3,
     "remaining": 0
   },
   "phase": {
     "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "2 materialized work item(s)",
+      "3 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
@@ -267,8 +325,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 2,
-    "ownership_coverage": "2/2",
+    "total_work_items": 3,
+    "ownership_coverage": "3/3",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -335,13 +393,13 @@
     }
   },
   "workItemSummary": {
-    "total": 2,
+    "total": 3,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 2,
+    "completed": 3,
     "archived": 0,
     "summary": "completed-only"
   },
