@@ -1,7 +1,7 @@
 ---
 type: agent
 name: codebase-agent
-version: 3.109.0
+version: 3.111.0
 group: tech
 ---
 # Codebase Foundation Agent

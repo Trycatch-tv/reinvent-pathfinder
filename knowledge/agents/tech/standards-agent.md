@@ -1,7 +1,7 @@
 ---
 type: agent
 name: standards-agent
-version: 3.109.0
+version: 3.111.0
 group: tech
 ---
 # Standards Agent
