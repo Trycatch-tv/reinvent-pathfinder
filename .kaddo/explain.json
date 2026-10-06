@@ -523,6 +523,7 @@
         "INI-003-motor-de-conocimiento-y-recomendaciones.md",
         "INI-004-experiencia-learning-path-y-reflexi-n.md",
         "INI-005-cierre-de-ciclo-y-exposici-n.md",
+        "INI-006-habilitaci-n-de-ia-real-en-aws-bedrock-agentcore-m.md",
         "WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
         "WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md",
         "WI-003-modelo-de-dominio-base-en-packages-domain.md",
