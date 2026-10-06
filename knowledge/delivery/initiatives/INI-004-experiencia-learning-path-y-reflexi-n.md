@@ -2,7 +2,7 @@
 type: initiative
 id: INI-004
 title: Experiencia Learning Path y reflexión
-status: in-progress
+status: completed
 knowledge_level: K2
 domains:
   - experience
@@ -39,6 +39,7 @@ candidates:
     materialized_as: WI-014
 horizon: next
 priority: medium
+completed_at: '2026-10-06'
 ---
 
 # Experiencia Learning Path y reflexión
