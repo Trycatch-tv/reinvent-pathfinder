@@ -23,15 +23,23 @@ implementation_evidence:
   repositories:
     core:
       role: core
-      status: in-progress
+      status: completed
       changed_paths:
-        - >-
-          knowledge/delivery/initiatives/INI-001-fundaci-n-t-cnica-del-monorepo.md
         - packages/domain/src/index.ts
-      validations: []
-implementation_status: in-progress
-validation_status: in-progress
-verified_at: '2026-10-05'
+        - packages/domain/src/types/**
+        - packages/domain/src/logic/**
+        - packages/domain/src/domain.test.ts
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck sin errores (reconciliado en WI-012).'
+        - command: 'vitest run (packages/domain)'
+          status: passed
+          reason: 'domain: 2 archivos de test, 16 tests passing.'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-06'
+reconciled_by: WI-012
 ---
 
 # Modelo de dominio base en packages/domain

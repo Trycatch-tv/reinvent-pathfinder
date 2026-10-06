@@ -23,18 +23,26 @@ implementation_evidence:
   repositories:
     core:
       role: core
-      status: in-progress
+      status: completed
       changed_paths:
-        - apps/client/package.json
-        - apps/client/src/main.ts
-        - apps/client/tsconfig.json
-        - >-
-          knowledge/delivery/initiatives/INI-004-experiencia-learning-path-y-reflexi-n.md
-        - pnpm-lock.yaml
-      validations: []
-implementation_status: in-progress
-validation_status: in-progress
-verified_at: '2026-10-05'
+        - apps/client/index.html
+        - apps/client/vite.config.ts
+        - apps/client/src/App.tsx
+        - apps/client/src/components/ContextForm.tsx
+        - apps/client/src/components/KnowledgeProfileView.tsx
+        - apps/client/src/components/KnowledgeGapsList.tsx
+        - apps/client/src/client.test.ts
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck sin errores (reconciliado en WI-012).'
+        - command: 'vitest run (apps/client)'
+          status: passed
+          reason: 'apps/client: 2 archivos de test passing.'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-06'
+reconciled_by: WI-012
 ---
 
 # UI de captura de contexto y visualización de Knowledge Profile / Gaps

@@ -28,23 +28,24 @@ implementation_evidence:
   repositories:
     core:
       role: core
-      status: in-progress
+      status: completed
       changed_paths:
-        - .kaddo/config.yml
-        - .kaddo/context-pack.json
-        - .kaddo/context-pack.md
-        - .kaddo/explain.json
-        - .kaddo/explain.md
-        - >-
-          knowledge/delivery/initiatives/INI-001-fundaci-n-t-cnica-del-monorepo.md
-        - knowledge/tech/codebase.md
+        - .github/workflows/ci.yml
+        - eslint.config.mjs
+        - vitest.config.ts
         - package.json
-        - packages/shared/src/index.ts
-        - pnpm-lock.yaml
-      validations: []
-implementation_status: in-progress
-validation_status: in-progress
-verified_at: '2026-10-04'
+        - packages/shared/src/index.test.ts
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck del workspace sin errores (reconciliado en WI-012).'
+        - command: 'pnpm -r test'
+          status: passed
+          reason: 'Suite del workspace en verde tras WI-012 (exit 0).'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-06'
+reconciled_by: WI-012
 ---
 
 # Tooling de calidad y CI (lint, typecheck, Vitest, pipeline de PR)

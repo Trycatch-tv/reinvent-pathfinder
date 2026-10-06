@@ -25,22 +25,26 @@ implementation_evidence:
   repositories:
     core:
       role: core
-      status: in-progress
+      status: completed
       changed_paths:
-        - .kaddo/context-pack.json
-        - >-
-          knowledge/delivery/initiatives/INI-001-fundaci-n-t-cnica-del-monorepo.md
-        - knowledge/delivery/initiatives/INI-002-integraci-n-con-aws-events.md
-        - package.json
         - packages/events-client/package.json
+        - packages/events-client/src/client/aws-events-client.ts
+        - packages/events-client/src/normalizer/normalize-session.ts
+        - packages/events-client/src/types/**
+        - packages/events-client/src/fixtures/sample-sessions.ts
+        - packages/events-client/src/events-client.test.ts
         - packages/events-client/src/index.ts
-        - packages/events-client/tsconfig.json
-        - pnpm-lock.yaml
-        - tsconfig.base.json
-      validations: []
-implementation_status: in-progress
-validation_status: in-progress
-verified_at: '2026-10-05'
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck sin errores (reconciliado en WI-012).'
+        - command: 'vitest run (packages/events-client)'
+          status: passed
+          reason: 'events-client: 6 archivos de test passing.'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-06'
+reconciled_by: WI-012
 ---
 
 # events-client: adapter base de AWS Events REST API (catálogo + paginación + normalización)

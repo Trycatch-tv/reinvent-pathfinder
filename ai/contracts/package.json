@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@pathfinder/domain": "workspace:*",

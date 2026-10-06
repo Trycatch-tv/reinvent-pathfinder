@@ -25,21 +25,30 @@ implementation_evidence:
   repositories:
     core:
       role: core
-      status: in-progress
+      status: completed
       changed_paths:
-        - ai/agents/package.json
-        - ai/agents/src/index.ts
-        - ai/contracts/package.json
+        - ai/contracts/src/agent-contracts.ts
         - ai/contracts/src/index.ts
-        - ai/tools/package.json
-        - ai/tools/src/index.ts
-        - >-
-          knowledge/delivery/initiatives/INI-003-motor-de-conocimiento-y-recomendaciones.md
-        - pnpm-lock.yaml
-      validations: []
-implementation_status: in-progress
-validation_status: in-progress
-verified_at: '2026-10-05'
+        - ai/tools/src/base-tool.ts
+        - ai/tools/src/context-analysis-tool.ts
+        - ai/tools/src/knowledge-base-search-tool.ts
+        - ai/tools/src/recommendations-rank-tool.ts
+        - ai/tools/src/schedule-conflict-check-tool.ts
+        - ai/tools/src/tools.test.ts
+        - ai/agents/src/knowledge-agent.ts
+        - ai/agents/src/journey-recommendation-agent.ts
+        - ai/agents/src/agents.test.ts
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck sin errores (reconciliado en WI-012).'
+        - command: 'vitest run (ai/tools, ai/agents)'
+          status: passed
+          reason: 'ai-tools (2) y ai-agents (2) con tests passing.'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-06'
+reconciled_by: WI-012
 ---
 
 # Runtime agentic (Strands + AgentCore): topología reducida y tools

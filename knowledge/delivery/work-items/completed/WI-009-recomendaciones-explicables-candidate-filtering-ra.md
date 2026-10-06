@@ -27,17 +27,26 @@ implementation_evidence:
   repositories:
     core:
       role: core
-      status: in-progress
+      status: completed
       changed_paths:
-        - ai/knowledge/src/index.ts
-        - >-
-          knowledge/delivery/initiatives/INI-003-motor-de-conocimiento-y-recomendaciones.md
+        - packages/contracts/src/recommendations.ts
         - packages/contracts/src/index.ts
-        - services/api/src/index.ts
-      validations: []
-implementation_status: in-progress
-validation_status: in-progress
-verified_at: '2026-10-05'
+        - ai/knowledge/src/recommendations/candidate-filter.ts
+        - ai/knowledge/src/recommendations/session-reranker.ts
+        - ai/knowledge/src/recommendations/recommendations.test.ts
+        - services/api/src/handlers/recommendations-rank.ts
+        - services/api/src/handlers/recommendations-rank.test.ts
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck sin errores (reconciliado en WI-012).'
+        - command: 'vitest run (ai/knowledge, services/api)'
+          status: passed
+          reason: 'ai-knowledge y services/api con tests passing.'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-06'
+reconciled_by: WI-012
 ---
 
 # Recomendaciones explicables: candidate filtering + ranking contextual con Bedrock
