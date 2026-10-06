@@ -19,6 +19,13 @@ import { ReflectionForm } from "./components/ReflectionForm.js"
 import { AvailabilityHeatmap, createAvailabilityProjection } from "./components/AvailabilityHeatmap.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 import { SAMPLE_RAW_SESSIONS, normalizeAwsSession } from "@pathfinder/events-client"
+import {
+  completeBuilderIdCallback,
+  initiateBuilderIdLogin,
+  logoutBuilderId,
+  type BuilderIdAuthClient,
+  type TransactionStorage,
+} from "./auth/builder-id-transaction.js"
 
 const mockProfile: KnowledgeProfile = {
   id: "prof-1",
@@ -66,6 +73,80 @@ const mockGaps: KnowledgeGap[] = [
 
 describe("apps/client UI components", () => {
   const heatmapSessions = SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
+
+  const createStorage = (): TransactionStorage & { readonly values: Map<string, string> } => {
+    const values = new Map<string, string>()
+    return {
+      values,
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => { values.set(key, value) },
+      removeItem: (key) => { values.delete(key) },
+    }
+  }
+
+  const createAuthClient = () => {
+    const handleCallback = vi.fn().mockImplementation(({ state, expectedState }) =>
+      state === expectedState ? Promise.resolve({}) : Promise.reject(new Error("Invalid state")),
+    )
+    const logout = vi.fn()
+
+    return {
+      initiateAuth: vi.fn().mockResolvedValue({
+        authorizationUrl: "https://builder-id.example/authorize",
+        state: "csrf-state",
+        verifier: "pkce-verifier",
+      }),
+      handleCallback,
+      logout,
+    } satisfies BuilderIdAuthClient
+  }
+
+  it("stores only the PKCE transaction before redirecting", async () => {
+    const storage = createStorage()
+    const client = createAuthClient()
+
+    await expect(initiateBuilderIdLogin(client, storage)).resolves.toBe("https://builder-id.example/authorize")
+    expect([...storage.values.entries()]).toEqual([
+      ["pathfinder.builder-id.state", "csrf-state"],
+      ["pathfinder.builder-id.verifier", "pkce-verifier"],
+    ])
+  })
+
+  it("completes a valid callback once and clears the PKCE transaction", async () => {
+    const storage = createStorage()
+    const client = createAuthClient()
+    await initiateBuilderIdLogin(client, storage)
+
+    await expect(completeBuilderIdCallback(client, storage, new URLSearchParams("code=authorization-code&state=csrf-state"))).resolves.toBe("authenticated")
+    expect(client.handleCallback).toHaveBeenCalledWith({
+      code: "authorization-code",
+      state: "csrf-state",
+      expectedState: "csrf-state",
+      verifier: "pkce-verifier",
+    })
+    expect(storage.values).toEqual(new Map())
+  })
+
+  it("rejects invalid callbacks without exchanging a token", async () => {
+    const storage = createStorage()
+    const client = createAuthClient()
+    await initiateBuilderIdLogin(client, storage)
+
+    await expect(completeBuilderIdCallback(client, storage, new URLSearchParams("code=authorization-code&state=wrong"))).resolves.toBe("invalid-callback")
+    expect(client.handleCallback).toHaveBeenCalledTimes(1)
+    expect(storage.values).toEqual(new Map())
+  })
+
+  it("clears the transaction and in-memory client state on logout", async () => {
+    const storage = createStorage()
+    const client = createAuthClient()
+    await initiateBuilderIdLogin(client, storage)
+
+    logoutBuilderId(client, storage)
+
+    expect(client.logout).toHaveBeenCalledOnce()
+    expect(storage.values).toEqual(new Map())
+  })
 
   it("renders the local availability heatmap and session detail from fixtures", () => {
     const html = renderToString(

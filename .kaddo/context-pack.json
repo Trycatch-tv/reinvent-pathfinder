@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-06T19:15:49.806Z",
+  "generatedAt": "2026-10-06T20:05:46.290Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -30,19 +30,19 @@
     "inventoryAvailable": true,
     "workItems": [
       {
-        "id": "WI-017",
+        "id": "WI-018",
         "type": "feature",
-        "title": "UI local-first del Session Availability Heatmap",
+        "title": "Integración del login con AWS Builder ID en apps/client",
         "status": "ready",
         "lifecycle": "ready",
-        "knowledgeLevel": "K2",
+        "knowledgeLevel": "K3",
         "domains": [
-          "experience",
-          "aws-events"
+          "aws-events",
+          "experience"
         ],
         "source": {
           "type": "unknown",
-          "id": "WI-CANDIDATE-003",
+          "id": "WI-CANDIDATE-004",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -53,19 +53,19 @@
     ],
     "activeWorkItems": [
       {
-        "id": "WI-017",
+        "id": "WI-018",
         "type": "feature",
-        "title": "UI local-first del Session Availability Heatmap",
+        "title": "Integración del login con AWS Builder ID en apps/client",
         "status": "ready",
         "lifecycle": "ready",
-        "knowledgeLevel": "K2",
+        "knowledgeLevel": "K3",
         "domains": [
-          "experience",
-          "aws-events"
+          "aws-events",
+          "experience"
         ],
         "source": {
           "type": "unknown",
-          "id": "WI-CANDIDATE-003",
+          "id": "WI-CANDIDATE-004",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -448,6 +448,30 @@
         "source": {
           "type": "unknown",
           "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-017",
+        "type": "feature",
+        "title": "UI local-first del Session Availability Heatmap",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -848,8 +872,8 @@
         "id": "WI-017",
         "type": "feature",
         "title": "UI local-first del Session Availability Heatmap",
-        "status": "ready",
-        "lifecycle": "ready",
+        "status": "completed",
+        "lifecycle": "completed",
         "knowledgeLevel": "K2",
         "domains": [
           "experience",
@@ -858,6 +882,30 @@
         "source": {
           "type": "unknown",
           "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-018",
+        "type": "feature",
+        "title": "Integración del login con AWS Builder ID en apps/client",
+        "status": "ready",
+        "lifecycle": "ready",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -1050,6 +1098,18 @@
           "apps/client/src/fixtures/availability-heatmap.ts",
           "apps/client/src/client.test.ts"
         ]
+      },
+      {
+        "id": "WI-018",
+        "type": "feature",
+        "title": "Integración del login con AWS Builder ID en apps/client",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/src/App.tsx",
+          "apps/client/src/components/BuilderIdLogin.tsx",
+          "apps/client/src/auth/builder-id-transaction.ts",
+          "apps/client/src/client.test.ts"
+        ]
       }
     ]
   },
@@ -1106,6 +1166,7 @@
         "WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md",
         "WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md",
         "WI-017-ui-local-first-del-session-availability-heatmap.md",
+        "WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md",
         "roadmap.md"
       ]
     }
@@ -1142,24 +1203,24 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 17,
+    "materialized_work_items": 18,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 17,
+    "materialized": 18,
     "remaining": 0
   },
   "phase": {
     "phase": "Active Delivery",
     "reasons": [
       "Roadmap available",
-      "17 materialized work item(s)",
+      "18 materialized work item(s)",
       "ready: 1",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
       "implementation-agent"
     ],
-    "nextStep": "Use implementation-agent to implement WI-017.",
+    "nextStep": "Use implementation-agent to implement WI-018.",
     "llmInstructions": [
       "Use the implementation-agent.",
       "Suggest a branch name only.",
@@ -1169,11 +1230,11 @@
   "nextStepRecommendation": {
     "id": "implement-work-item",
     "phase": "Active Delivery",
-    "label": "Use implementation-agent to implement WI-017.",
+    "label": "Use implementation-agent to implement WI-018.",
     "agent": "implementation-agent",
     "skill": "implementation-planning",
-    "target": "WI-017",
-    "reason": "WI-017 is ready for implementation.",
+    "target": "WI-018",
+    "reason": "WI-018 is ready for implementation.",
     "secondary": [
       {
         "id": "validate-work-item-modules",
@@ -1189,15 +1250,15 @@
     "refined_draft_ids": [],
     "ready_work_items": 1,
     "ready_work_item_ids": [
-      "WI-017"
+      "WI-018"
     ],
     "ready_multirepo_wi_ids": [
-      "WI-017"
+      "WI-018"
     ],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 17,
-    "ownership_coverage": "17/17",
+    "total_work_items": 18,
+    "ownership_coverage": "18/18",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1264,13 +1325,13 @@
     }
   },
   "workItemSummary": {
-    "total": 17,
+    "total": 18,
     "active": 1,
     "draft": 0,
     "ready": 1,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 16,
+    "completed": 17,
     "archived": 0,
     "summary": "ready"
   },
@@ -1503,7 +1564,7 @@
       "implementation-agent"
     ],
     "nextSteps": [
-      "Use implementation-agent to implement WI-017."
+      "Use implementation-agent to implement WI-018."
     ],
     "instructions": [
       "Use the implementation-agent.",

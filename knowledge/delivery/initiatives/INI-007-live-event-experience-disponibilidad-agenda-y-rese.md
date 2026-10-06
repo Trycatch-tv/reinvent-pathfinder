@@ -55,6 +55,7 @@ candidates:
     notes: >-
       Tokens solo en memoria; reutilizar AwsBuilderIdAuthClient, PKCE e
       InMemoryTokenStore.
+    materialized_as: WI-018
   - id: WI-CANDIDATE-005
     title: Integración live de disponibilidad con AWS Events
     type: feature

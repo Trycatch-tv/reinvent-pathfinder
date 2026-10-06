@@ -15,8 +15,8 @@
 - Phase: Active Delivery
 - Recommended agent: implementation-agent
 - Recommended skill: implementation-planning
-- Next step: Use implementation-agent to implement WI-017.
-- Reason: WI-017 is ready for implementation.
+- Next step: Use implementation-agent to implement WI-018.
+- Reason: WI-018 is ready for implementation.
 
 ## Delivery State
 
@@ -24,7 +24,7 @@
 - Ready Work Items: 1
 - In-progress Work Items: 0
 - Blocked Work Items: 0
-- Ownership coverage: 17/17
+- Ownership coverage: 18/18
 - Remaining Work Item candidates: 0
 - Technical decision candidates: 0
 - Accepted ADRs: 0
@@ -46,7 +46,7 @@ Warnings:
 - id: implement-work-item
 - agent: implementation-agent
 - skill: implementation-planning
-- reason: WI-017 is ready for implementation.
+- reason: WI-018 is ready for implementation.
 
 ## Secondary Recommendations
 
@@ -54,7 +54,7 @@ Warnings:
 
 ## Active Work Items
 
-- WI-017 [feature] ready — UI local-first del Session Availability Heatmap
+- WI-018 [feature] ready — Integración del login con AWS Builder ID en apps/client
 
 ## Context Pack
 
@@ -72,7 +72,7 @@ Use:
 
 The LLM should produce:
 
-- `WI-017`
+- `WI-018`
 - Implementation plan or code changes guided by the Work Item.
 
 ## Copy/Paste Instructions
@@ -87,15 +87,15 @@ Ask the LLM to follow the implementation-agent instructions.
 
 ## Next Steps
 
-1. Use implementation-agent to implement WI-017.
+1. Use implementation-agent to implement WI-018.
 2. Validate affected modules for multirepo Work Items before implementation.
 3. Re-run `kaddo explain`.
 
 ## Branch Strategy
 
-**WI-017** affects: reinvent-pathfinder
+**WI-018** affects: reinvent-pathfinder
 
-- `reinvent-pathfinder`: branch `wi-017/ui-local-first-del-session-availability-`
+- `reinvent-pathfinder`: branch `wi-018/integraci-n-del-login-con-aws-builder-id`
 
 ## Metadata Health
 

@@ -25,13 +25,13 @@ Phase: Active Delivery
 Reason:
 
 - Roadmap available
-- 17 materialized work item(s)
+- 18 materialized work item(s)
 - ready: 1
 - Ownership coverage 100%
 
 Recommended next: implementation-agent
 
-Next step: Use implementation-agent to implement WI-017.
+Next step: Use implementation-agent to implement WI-018.
 
 ## Delivery State
 
@@ -39,14 +39,14 @@ Next step: Use implementation-agent to implement WI-017.
 - Draft Work Items: 0
 - Ready Work Items: 1
 - In-progress Work Items: 0
-- Ownership coverage: 17/17
+- Ownership coverage: 18/18
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use implementation-agent to implement WI-017.
+- Use implementation-agent to implement WI-018.
   - id: implement-work-item
-  - reason: WI-017 is ready for implementation.
+  - reason: WI-018 is ready for implementation.
   - agent: implementation-agent
   - skill: implementation-planning
 
@@ -104,6 +104,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md
 - ✓ WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md
 - ✓ WI-017-ui-local-first-del-session-availability-heatmap.md
+- ✓ WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -127,14 +128,14 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 17
+- Materialized Work Items: 18
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
 
 ## Active Work Items
 
-- WI-017 [feature] [K2] (ready) — UI local-first del Session Availability Heatmap · domains: experience, aws-events
+- WI-018 [feature] [K3] (ready) — Integración del login con AWS Builder ID en apps/client · domains: aws-events, experience
 
 ## Delivery Mix
 
@@ -161,6 +162,7 @@ Active Work Items by type:
 - WI-015 [feature] owns: packages/domain/src/types/**, packages/domain/src/fixtures/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
 - WI-016 [feature] owns: packages/domain/src/types/**, packages/domain/src/logic/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
 - WI-017 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/fixtures/availability-heatmap.ts, apps/client/src/client.test.ts
+- WI-018 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/BuilderIdLogin.tsx, apps/client/src/auth/builder-id-transaction.ts, apps/client/src/client.test.ts
 
 ## Mapped Modules
 
@@ -237,7 +239,7 @@ Recommended next for the **Active Delivery** phase:
 
 Next step:
 
-- Use implementation-agent to implement WI-017.
+- Use implementation-agent to implement WI-018.
 
 ## Instructions for the LLM
 

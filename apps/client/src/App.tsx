@@ -19,6 +19,8 @@ import type {
 import {
   SAMPLE_RAW_SESSIONS,
   SAMPLE_USER_SCHEDULE,
+  AwsBuilderIdAuthClient,
+  InMemoryTokenStore,
   normalizeAwsSession,
 } from "@pathfinder/events-client"
 import React, { useState } from "react"
@@ -28,10 +30,15 @@ import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
 import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
+import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 
 // Catálogo demo normalizado (local-first; sin AWS). Decisión de alcance WI-013.
 const DEMO_SESSIONS: readonly SessionCandidate[] =
   SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
+const authClient = new AwsBuilderIdAuthClient({
+  redirectUri: "http://localhost:8484/callback",
+  tokenStore: new InMemoryTokenStore(),
+})
 
 export const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] =
@@ -44,8 +51,11 @@ export const App: React.FC = () => {
   >([])
   const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>([])
   const [isBuildingPath, setIsBuildingPath] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const isAvailabilityRoute =
     typeof window !== "undefined" && window.location.pathname === "/availability"
+  const isCallbackRoute =
+    typeof window !== "undefined" && window.location.pathname === "/callback"
 
   const handleContextSubmit = async (request: AnalyzeContextRequest) => {
     setIsLoading(true)
@@ -158,10 +168,13 @@ export const App: React.FC = () => {
           de aprendizaje adaptativa.
         </p>
         {!isAvailabilityRoute && <p style={{ marginBottom: 0 }}><a href="/availability">Ver disponibilidad de sesiones</a></p>}
+        {!isCallbackRoute && <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => setIsAuthenticated(true)} onLogout={() => setIsAuthenticated(false)} />}
       </header>
 
       {isAvailabilityRoute ? (
         <AvailabilityHeatmap sessions={DEMO_SESSIONS} availability={SAMPLE_HEATMAP_AVAILABILITY} />
+      ) : isCallbackRoute ? (
+        <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => setIsAuthenticated(true)} onLogout={() => setIsAuthenticated(false)} />
       ) : (
         <>
 
