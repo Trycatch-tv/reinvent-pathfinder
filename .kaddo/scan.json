@@ -1,19 +1,25 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-03T04:40:04.459Z",
+  "generatedAt": "2026-10-06T19:06:56.960Z",
   "project": {
     "state": "new",
     "structure": "monorepo",
     "teamSize": "small"
   },
   "detected": {
-    "languages": [],
+    "languages": [
+      "typescript"
+    ],
     "frameworks": [],
-    "packageManagers": [],
+    "packageManagers": [
+      "pnpm"
+    ],
     "sourceDirectories": [],
     "migrationDirectories": [],
     "contractFiles": [],
-    "infrastructureFiles": [],
+    "infrastructureFiles": [
+      ".github/workflows/"
+    ],
     "testDirectories": []
   },
   "signals": {
@@ -29,14 +35,24 @@
     "tests": [
       {
         "type": "tests",
-        "label": "No test directory detected",
+        "label": "Vitest",
         "confidence": "high",
-        "evidence": [],
-        "recommended_review": "Confirm how this project is validated before production changes."
+        "evidence": [
+          "package.json"
+        ]
       }
     ],
     "security": [],
-    "infrastructure": [],
+    "infrastructure": [
+      {
+        "type": "infrastructure",
+        "label": "GitHub Actions",
+        "confidence": "high",
+        "evidence": [
+          ".github/workflows/"
+        ]
+      }
+    ],
     "external_integrations": [],
     "environment": []
   },

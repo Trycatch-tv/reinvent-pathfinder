@@ -20,33 +20,39 @@
 
 ## Current Phase
 
-Phase: Maintenance
+Phase: Active Delivery
 
 Reason:
 
 - Roadmap available
-- 15 materialized work item(s)
+- 16 materialized work item(s)
+- ready: 1
 - Ownership coverage 100%
 
-Recommended next: roadmap-agent
+Recommended next: implementation-agent
 
-Next step: Use the roadmap-agent to plan the next initiative.
+Next step: Use implementation-agent to implement WI-016.
 
 ## Delivery State
 
-- Phase: Maintenance
+- Phase: Active Delivery
 - Draft Work Items: 0
-- Ready Work Items: 0
+- Ready Work Items: 1
 - In-progress Work Items: 0
-- Ownership coverage: 15/15
+- Ownership coverage: 16/16
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use the roadmap-agent to plan the next initiative.
-  - id: plan-next
-  - reason: No active Work Items and no remaining roadmap candidates.
-  - agent: roadmap-agent
+- Use implementation-agent to implement WI-016.
+  - id: implement-work-item
+  - reason: WI-016 is ready for implementation.
+  - agent: implementation-agent
+  - skill: implementation-planning
+
+Also (secondary):
+
+- Validate affected modules for multirepo Work Items before implementation.
 
 ## Project Route
 
@@ -96,6 +102,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-013-construcci-n-y-visualizaci-n-del-learning-path-con.md
 - ✓ WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md
 - ✓ WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md
+- ✓ WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -116,14 +123,20 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 15
+- Materialized Work Items: 16
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
 
 ## Active Work Items
 
-No active work items found.
+- WI-016 [feature] [K2] (ready) — Motor de proyección y filtrado para Availability Heatmap · domains: aws-events, experience
+
+## Delivery Mix
+
+Active Work Items by type:
+
+- Features: 1
 
 ## Artifacts and Ownership
 
@@ -142,6 +155,7 @@ No active work items found.
 - WI-013 [feature] owns: apps/client/**, ai/knowledge/**
 - WI-014 [feature] owns: apps/client/**, ai/knowledge/**
 - WI-015 [feature] owns: packages/domain/src/types/**, packages/domain/src/fixtures/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
+- WI-016 [feature] owns: packages/domain/src/types/**, packages/domain/src/logic/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
 
 ## Mapped Modules
 
@@ -212,15 +226,16 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Maintenance** phase:
+Recommended next for the **Active Delivery** phase:
 
-1. roadmap-agent
+1. implementation-agent
 
 Next step:
 
-- Use the roadmap-agent to plan the next initiative.
+- Use implementation-agent to implement WI-016.
 
 ## Instructions for the LLM
 
-- No active work.
-- Use the roadmap-agent to plan the next initiative.
+- Use the implementation-agent.
+- Suggest a branch name only.
+- Do not run git commands.

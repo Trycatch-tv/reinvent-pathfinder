@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-06T18:49:49.686Z",
+  "generatedAt": "2026-10-06T19:01:00.846Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -22,8 +22,52 @@
     "summary": "",
     "roadmapSummary": "",
     "inventoryAvailable": true,
-    "workItems": [],
-    "activeWorkItems": [],
+    "workItems": [
+      {
+        "id": "WI-016",
+        "type": "feature",
+        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "status": "ready",
+        "lifecycle": "ready",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      }
+    ],
+    "activeWorkItems": [
+      {
+        "id": "WI-016",
+        "type": "feature",
+        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "status": "ready",
+        "lifecycle": "ready",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      }
+    ],
     "completedWorkItems": [
       {
         "id": "WI-001",
@@ -745,6 +789,27 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-016",
+        "type": "feature",
+        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "status": "ready",
+        "lifecycle": "ready",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -907,6 +972,18 @@
           "packages/domain/src/index.ts",
           "packages/domain/src/domain.test.ts"
         ]
+      },
+      {
+        "id": "WI-016",
+        "type": "feature",
+        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "summary": "",
+        "codeGlobs": [
+          "packages/domain/src/types/**",
+          "packages/domain/src/logic/**",
+          "packages/domain/src/index.ts",
+          "packages/domain/src/domain.test.ts"
+        ]
       }
     ]
   },
@@ -961,6 +1038,7 @@
         "WI-013-construcci-n-y-visualizaci-n-del-learning-path-con.md",
         "WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md",
         "WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md",
+        "WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md",
         "roadmap.md"
       ]
     }
@@ -997,47 +1075,62 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 15,
+    "materialized_work_items": 16,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 15,
+    "materialized": 16,
     "remaining": 0
   },
   "phase": {
-    "phase": "Maintenance",
+    "phase": "Active Delivery",
     "reasons": [
       "Roadmap available",
-      "15 materialized work item(s)",
+      "16 materialized work item(s)",
+      "ready: 1",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
-      "roadmap-agent"
+      "implementation-agent"
     ],
-    "nextStep": "Use the roadmap-agent to plan the next initiative.",
+    "nextStep": "Use implementation-agent to implement WI-016.",
     "llmInstructions": [
-      "No active work.",
-      "Use the roadmap-agent to plan the next initiative."
+      "Use the implementation-agent.",
+      "Suggest a branch name only.",
+      "Do not run git commands."
     ]
   },
   "nextStepRecommendation": {
-    "id": "plan-next",
-    "phase": "Maintenance",
-    "label": "Use the roadmap-agent to plan the next initiative.",
-    "agent": "roadmap-agent",
-    "reason": "No active Work Items and no remaining roadmap candidates."
+    "id": "implement-work-item",
+    "phase": "Active Delivery",
+    "label": "Use implementation-agent to implement WI-016.",
+    "agent": "implementation-agent",
+    "skill": "implementation-planning",
+    "target": "WI-016",
+    "reason": "WI-016 is ready for implementation.",
+    "secondary": [
+      {
+        "id": "validate-work-item-modules",
+        "label": "Validate affected modules for multirepo Work Items before implementation.",
+        "reason": "1 ready Work Item(s) reference affected_modules."
+      }
+    ]
   },
   "deliveryState": {
-    "phase": "Maintenance",
+    "phase": "Active Delivery",
     "draft_work_items": 0,
     "refined_draft_work_items": 0,
     "refined_draft_ids": [],
-    "ready_work_items": 0,
-    "ready_work_item_ids": [],
-    "ready_multirepo_wi_ids": [],
+    "ready_work_items": 1,
+    "ready_work_item_ids": [
+      "WI-016"
+    ],
+    "ready_multirepo_wi_ids": [
+      "WI-016"
+    ],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 15,
-    "ownership_coverage": "15/15",
+    "total_work_items": 16,
+    "ownership_coverage": "16/16",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1104,17 +1197,19 @@
     }
   },
   "workItemSummary": {
-    "total": 15,
-    "active": 0,
+    "total": 16,
+    "active": 1,
     "draft": 0,
-    "ready": 0,
+    "ready": 1,
     "in_progress": 0,
     "blocked": 0,
     "completed": 15,
     "archived": 0,
-    "summary": "completed-only"
+    "summary": "ready"
   },
-  "deliveryMix": {},
+  "deliveryMix": {
+    "feature": 1
+  },
   "external": [],
   "graph": {
     "generatedAt": "2026-10-03T06:00:22.556Z",
@@ -1328,14 +1423,15 @@
   ],
   "handoff": {
     "recommendedAgents": [
-      "roadmap-agent"
+      "implementation-agent"
     ],
     "nextSteps": [
-      "Use the roadmap-agent to plan the next initiative."
+      "Use implementation-agent to implement WI-016."
     ],
     "instructions": [
-      "No active work.",
-      "Use the roadmap-agent to plan the next initiative."
+      "Use the implementation-agent.",
+      "Suggest a branch name only.",
+      "Do not run git commands."
     ],
     "operatingRules": [
       "**Never run `git commit`, `git push` or `git merge` without explicit human confirmation.**",

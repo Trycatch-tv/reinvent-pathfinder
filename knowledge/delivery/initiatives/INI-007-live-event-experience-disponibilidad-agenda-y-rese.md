@@ -40,6 +40,7 @@ candidates:
     expected_value: >-
       Proyección por día, horario, venue y disponibilidad reutilizable por
       cualquier UI.
+    materialized_as: WI-016
   - id: WI-CANDIDATE-003
     title: UI local-first del Session Availability Heatmap
     type: feature

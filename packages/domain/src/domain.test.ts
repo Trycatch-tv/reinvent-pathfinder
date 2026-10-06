@@ -10,6 +10,7 @@ import {
   type AvailabilityStatus,
   type SessionAvailability,
   SAMPLE_SESSION_AVAILABILITIES,
+  projectSessionAvailability,
   type Reflection,
   type AttendeeJourney,
   type ProjectContext,
@@ -59,6 +60,108 @@ describe('Domain Models and Logic', () => {
 
       expect(availability?.status).toBe('available');
       expect(availability?.capacityRemaining).toBe(48);
+    });
+  });
+
+  describe('Availability projection', () => {
+    const sessions: readonly SessionCandidate[] = [
+      {
+        id: 'session-later',
+        code: 'ARC201',
+        title: 'Zulu Availability',
+        description: '',
+        level: 200,
+        format: 'workshop',
+        topics: ['Architecture', 'AI/ML'],
+        schedule: { day: '2026-12-02', startTime: '11:00', endTime: '12:00' },
+        location: { venue: 'Venetian' },
+      },
+      {
+        id: 'session-unknown',
+        code: 'AIM101',
+        title: 'Alpha Unknown',
+        description: '',
+        level: 100,
+        format: 'breakout',
+        topics: ['AI/ML'],
+        schedule: { day: '2026-12-02', startTime: '10:00', endTime: '11:00' },
+        location: { venue: 'Caesars Forum' },
+      },
+      {
+        id: 'session-same-cell',
+        code: 'ARC202',
+        title: 'Beta Available',
+        description: '',
+        level: 200,
+        format: 'workshop',
+        topics: ['Architecture'],
+        schedule: { day: '2026-12-02', startTime: '11:00', endTime: '12:00' },
+        location: { venue: 'Venetian' },
+      },
+      {
+        id: 'session-without-venue',
+        code: 'DAT101',
+        title: 'No Venue',
+        description: '',
+        level: 100,
+        format: 'breakout',
+        topics: [],
+        schedule: { day: '2026-12-02', startTime: '09:00', endTime: '10:00' },
+      },
+      {
+        id: 'session-without-schedule',
+        code: 'SEC101',
+        title: 'No Schedule',
+        description: '',
+        level: 100,
+        format: 'breakout',
+        topics: [],
+        location: { venue: 'Venetian' },
+      },
+    ];
+
+    const availability: readonly SessionAvailability[] = [
+      { sessionId: 'session-later', status: 'limited' },
+      { sessionId: 'session-same-cell', status: 'available' },
+    ];
+
+    it('groups deterministically and uses unknown when availability is absent', () => {
+      const result = projectSessionAvailability(sessions, availability);
+
+      expect(result.groups).toHaveLength(2);
+      expect(result.groups[0]).toMatchObject({
+        day: '2026-12-02',
+        startTime: '10:00',
+        venue: 'Caesars Forum',
+      });
+      expect(result.groups[0]?.sessions[0]?.availability.status).toBe('unknown');
+      expect(result.groups[1]?.sessions.map(({ session }) => session.title)).toEqual([
+        'Beta Available',
+        'Zulu Availability',
+      ]);
+      expect(result.excludedSessionIds).toEqual([
+        'session-without-schedule',
+        'session-without-venue',
+      ]);
+    });
+
+    it('applies all supplied filters without mutating its inputs', () => {
+      const result = projectSessionAvailability(sessions, availability, {
+        day: '2026-12-02',
+        startTime: '11:00',
+        venue: 'Venetian',
+        availability: ['available'],
+        formats: ['workshop'],
+        levels: [200],
+        topics: ['Architecture'],
+      });
+
+      expect(result.groups).toHaveLength(1);
+      expect(result.groups[0]?.sessions.map(({ session }) => session.id)).toEqual([
+        'session-same-cell',
+      ]);
+      expect(sessions[0]?.title).toBe('Zulu Availability');
+      expect(availability[0]?.status).toBe('limited');
     });
   });
 
