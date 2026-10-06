@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@pathfinder/domain": "workspace:*",
-    "@pathfinder/contracts": "workspace:*"
+    "@pathfinder/contracts": "workspace:*",
+    "@pathfinder/events-client": "workspace:*"
   }
 }

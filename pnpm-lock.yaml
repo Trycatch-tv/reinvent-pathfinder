@@ -226,6 +226,9 @@ importers:
       '@pathfinder/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@pathfinder/events-client':
+        specifier: workspace:*
+        version: link:../../packages/events-client
 
   ai/tools:
     dependencies:
@@ -256,6 +259,9 @@ importers:
       '@pathfinder/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@pathfinder/events-client':
+        specifier: workspace:*
+        version: link:../../packages/events-client
       react:
         specifier: ^19.3.0
         version: 19.3.0

@@ -3,7 +3,7 @@ type: feature
 id: WI-013
 title: Construcción y visualización del Learning Path (con reconciliación de agenda)
 knowledge_level: K2
-status: ready
+status: completed
 phase: now
 initiative: INI-004
 domains:
@@ -12,7 +12,6 @@ domains:
 code:
   - apps/client/**
   - ai/knowledge/**
-  - packages/contracts/**
 affected_modules:
   - reinvent-pathfinder
 created_at: '2026-10-06'
@@ -20,6 +19,32 @@ source: initiative
 source_id: WI-CANDIDATE-002
 source_initiative: INI-004
 ready_at: '2026-10-06'
+completed_at: '2026-10-06'
+implementation_evidence:
+  repositories:
+    core:
+      role: core
+      status: completed
+      changed_paths:
+        - ai/knowledge/src/recommendations/learning-path-builder.ts
+        - ai/knowledge/src/recommendations/learning-path-builder.test.ts
+        - ai/knowledge/src/index.ts
+        - ai/knowledge/package.json
+        - apps/client/src/components/LearningPathView.tsx
+        - apps/client/src/App.tsx
+        - apps/client/src/client.test.ts
+        - apps/client/package.json
+        - apps/client/vite.config.ts
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck del workspace sin errores (exit 0).'
+        - command: 'pnpm -r test'
+          status: passed
+          reason: 'Workspace en verde; ai/knowledge 48 tests (incl. 5 de buildLearningPath), apps/client 5 tests (incl. LearningPathView).'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-06'
 ---
 
 # Construcción y visualización del Learning Path (con reconciliación de agenda)
@@ -82,12 +107,12 @@ _Expected value:_ Ruta priorizada que considera conocimiento, horario y conflict
 
 ## Acceptance Criteria
 
-- [ ] Existe una función/módulo que construye un `LearningPath` del dominio a partir de `SessionRecommendation[]` + `KnowledgeGap[]`, con `items` ordenados y `targetGapIds` por ítem.
-- [ ] El `LearningPath` resultante incluye `conflicts` poblados vía `evaluateScheduleConflicts` contra la agenda del usuario (con soporte offline/mock).
-- [ ] `apps/client` visualiza el `LearningPath` (orden, gaps cubiertos, conflictos) y reemplaza el `alert` placeholder del botón de construcción.
-- [ ] El usuario puede descartar/mantener ítems del path desde la UI.
-- [ ] **End-to-end:** desde el diagnóstico (perfil+gaps) el usuario llega a un Learning Path visible con conflictos reconciliados, ejecutable local-first sin AWS.
-- [ ] Tests Vitest cubren la construcción del path (y el componente de UI donde aplique); `pnpm -r test` y `tsc -b` en verde.
+- [x] Existe una función/módulo que construye un `LearningPath` del dominio a partir de `SessionRecommendation[]` + `KnowledgeGap[]`, con `items` ordenados y `targetGapIds` por ítem. → `buildLearningPath` en `ai/knowledge/src/recommendations/learning-path-builder.ts`.
+- [x] El `LearningPath` resultante incluye `conflicts` poblados vía `evaluateScheduleConflicts` contra la agenda del usuario (con soporte offline/mock). → verificado con `SAMPLE_USER_SCHEDULE`.
+- [x] `apps/client` visualiza el `LearningPath` (orden, gaps cubiertos, conflictos) y reemplaza el `alert` placeholder del botón de construcción. → `LearningPathView` + `App.tsx`.
+- [x] El usuario puede descartar/mantener ítems del path desde la UI. → `onDiscardItem` + estado local en `LearningPathView`.
+- [x] **End-to-end:** desde el diagnóstico (perfil+gaps) el usuario llega a un Learning Path visible con conflictos reconciliados, ejecutable local-first sin AWS. → cableado reranker→builder→view con fixtures; verificado vía tests (no en navegador).
+- [x] Tests Vitest cubren la construcción del path (y el componente de UI donde aplique); `pnpm -r test` y `tsc -b` en verde. → 5 tests del builder + test de `LearningPathView`; suite completa exit 0.
 
 ## Validation
 
@@ -117,4 +142,24 @@ _Resueltas durante el refinamiento (2026-10-06) — defaults local-first, cohere
 
 ## Learning
 
-_What did we learn? Update after completion._
+_Capturado al cierre (2026-10-06):_
+
+- **Qué se entregó:** `buildLearningPath` (`ai/knowledge`) que convierte `SessionRecommendation[]` en un `LearningPath` del dominio (ítems ordenados por el reranker, `targetGapIds` por ítem, `status: planned`) y reconcilia la agenda vía `evaluateScheduleConflicts`. Componente `LearningPathView` en `apps/client` que muestra la ruta, los gaps cubiertos, el score y los conflictos, y permite descartar ítems. `App.tsx` cablea reranker→builder→view reemplazando el `alert` placeholder. Todo local-first (fixtures `SAMPLE_RAW_SESSIONS`/`SAMPLE_USER_SCHEDULE`, sin AWS).
+- **Reutilización, no duplicación:** se reusaron `HeuristicSessionReranker`, `evaluateScheduleConflicts` y los tipos de dominio `LearningPath`/`LearningPathItem`/`ScheduleConflict` existentes. Decisión del plan respetada.
+- **Decisiones (open questions resueltas en refinamiento):** construcción solo en cliente (sin endpoint `services/api`); agenda demo desde fixtures de `events-client`; orden del path = orden del reranker.
+- **Hallazgos durante implementación:**
+  - El reformateador del editor reordena imports alfabéticamente y descartó líneas de import que había añadido; hubo que re-insertarlas. (Afectó `App.tsx` y `client.test.ts`.)
+  - React SSR inserta comentarios `<!-- -->` entre expresiones JSX adyacentes; las assertions de texto deben verificar fragmentos contiguos, no cadenas que crucen una expresión.
+  - El vitest del cliente recogía artefactos `dist/`; se añadió sección `test` a `apps/client/vite.config.ts` (`include: src`, `exclude: dist`).
+  - `ProjectContext` no tiene `userId` (solo `id`); se usó `'local-user'` para el `LearningPath` en modo demo.
+- **Verificación:** `tsc -b` exit 0; `pnpm -r test` exit 0 (ai/knowledge 48 tests, apps/client 5 tests).
+
+### Conocimiento a actualizar
+
+- Ninguna ADR nueva requerida; es una feature que sigue decisiones de arquitectura ya establecidas (local-first, reutilización de dominio).
+
+### Pendientes
+
+- [open] Siguiente candidato de INI-004: reflexión post-sesión y re-ranking adaptativo (WI-CANDIDATE-003).
+- [open] Agenda autenticada real (en vez de fixtures) cuando el login OAuth esté cableado en el cliente.
+- [open] Persistencia del `LearningPath` (hoy en memoria/cliente).

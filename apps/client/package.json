@@ -13,6 +13,7 @@
     "@pathfinder/ai-knowledge": "workspace:*",
     "@pathfinder/contracts": "workspace:*",
     "@pathfinder/domain": "workspace:*",
+    "@pathfinder/events-client": "workspace:*",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
