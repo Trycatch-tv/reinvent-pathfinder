@@ -1,51 +1,57 @@
-import http from 'node:http';
+import http from "node:http"
 import {
   AwsBuilderIdAuthClient,
-  InMemoryTokenStore,
   AwsEventsClient,
-  evaluateScheduleConflicts,
+  InMemoryTokenStore,
   SAMPLE_USER_SCHEDULE,
-} from './index.js';
+  evaluateScheduleConflicts,
+} from "./index.js"
 
-const PORT = 8484; // Loopback port autorizado por AWS Events API (rango 8484-8489)
-const REDIRECT_URI = `http://localhost:${PORT}/callback`;
+const PORT = 8484 // Loopback port autorizado por AWS Events API (rango 8484-8489)
+const REDIRECT_URI = `http://localhost:${PORT}/callback`
 
 // Se puede configurar vía variables de entorno o usar el oficial por defecto
-const CLIENT_ID = process.env.AWS_BUILDER_ID_CLIENT_ID ?? '7vmom55m1qstvq8i71ph127bfq';
-const IS_MOCK = process.env.AUTH_MODE !== 'real' && !process.env.AWS_BUILDER_ID_CLIENT_ID;
+const CLIENT_ID =
+  process.env.AWS_BUILDER_ID_CLIENT_ID ?? "7vmom55m1qstvq8i71ph127bfq"
+const IS_MOCK =
+  process.env.AUTH_MODE !== "real" && !process.env.AWS_BUILDER_ID_CLIENT_ID
 
-console.log('='.repeat(65));
-console.log('  AWS EVENTS / BUILDER ID — FLUJO OAUTH 2.0 + PKCE');
-console.log('='.repeat(65));
-console.log(`Modo de ejecución: ${IS_MOCK ? 'SIMULADO / OFFLINE (Mock)' : 'REAL (AWS Events Live)'}`);
-console.log(`Endpoint Auth:     https://oauth.awsevents.com/oauth2/authorize`);
-console.log(`Endpoint Token:    https://oauth.awsevents.com/oauth2/token`);
-console.log(`Client ID:         ${CLIENT_ID}`);
-console.log(`Redirect URI:      ${REDIRECT_URI}\n`);
+console.log("=".repeat(65))
+console.log("  AWS EVENTS / BUILDER ID — FLUJO OAUTH 2.0 + PKCE")
+console.log("=".repeat(65))
+console.log(
+  `Modo de ejecución: ${IS_MOCK ? "SIMULADO / OFFLINE (Mock)" : "REAL (AWS Events Live)"}`,
+)
+console.log(`Endpoint Auth:     https://oauth.awsevents.com/oauth2/authorize`)
+console.log(`Endpoint Token:    https://oauth.awsevents.com/oauth2/token`)
+console.log(`Client ID:         ${CLIENT_ID}`)
+console.log(`Redirect URI:      ${REDIRECT_URI}\n`)
 
-const tokenStore = new InMemoryTokenStore();
+const tokenStore = new InMemoryTokenStore()
 const authClient = new AwsBuilderIdAuthClient({
   clientId: CLIENT_ID,
   redirectUri: REDIRECT_URI,
   tokenStore,
   mockMode: IS_MOCK,
-});
+})
 
 // 1. Generar desafío criptográfico PKCE
-const { authorizationUrl, verifier, state } = authClient.initiateAuth();
+const { authorizationUrl, verifier, state } = await authClient.initiateAuth()
 
-console.log('1. Parámetros criptográficos PKCE generados:');
-console.log(`   - State (anti-CSRF): ${state}`);
-console.log(`   - Code Verifier:     ${verifier.slice(0, 15)}... (longitud: ${verifier.length})`);
-console.log(`\n2. URL de Autorización oficial:\n   ${authorizationUrl}\n`);
+console.log("1. Parámetros criptográficos PKCE generados:")
+console.log(`   - State (anti-CSRF): ${state}`)
+console.log(
+  `   - Code Verifier:     ${verifier.slice(0, 15)}... (longitud: ${verifier.length})`,
+)
+console.log(`\n2. URL de Autorización oficial:\n   ${authorizationUrl}\n`)
 
 // 2. Levantar servidor HTTP local en el puerto loopback oficial
 const server = http.createServer(async (req, res) => {
-  const reqUrl = new URL(req.url ?? '/', `http://localhost:${PORT}`);
+  const reqUrl = new URL(req.url ?? "/", `http://localhost:${PORT}`)
 
   // Página de inicio interactiva
-  if (reqUrl.pathname === '/') {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  if (reqUrl.pathname === "/") {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
     res.end(`
       <!DOCTYPE html>
       <html>
@@ -76,23 +82,25 @@ const server = http.createServer(async (req, res) => {
         </div>
       </body>
       </html>
-    `);
-    return;
+    `)
+    return
   }
 
-  if (reqUrl.pathname === '/login') {
-    res.writeHead(302, { Location: authorizationUrl });
-    res.end();
-    return;
+  if (reqUrl.pathname === "/login") {
+    res.writeHead(302, { Location: authorizationUrl })
+    res.end()
+    return
   }
 
-  if (reqUrl.pathname === '/callback') {
-    const code = reqUrl.searchParams.get('code') ?? (IS_MOCK ? 'mock_auth_code_12345' : '');
-    const returnedState = reqUrl.searchParams.get('state') ?? (IS_MOCK ? state : '');
+  if (reqUrl.pathname === "/callback") {
+    const code =
+      reqUrl.searchParams.get("code") ?? (IS_MOCK ? "mock_auth_code_12345" : "")
+    const returnedState =
+      reqUrl.searchParams.get("state") ?? (IS_MOCK ? state : "")
 
-    console.log('3. Callback recibido en el servidor local:');
-    console.log(`   - Code recibido:  ${code.slice(0, 20)}...`);
-    console.log(`   - State devuelto: ${returnedState}`);
+    console.log("3. Callback recibido en el servidor local:")
+    console.log(`   - Code recibido:  ${code.slice(0, 20)}...`)
+    console.log(`   - State devuelto: ${returnedState}`)
 
     try {
       // 4. Canjear código por tokens (validando state y enviando code_verifier)
@@ -101,55 +109,59 @@ const server = http.createServer(async (req, res) => {
         state: returnedState,
         expectedState: state,
         verifier,
-      });
+      })
 
-      console.log('\n4. Tokens intercambiados exitosamente:');
-      console.log(`   - Access Token:   ${tokens.accessToken.slice(0, 25)}...`);
-      console.log(`   - Token Type:     ${tokens.tokenType}`);
-      console.log(`   - Expira en:      ${tokens.expiresIn} segundos`);
-      console.log(`   - Token en RAM:   InMemoryTokenStore (${tokenStore.getAccessToken() ? 'OK' : 'FAIL'})`);
+      console.log("\n4. Tokens intercambiados exitosamente:")
+      console.log(`   - Access Token:   ${tokens.accessToken.slice(0, 25)}...`)
+      console.log(`   - Token Type:     ${tokens.tokenType}`)
+      console.log(`   - Expira en:      ${tokens.expiresIn} segundos`)
+      console.log(
+        `   - Token en RAM:   InMemoryTokenStore (${tokenStore.getAccessToken() ? "OK" : "FAIL"})`,
+      )
 
       // 5. Demostrar llamada autenticada a la agenda personal
       const eventsClient = new AwsEventsClient({
         tokenStore,
         mockMode: true,
-      });
+      })
 
-      const scheduleResult = await eventsClient.getPersonalSchedule();
-      const favorites = await eventsClient.getFavorites();
+      const scheduleResult = await eventsClient.getPersonalSchedule()
+      const favorites = await eventsClient.getFavorites()
 
-      console.log('\n5. Consulta a la Agenda Personal del Asistente:');
-      console.log(`   - Total items agendados: ${scheduleResult.items.length}`);
-      console.log(`   - Favoritos del usuario: ${favorites.join(', ')}`);
+      console.log("\n5. Consulta a la Agenda Personal del Asistente:")
+      console.log(`   - Total items agendados: ${scheduleResult.items.length}`)
+      console.log(`   - Favoritos del usuario: ${favorites.join(", ")}`)
 
       // 6. Demostrar detección de conflictos de agenda
       const conflicts = evaluateScheduleConflicts(
         [
           {
-            id: 'demo-conflict-sess',
-            code: 'DAT304-CONFLICT',
-            title: 'Sesión de DynamoDB que colisiona',
-            description: 'Colisión horaria con la agenda del usuario.',
+            id: "demo-conflict-sess",
+            code: "DAT304-CONFLICT",
+            title: "Sesión de DynamoDB que colisiona",
+            description: "Colisión horaria con la agenda del usuario.",
             level: 300,
-            topics: ['DynamoDB'],
-            format: 'breakout',
+            topics: ["DynamoDB"],
+            format: "breakout",
             schedule: {
-              day: '2026-12-01',
-              startTime: '10:15',
-              endTime: '11:15',
+              day: "2026-12-01",
+              startTime: "10:15",
+              endTime: "11:15",
             },
           },
         ],
-        SAMPLE_USER_SCHEDULE
-      );
+        SAMPLE_USER_SCHEDULE,
+      )
 
-      console.log(`\n6. Detección de Conflictos: ${conflicts.length} conflicto(s) encontrado(s):`);
+      console.log(
+        `\n6. Detección de Conflictos: ${conflicts.length} conflicto(s) encontrado(s):`,
+      )
       for (const c of conflicts) {
-        console.log(`   [!] ${c.conflict.reason}`);
+        console.log(`   [!] ${c.conflict.reason}`)
       }
 
       // Respuesta HTML al navegador
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
       res.end(`
         <!DOCTYPE html>
         <html>
@@ -179,29 +191,33 @@ const server = http.createServer(async (req, res) => {
           </div>
         </body>
         </html>
-      `);
+      `)
 
-      console.log('\n' + '='.repeat(65));
-      console.log('  Prueba completada satisfactoriamente. Cerrando servidor.');
-      console.log('='.repeat(65));
+      console.log("\n" + "=".repeat(65))
+      console.log("  Prueba completada satisfactoriamente. Cerrando servidor.")
+      console.log("=".repeat(65))
 
       setTimeout(() => {
-        server.close();
-        process.exit(0);
-      }, 1500);
+        server.close()
+        process.exit(0)
+      }, 1500)
     } catch (err) {
-      console.error('Error durante el callback:', err);
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end('Error durante la autenticación: ' + String(err));
-      server.close();
-      process.exit(1);
+      console.error("Error durante el callback:", err)
+      res.writeHead(500, { "Content-Type": "text/plain" })
+      res.end("Error durante la autenticación: " + String(err))
+      server.close()
+      process.exit(1)
     }
   }
-});
+})
 
 server.listen(PORT, () => {
-  console.log(`Servidor local de callback activo en: http://localhost:${PORT}`);
-  console.log(`Para completar el flujo automáticamente, visita en tu navegador:`);
-  console.log(`👉 http://localhost:${PORT}/callback?code=test-code-123&state=${state}\n`);
-  console.log('Esperando callback...');
-});
+  console.log(`Servidor local de callback activo en: http://localhost:${PORT}`)
+  console.log(
+    `Para completar el flujo automáticamente, visita en tu navegador:`,
+  )
+  console.log(
+    `👉 http://localhost:${PORT}/callback?code=test-code-123&state=${state}\n`,
+  )
+  console.log("Esperando callback...")
+})
