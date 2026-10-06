@@ -28,6 +28,7 @@ candidates:
     expected_value: >-
       Ruta priorizada que considera conocimiento, horario y conflictos; el
       usuario mantiene control.
+    materialized_as: WI-013
   - id: WI-CANDIDATE-003
     title: Reflexión post-sesión y adaptación del journey (re-ranking)
     type: feature
