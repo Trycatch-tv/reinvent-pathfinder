@@ -39,6 +39,7 @@
 - ✓ WI-011-ui-de-captura-de-contexto-y-visualizaci-n-de-knowl.md
 - ✓ WI-012-reconciliar-verificaci-n-de-delivery-y-tests-ausen.md
 - ✓ WI-013-construcci-n-y-visualizaci-n-del-learning-path-con.md
+- ✓ WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md
 - ✓ roadmap.md
 
 ## Detected Stack
@@ -56,31 +57,31 @@
 - Agents: available
 - Roadmap initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 13
-- Ownership coverage: 13/13 work items
+- Materialized Work Items: 14
+- Ownership coverage: 14/14 work items
 
 ## Work Items
 - Draft: 0
 - Ready: 0
 - In Progress: 0
 - Blocked: 0
-- Completed: 13
+- Completed: 14
 - Archived: 0
 
 ## Work Items by Type
-- Features: 9
+- Features: 10
 - Chores: 3
 - Spikes: 1
 
 ## Work Item Sources
-- Unknown: 12
+- Unknown: 13
 - Chat: 1
 
 ## Work Items by Initiative
 - INI-001 — Completed: 3
 - INI-002 — Completed: 3
 - INI-003 — Completed: 4
-- INI-004 — Completed: 2
+- INI-004 — Completed: 3
 - Unassigned — Completed: 1
 
 ## Implementation Evidence
@@ -187,6 +188,14 @@ Affected modules: reinvent-pathfinder
 Repositories:
 - core — completed
 
+### WI-014
+- Lifecycle: Completed
+- Implementation: completed
+- Validation: completed
+- Release: not-assessed
+Repositories:
+- core — completed
+
 ## Domains
 - platform, tech, aws-events, integration, ai, knowledge, recommendations, experience, product
 
@@ -226,6 +235,7 @@ Groups:
   - WI-003 — Modelo de dominio base en packages/domain
   - WI-006 — Agenda personal: GetSchedule, favoritos y detección de conflictos
   - WI-009 — Recomendaciones explicables: candidate filtering + ranking contextual con Bedrock
+  - WI-014 — Reflexión post-sesión y adaptación del journey (re-ranking)
 Review before continuing (non-blocking).
 
 ## Project Route
@@ -250,14 +260,14 @@ Progress: 10/12
 - Phase: Maintenance
 - Reason:
   - Roadmap available
-  - 13 materialized work item(s)
+  - 14 materialized work item(s)
   - Ownership coverage 100%
 - Next step: This project uses the standard new-project Kaddo flow.
 
 ## Delivery Summary
-- Completed Work Items: 13
+- Completed Work Items: 14
 - Active Work Items: 0
-- Implementation completed: 11
+- Implementation completed: 12
 
 ## Suggested Next Steps
 1. Use the roadmap-agent to plan the next initiative.
@@ -281,7 +291,7 @@ Discovery:
 ## Roadmap Status
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 13
+- Materialized Work Items: 14
 - Remaining Work Item candidates: 0
 
 ## Installed Assets

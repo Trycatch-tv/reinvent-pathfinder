@@ -26,7 +26,7 @@
     "hasSkills": true
   },
   "workItems": {
-    "total": 13,
+    "total": 14,
     "inProgress": 0,
     "done": 0,
     "cancelled": 0,
@@ -35,12 +35,12 @@
       "ready": 0,
       "in-progress": 0,
       "blocked": 0,
-      "completed": 13,
+      "completed": 14,
       "archived": 0
     },
     "byType": {
       "chore": 3,
-      "feature": 9,
+      "feature": 10,
       "spike": 1
     },
     "initiatives": [
@@ -84,7 +84,7 @@
           "ready": 0,
           "in-progress": 0,
           "blocked": 0,
-          "completed": 2,
+          "completed": 3,
           "archived": 0
         }
       },
@@ -346,12 +346,31 @@
           "id": "WI-CANDIDATE-002",
           "inferred": true
         }
+      },
+      {
+        "id": "WI-014",
+        "title": "Reflexión post-sesión y adaptación del journey (re-ranking)",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-004",
+        "knowledgeLevel": "K3",
+        "hasOwnership": true,
+        "domains": [
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true
+        }
       }
     ]
   },
   "ownership": {
-    "workItemsTotal": 13,
-    "workItemsWithOwnership": 13,
+    "workItemsTotal": 14,
+    "workItemsWithOwnership": 14,
     "workItemsMissingOwnership": 0
   },
   "domains": [
@@ -422,6 +441,10 @@
         {
           "id": "WI-009",
           "title": "Recomendaciones explicables: candidate filtering + ranking contextual con Bedrock"
+        },
+        {
+          "id": "WI-014",
+          "title": "Reflexión post-sesión y adaptación del journey (re-ranking)"
         }
       ]
     }
@@ -513,6 +536,7 @@
         "WI-011-ui-de-captura-de-contexto-y-visualizaci-n-de-knowl.md",
         "WI-012-reconciliar-verificaci-n-de-delivery-y-tests-ausen.md",
         "WI-013-construcci-n-y-visualizaci-n-del-learning-path-con.md",
+        "WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md",
         "roadmap.md"
       ]
     }
@@ -521,10 +545,10 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 13,
+    "materialized_work_items": 14,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 13,
+    "materialized": 14,
     "remaining": 0
   },
   "missingKnowledge": [],
@@ -978,10 +1002,10 @@
   },
   "isModuleRepo": false,
   "deliverySummary": {
-    "completedWorkItems": 13,
+    "completedWorkItems": 14,
     "archivedWorkItems": 0,
     "activeWorkItems": 0,
-    "implementationCompleted": 11,
+    "implementationCompleted": 12,
     "releaseBlocked": 0,
     "releaseReady": 0
   },
@@ -1195,6 +1219,24 @@
     },
     {
       "id": "WI-013",
+      "lifecycle": "completed",
+      "implementationStatus": "completed",
+      "validationStatus": "completed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "core": {
+          "role": "core",
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "id": "WI-014",
       "lifecycle": "completed",
       "implementationStatus": "completed",
       "validationStatus": "completed",

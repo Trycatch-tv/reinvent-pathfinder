@@ -3,6 +3,7 @@ import type {
   KnowledgeGap,
   KnowledgeProfile,
   ProjectContext,
+  Reflection,
   SessionCandidate,
   SessionRecommendation,
 } from "@pathfinder/domain"
@@ -14,6 +15,7 @@ import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
+import { ReflectionForm } from "./components/ReflectionForm.js"
 
 const mockProfile: KnowledgeProfile = {
   id: "prof-1",
@@ -149,5 +151,92 @@ describe("apps/client UI components", () => {
     expect(html).toContain("gap(s)")
     expect(html).toContain("relevancia 92%")
     expect(html).toContain("Sin conflictos")
+  })
+
+  it("ReflectionForm renders rating, takeaways and related gap options", () => {
+    const relatedGaps: readonly KnowledgeGap[] = [
+      {
+        id: "gap-1",
+        topic: "Amazon Bedrock AgentCore",
+        description: "orquestación de agentes",
+        targetProficiency: "professional",
+        severity: "critical",
+        status: "open",
+        rationale: "proyecto agentic",
+        addressedBySessionIds: [],
+      },
+    ]
+
+    const html = renderToString(
+      React.createElement(ReflectionForm, {
+        sessionId: "sess-a",
+        sessionTitle: "Autonomous Agents con Bedrock",
+        userId: "local-user",
+        relatedGaps,
+        onSubmit: () => {},
+      }),
+    )
+
+    expect(html).toContain("Reflexión post-sesión")
+    expect(html).toContain("Autonomous Agents con Bedrock")
+    expect(html).toContain("¿Qué aprendiste?")
+    expect(html).toContain("Amazon Bedrock AgentCore")
+    expect(html).toContain("Guardar reflexión y adaptar ruta")
+  })
+
+  it("LearningPathView shows a reflect action when onReflectionSubmit is provided", () => {
+    const recommendations: readonly SessionRecommendation[] = [
+      {
+        sessionId: "sess-a",
+        sessionCode: "AIM301",
+        title: "Autonomous Agents con Bedrock",
+        relevanceScore: 0.9,
+        coveredGapIds: ["gap-1"],
+        explanation: "cubre gap-1",
+      },
+    ]
+    const candidates: readonly SessionCandidate[] = [
+      {
+        id: "sess-a",
+        code: "AIM301",
+        title: "Autonomous Agents con Bedrock",
+        description: "demo",
+        level: 300,
+        format: "breakout",
+        topics: ["bedrock"],
+        schedule: { day: "2026-12-03", startTime: "09:00", endTime: "10:00" },
+      },
+    ]
+    const gaps: readonly KnowledgeGap[] = [
+      {
+        id: "gap-1",
+        topic: "Bedrock",
+        description: "d",
+        targetProficiency: "professional",
+        severity: "critical",
+        status: "open",
+        rationale: "r",
+        addressedBySessionIds: [],
+      },
+    ]
+
+    const path = buildLearningPath({
+      recommendations,
+      candidateSessions: candidates,
+      userId: "local-user",
+      journeyId: "ctx-1",
+    })
+
+    const html = renderToString(
+      React.createElement(LearningPathView, {
+        learningPath: path,
+        recommendations,
+        gaps,
+        userId: "local-user",
+        onReflectionSubmit: (_r: Reflection) => {},
+      }),
+    )
+
+    expect(html).toContain("Reflexionar")
   })
 })

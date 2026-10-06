@@ -1,6 +1,7 @@
 import {
   HeuristicContextAnalyzer,
   HeuristicSessionReranker,
+  adaptLearningPathFromReflection,
   buildLearningPath,
 } from "@pathfinder/ai-knowledge"
 import type {
@@ -9,7 +10,9 @@ import type {
   RankRecommendationsRequest,
 } from "@pathfinder/contracts"
 import type {
+  KnowledgeGap,
   LearningPath,
+  Reflection,
   SessionCandidate,
   SessionRecommendation,
 } from "@pathfinder/domain"
@@ -37,6 +40,7 @@ export const App: React.FC = () => {
   const [recommendations, setRecommendations] = useState<
     readonly SessionRecommendation[]
   >([])
+  const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>([])
   const [isBuildingPath, setIsBuildingPath] = useState(false)
 
   const handleContextSubmit = async (request: AnalyzeContextRequest) => {
@@ -80,6 +84,7 @@ export const App: React.FC = () => {
       })
 
       setRecommendations(ranked.recommendations)
+      setCurrentGaps(analysisResult.knowledgeGaps)
       setLearningPath(path)
     } catch (err: unknown) {
       setError(
@@ -92,10 +97,34 @@ export const App: React.FC = () => {
     }
   }
 
+  // Cierra el ciclo adaptativo (Journey 5): aplica la reflexión, recalcula gaps,
+  // recomendaciones y Learning Path. Local-first.
+  const handleReflectionSubmit = async (reflection: Reflection) => {
+    if (!analysisResult || !learningPath) return
+    setError(null)
+    try {
+      const result = await adaptLearningPathFromReflection({
+        reflection,
+        gaps: currentGaps,
+        candidateSessions: DEMO_SESSIONS,
+        projectContext: analysisResult.projectContext,
+        scheduledItems: SAMPLE_USER_SCHEDULE,
+        userId: "local-user",
+        journeyId: analysisResult.projectContext.id,
+      })
+      setCurrentGaps(result.updatedGaps)
+      setRecommendations(result.recommendations)
+      setLearningPath(result.learningPath)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al adaptar la ruta.")
+    }
+  }
+
   const handleReset = () => {
     setAnalysisResult(null)
     setLearningPath(null)
     setRecommendations([])
+    setCurrentGaps([])
   }
 
   return (
@@ -229,6 +258,9 @@ export const App: React.FC = () => {
             <LearningPathView
               learningPath={learningPath}
               recommendations={recommendations}
+              gaps={currentGaps}
+              userId="local-user"
+              onReflectionSubmit={handleReflectionSubmit}
             />
           )}
         </section>

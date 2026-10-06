@@ -36,6 +36,7 @@ candidates:
     expected_value: >-
       Cierra el ciclo adaptativo (Journey 5): la reflexión actualiza gaps y
       recalcula recomendaciones.
+    materialized_as: WI-014
 horizon: next
 priority: medium
 ---
