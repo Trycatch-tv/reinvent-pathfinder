@@ -67,6 +67,7 @@ candidates:
     type: feature
     suggested_knowledge_level: K2
     expected_value: GetSchedule y favoritos reconciliados con el mapa de disponibilidad.
+    materialized_as: WI-020
   - id: WI-CANDIDATE-007
     title: Reserva y cancelación de sesiones desde Pathfinder
     type: feature

@@ -25,7 +25,7 @@ Phase: Maintenance
 Reason:
 
 - Roadmap available
-- 19 materialized work item(s)
+- 20 materialized work item(s)
 - Ownership coverage 100%
 
 Recommended next: roadmap-agent
@@ -38,7 +38,7 @@ Next step: Use the roadmap-agent to plan the next initiative.
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 19/19
+- Ownership coverage: 20/20
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -100,6 +100,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-017-ui-local-first-del-session-availability-heatmap.md
 - ✓ WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md
 - ✓ WI-019-integraci-n-live-de-disponibilidad-con-aws-events.md
+- ✓ WI-020-integraci-n-de-agenda-personal-y-favoritos.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -123,7 +124,7 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 19
+- Materialized Work Items: 20
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
@@ -153,6 +154,7 @@ No active work items found.
 - WI-017 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/fixtures/availability-heatmap.ts, apps/client/src/client.test.ts
 - WI-018 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/BuilderIdLogin.tsx, apps/client/src/auth/builder-id-transaction.ts, apps/client/src/client.test.ts
 - WI-019 [feature] owns: packages/events-client/src/types/raw-aws-events.ts, packages/events-client/src/normalizer/normalize-session.ts, packages/events-client/src/normalizer/normalize-availability.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts, apps/client/src/vite-env.d.ts, apps/client/vite.config.ts, packages/domain/src/types/session-candidate.ts, packages/domain/src/domain.test.ts
+- WI-020 [feature] owns: packages/events-client/src/types/user-schedule.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
 
 ## Mapped Modules
 

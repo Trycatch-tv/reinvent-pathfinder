@@ -4,6 +4,7 @@ import {
   AwsEventsClient,
   SAMPLE_RAW_SESSIONS,
   AwsEventsThrottlingError,
+  AwsEventsNotFoundError,
   AwsEventsForbiddenError,
   AwsEventsUnauthorizedError,
   normalizeAwsAvailability,
@@ -173,6 +174,53 @@ describe('AWS Events Client & Normalizer', () => {
       expect(snapshot.sessions.map((session) => session.id)).toEqual(['official-1', 'official-2']);
       expect(snapshot.availability.map((item) => item.status)).toEqual(['limited', 'walk-up']);
       expect(new Set(snapshot.availability.map((item) => item.lastUpdatedAt))).toEqual(new Set([snapshot.observedAt]));
+    });
+  });
+
+  describe('AWS Events attendee schedule and favorites', () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('reads the official schedule without fetching each session', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+        schedule: {
+          reserved: ['reserved-1'],
+          favorites: ['favorite-1', 'unknown-id'],
+          personalTime: [{ personalTimeId: 'personal-1', startDateTime: '2026-12-01T12:00:00', endDateTime: '2026-12-01T13:00:00', title: 'Lunch', description: 'Team lunch' }],
+        },
+      }), { status: 200 }));
+      vi.stubGlobal('fetch', mockFetch);
+      const client = new AwsEventsClient({ baseUrl: 'https://events.example/v1', eventId: 'evt-1', tokenStore: { getAccessToken: () => 'token' } as never });
+
+      const schedule = await client.getPersonalSchedule();
+
+      expect(mockFetch).toHaveBeenCalledOnce();
+      expect(mockFetch.mock.calls[0]?.[0]).toBe('https://events.example/v1/events/evt-1/schedule');
+      expect(schedule.reservedSessionIds).toEqual(['reserved-1']);
+      expect(schedule.favoriteSessionIds).toEqual(['favorite-1', 'unknown-id']);
+      expect(schedule.personalTime[0]?.title).toBe('Lunch');
+    });
+
+    it('reports partial favorite results instead of assuming a 200 succeeded globally', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+        result: { successful: ['favorite-1'], failed: [{ sessionId: 'favorite-2', code: 'OperationUnavailable' }] },
+      }), { status: 200 }));
+      vi.stubGlobal('fetch', mockFetch);
+      const client = new AwsEventsClient({ baseUrl: 'https://events.example/v1', eventId: 'evt-1', tokenStore: { getAccessToken: () => 'token' } as never });
+
+      const result = await client.addFavorite('favorite-1');
+
+      expect(mockFetch.mock.calls[0]?.[0]).toBe('https://events.example/v1/events/evt-1/favorites');
+      expect(mockFetch.mock.calls[0]?.[1]).toMatchObject({ method: 'POST', body: JSON.stringify({ sessionIds: ['favorite-1'] }) });
+      expect(result).toEqual({ successfulSessionIds: ['favorite-1'], failed: [{ sessionId: 'favorite-2', code: 'OperationUnavailable' }] });
+    });
+
+    it('does not retry a failed favorite removal', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(new Response('Not Found', { status: 404 }));
+      vi.stubGlobal('fetch', mockFetch);
+      const client = new AwsEventsClient({ baseUrl: 'https://events.example/v1', eventId: 'evt-1', tokenStore: { getAccessToken: () => 'token' } as never, maxRetries: 3 });
+
+      await expect(client.removeFavorite('favorite-1')).rejects.toThrow(AwsEventsNotFoundError);
+      expect(mockFetch).toHaveBeenCalledOnce();
     });
   });
 

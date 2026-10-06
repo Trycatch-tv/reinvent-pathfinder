@@ -155,6 +155,14 @@ describe("apps/client UI components", () => {
         sessions: heatmapSessions,
         availability: SAMPLE_HEATMAP_AVAILABILITY,
         initialSelectedSessionId: "sess-aim-301",
+        schedule: {
+          reservedSessionIds: ["sess-aim-301"],
+          favoriteSessionIds: ["sess-aim-301"],
+          personalTime: [],
+          lastSyncedAt: "2026-10-06T00:00:00.000Z",
+          items: [],
+        },
+        onToggleFavorite: () => {},
       }),
     )
 
@@ -163,6 +171,8 @@ describe("apps/client UI components", () => {
     expect(html).toContain("Disponibilidad desconocida")
     expect(html).toContain("Palazzo Ballroom E")
     expect(html).toContain("Modo fixture local")
+    expect(html).toContain("Mi agenda")
+    expect(html).toContain("Quitar de favoritos")
   })
 
   it("explains live availability failures without exposing provider details", () => {

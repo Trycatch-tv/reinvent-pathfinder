@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-06T23:11:04.547Z",
+  "generatedAt": "2026-10-06T23:40:33.324Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -485,6 +485,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-020",
+        "type": "feature",
+        "title": "Integración de agenda personal y favoritos",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-006",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -943,6 +967,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-020",
+        "type": "feature",
+        "title": "Integración de agenda personal y favoritos",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-006",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -1161,6 +1209,20 @@
           "packages/domain/src/types/session-candidate.ts",
           "packages/domain/src/domain.test.ts"
         ]
+      },
+      {
+        "id": "WI-020",
+        "type": "feature",
+        "title": "Integración de agenda personal y favoritos",
+        "summary": "",
+        "codeGlobs": [
+          "packages/events-client/src/types/user-schedule.ts",
+          "packages/events-client/src/client/aws-events-client.ts",
+          "packages/events-client/src/events-client.test.ts",
+          "apps/client/src/App.tsx",
+          "apps/client/src/components/AvailabilityHeatmap.tsx",
+          "apps/client/src/client.test.ts"
+        ]
       }
     ]
   },
@@ -1219,6 +1281,7 @@
         "WI-017-ui-local-first-del-session-availability-heatmap.md",
         "WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md",
         "WI-019-integraci-n-live-de-disponibilidad-con-aws-events.md",
+        "WI-020-integraci-n-de-agenda-personal-y-favoritos.md",
         "roadmap.md"
       ]
     }
@@ -1255,17 +1318,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 19,
+    "materialized_work_items": 20,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 19,
+    "materialized": 20,
     "remaining": 0
   },
   "phase": {
     "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "19 materialized work item(s)",
+      "20 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
@@ -1294,8 +1357,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 19,
-    "ownership_coverage": "19/19",
+    "total_work_items": 20,
+    "ownership_coverage": "20/20",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1362,13 +1425,13 @@
     }
   },
   "workItemSummary": {
-    "total": 19,
+    "total": 20,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 19,
+    "completed": 20,
     "archived": 0,
     "summary": "completed-only"
   },

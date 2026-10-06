@@ -6,6 +6,7 @@ import {
   type SessionAvailability,
   type SessionCandidate,
 } from '@pathfinder/domain'
+import type { UserScheduleResult } from '@pathfinder/events-client'
 import React, { useMemo, useState } from 'react'
 
 export interface AvailabilityHeatmapProps {
@@ -19,6 +20,12 @@ export interface AvailabilityHeatmapProps {
   readonly canRefreshLive?: boolean
   readonly onRefreshLive?: () => void
   readonly onReturnHome?: () => void
+  readonly schedule?: UserScheduleResult
+  readonly isRefreshingSchedule?: boolean
+  readonly canRefreshSchedule?: boolean
+  readonly onRefreshSchedule?: () => void
+  readonly onToggleFavorite?: (sessionId: string, isFavorite: boolean) => void
+  readonly favoriteMutationSessionId?: string | null
 }
 
 export function createAvailabilityProjection(
@@ -46,7 +53,13 @@ function uniqueSorted(values: readonly string[]): readonly string[] {
   return [...new Set(values)].sort()
 }
 
-function AvailabilityDetail({ selected }: { readonly selected: AvailabilityProjectedSession }) {
+function AvailabilityDetail({ selected, isFavorite, isReserved, onToggleFavorite, isMutatingFavorite }: {
+  readonly selected: AvailabilityProjectedSession
+  readonly isFavorite: boolean
+  readonly isReserved: boolean
+  readonly onToggleFavorite?: () => void
+  readonly isMutatingFavorite: boolean
+}) {
   const { session, availability } = selected
 
   return (
@@ -60,11 +73,13 @@ function AvailabilityDetail({ selected }: { readonly selected: AvailabilityProje
         <dt>Horario</dt><dd>{session.schedule?.day} · {session.schedule?.startTime}–{session.schedule?.endTime}</dd>
         <dt>Ubicación</dt><dd>{session.location?.venue}{session.location?.room ? ` · ${session.location.room}` : ''}</dd>
         <dt>Disponibilidad</dt><dd>{statusLabel(availability.status)}</dd>
+        <dt>Agenda</dt><dd>{isReserved ? 'Reservada' : 'Sin reserva'}{isFavorite ? ' · Favorita' : ''}</dd>
         <dt>Tipo</dt><dd>{session.format}</dd>
         <dt>Nivel</dt><dd>{session.level}</dd>
         <dt>Temas</dt><dd>{session.topics.join(', ') || 'Sin temas'}</dd>
         {availability.lastUpdatedAt && <><dt>Actualizado</dt><dd>{availability.lastUpdatedAt}</dd></>}
       </dl>
+      {onToggleFavorite && <button type="button" onClick={onToggleFavorite} disabled={isMutatingFavorite}>{isMutatingFavorite ? 'Actualizando favorito…' : isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}</button>}
     </aside>
   )
 }
@@ -80,6 +95,12 @@ export function AvailabilityHeatmap({
   canRefreshLive = false,
   onRefreshLive,
   onReturnHome,
+  schedule,
+  isRefreshingSchedule = false,
+  canRefreshSchedule = false,
+  onRefreshSchedule,
+  onToggleFavorite,
+  favoriteMutationSessionId = null,
 }: AvailabilityHeatmapProps) {
   const days = uniqueSorted(sessions.flatMap((session) => session.schedule ? [session.schedule.day] : []))
   const venues = uniqueSorted(sessions.flatMap((session) => session.location ? [session.location.venue] : []))
@@ -94,6 +115,8 @@ export function AvailabilityHeatmap({
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(initialSelectedSessionId)
   const selected = projectedSessions.find(({ session }) => session.id === selectedSessionId) ?? projectedSessions[0]
   const rowKeys = uniqueSorted(projection.groups.map((group) => `${group.day}\u0000${group.startTime}`))
+  const favoriteIds = new Set(schedule?.favoriteSessionIds ?? [])
+  const reservedIds = new Set(schedule?.reservedSessionIds ?? [])
 
   const updateFilter = <Key extends keyof AvailabilityProjectionFilters>(key: Key, value: AvailabilityProjectionFilters[Key]) => {
     setFilters((current) => ({ ...current, [key]: value }))
@@ -114,9 +137,14 @@ export function AvailabilityHeatmap({
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           {onRefreshLive && <button type="button" onClick={onRefreshLive} disabled={!canRefreshLive || isRefreshing}>{isRefreshing ? 'Actualizando…' : 'Actualizar disponibilidad'}</button>}
+          {onRefreshSchedule && <button type="button" onClick={onRefreshSchedule} disabled={!canRefreshSchedule || isRefreshingSchedule}>{isRefreshingSchedule ? 'Actualizando agenda…' : 'Actualizar mi agenda'}</button>}
           <button type="button" onClick={onReturnHome}>Volver a Pathfinder</button>
         </div>
       </div>
+
+      {schedule && <section aria-label="Resumen de agenda" style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.75rem', margin: '1rem 0' }}>
+        <strong>Mi agenda</strong>: {schedule.reservedSessionIds.length} reserva(s), {schedule.favoriteSessionIds.length} favorito(s), {schedule.personalTime.length} bloque(s) personal(es). <span>Sincronizada el {new Date(schedule.lastSyncedAt).toLocaleString()}.</span>
+      </section>}
 
       <fieldset style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '1rem', margin: '1rem 0' }}>
         <legend>Filtros</legend>
@@ -140,13 +168,18 @@ export function AvailabilityHeatmap({
               const [day, startTime] = rowKey.split('\u0000')
               return <tr key={rowKey}><th scope="row">{day} · {startTime}</th>{venues.map((venue) => {
                 const group = projection.groups.find((candidate) => candidate.day === day && candidate.startTime === startTime && candidate.venue === venue)
-                return <td key={venue}>{group?.sessions.map((item) => <button key={item.session.id} type="button" onClick={() => setSelectedSessionId(item.session.id)} aria-label={`${item.session.title}: ${statusLabel(item.availability.status)}`} style={{ display: 'block', marginBottom: '0.35rem' }}>{item.session.code} — {statusLabel(item.availability.status)}</button>) ?? '—'}</td>
+                return <td key={venue}>{group?.sessions.map((item) => {
+                  const isFavorite = favoriteIds.has(item.session.id)
+                  const isReserved = reservedIds.has(item.session.id)
+                  const agendaLabel = `${isReserved ? ' · Reservada' : ''}${isFavorite ? ' · Favorita' : ''}`
+                  return <button key={item.session.id} type="button" onClick={() => setSelectedSessionId(item.session.id)} aria-label={`${item.session.title}: ${statusLabel(item.availability.status)}${agendaLabel}`} style={{ display: 'block', marginBottom: '0.35rem' }}>{item.session.code} — {statusLabel(item.availability.status)}{isReserved ? ' · Reservada' : ''}{isFavorite ? ' · Favorita' : ''}</button>
+                }) ?? '—'}</td>
               })}</tr>
             })}
           </tbody>
         </table>
       </div>
-      {selected ? <AvailabilityDetail selected={selected} /> : <p>No hay sesiones que coincidan con los filtros.</p>}
+      {selected ? <AvailabilityDetail selected={selected} isFavorite={favoriteIds.has(selected.session.id)} isReserved={reservedIds.has(selected.session.id)} onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(selected.session.id, favoriteIds.has(selected.session.id)) : undefined} isMutatingFavorite={favoriteMutationSessionId === selected.session.id} /> : <p>No hay sesiones que coincidan con los filtros.</p>}
     </section>
   )
 }

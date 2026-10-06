@@ -23,6 +23,7 @@ import {
   AwsEventsClient,
   AwsEventsError,
   AwsEventsForbiddenError,
+  AwsEventsNotFoundError,
   AwsEventsThrottlingError,
   AwsEventsUnauthorizedError,
   InMemoryTokenStore,
@@ -53,6 +54,7 @@ const liveEventsClient = liveEventId
   ? new AwsEventsClient({ baseUrl: eventsApiBaseUrl, eventId: liveEventId, tokenStore })
   : null
 type LiveAvailabilitySnapshot = Awaited<ReturnType<AwsEventsClient["fetchAvailabilitySnapshot"]>>
+type LiveScheduleSnapshot = Awaited<ReturnType<AwsEventsClient["getPersonalSchedule"]>>
 
 export function selectAvailabilitySnapshot(snapshot: LiveAvailabilitySnapshot | null) {
   return snapshot
@@ -73,6 +75,13 @@ export function describeLiveAvailabilityError(error: unknown): string {
   return "No fue posible actualizar la disponibilidad desde AWS Events."
 }
 
+export function describeLiveScheduleError(error: unknown): string {
+  if (error instanceof AwsEventsNotFoundError || (error instanceof AwsEventsError && error.statusCode === 404)) {
+    return "Ese favorito ya no existe en AWS Events; actualiza tu agenda para reconciliarla."
+  }
+  return describeLiveAvailabilityError(error).replace("la disponibilidad", "tu agenda")
+}
+
 export const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] =
     useState<AnalyzeContextResponse | null>(null)
@@ -88,6 +97,10 @@ export const App: React.FC = () => {
   const [liveSnapshot, setLiveSnapshot] = useState<LiveAvailabilitySnapshot | null>(null)
   const [isRefreshingAvailability, setIsRefreshingAvailability] = useState(false)
   const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(null)
+  const [scheduleSnapshot, setScheduleSnapshot] = useState<LiveScheduleSnapshot | null>(null)
+  const [scheduleMessage, setScheduleMessage] = useState<string | null>(null)
+  const [isRefreshingSchedule, setIsRefreshingSchedule] = useState(false)
+  const [favoriteMutationSessionId, setFavoriteMutationSessionId] = useState<string | null>(null)
   const [route, setRoute] = useState(() => typeof window === "undefined" ? "/" : window.location.pathname)
   const isAvailabilityRoute = route === "/availability"
   const isCallbackRoute = route === "/callback"
@@ -212,6 +225,51 @@ export const App: React.FC = () => {
     }
   }
 
+  const canLoadSchedule = Boolean(liveEventsClient && isAuthenticated && tokenStore.getAccessToken() && liveSnapshot)
+
+  const handleScheduleRefresh = async () => {
+    if (!liveEventsClient || !liveSnapshot) {
+      setScheduleMessage("Actualiza primero la disponibilidad live para consultar tu agenda.")
+      return
+    }
+    if (!isAuthenticated || !tokenStore.getAccessToken()) {
+      setScheduleMessage("Inicia sesión con Builder ID para consultar tu agenda.")
+      return
+    }
+    setIsRefreshingSchedule(true)
+    setScheduleMessage(null)
+    try {
+      setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
+    } catch (err: unknown) {
+      setScheduleMessage(`${describeLiveScheduleError(err)}${scheduleSnapshot ? " Se conserva la última agenda confirmada." : ""}`)
+    } finally {
+      setIsRefreshingSchedule(false)
+    }
+  }
+
+  const handleToggleFavorite = async (sessionId: string, isFavorite: boolean) => {
+    if (!liveEventsClient || !scheduleSnapshot || !canLoadSchedule) return
+    setFavoriteMutationSessionId(sessionId)
+    setScheduleMessage(null)
+    try {
+      const result = isFavorite
+        ? (await liveEventsClient.removeFavorite(sessionId), { successfulSessionIds: [sessionId], failed: [] })
+        : await liveEventsClient.addFavorite(sessionId)
+      const reconciled = await liveEventsClient.getPersonalSchedule()
+      setScheduleSnapshot(reconciled)
+      setScheduleMessage(result.failed.length ? `AWS Events rechazó ${result.failed.length} favorito(s); se mostró la agenda confirmada.` : "Agenda reconciliada con AWS Events.")
+    } catch (err: unknown) {
+      try {
+        setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
+      } catch {
+        // Preserve the last confirmed schedule when reconciliation also fails.
+      }
+      setScheduleMessage(describeLiveScheduleError(err))
+    } finally {
+      setFavoriteMutationSessionId(null)
+    }
+  }
+
   return (
     <div
       style={{
@@ -248,11 +306,17 @@ export const App: React.FC = () => {
           availability={availabilityView.availability}
           source={availabilityView.source}
           snapshotAt={liveSnapshot?.observedAt}
-          liveStatus={availabilityMessage ?? undefined}
+          liveStatus={availabilityMessage ?? scheduleMessage ?? undefined}
           isRefreshing={isRefreshingAvailability}
           canRefreshLive={Boolean(liveEventsClient && isAuthenticated)}
           onRefreshLive={handleAvailabilityRefresh}
           onReturnHome={() => navigate("/")}
+          schedule={scheduleSnapshot ?? undefined}
+          isRefreshingSchedule={isRefreshingSchedule}
+          canRefreshSchedule={canLoadSchedule}
+          onRefreshSchedule={handleScheduleRefresh}
+          onToggleFavorite={handleToggleFavorite}
+          favoriteMutationSessionId={favoriteMutationSessionId}
         />
       ) : isCallbackRoute ? (
         <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => { setIsAuthenticated(true); setRoute("/") }} onLogout={() => setIsAuthenticated(false)} />

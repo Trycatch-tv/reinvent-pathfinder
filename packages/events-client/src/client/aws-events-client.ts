@@ -16,7 +16,7 @@ import { normalizeAwsSession } from '../normalizer/normalize-session.js';
 import { normalizeAwsAvailability } from '../normalizer/normalize-availability.js';
 import { SAMPLE_RAW_SESSIONS } from '../fixtures/sample-sessions.js';
 import { SAMPLE_USER_SCHEDULE } from '../fixtures/sample-user-schedule.js';
-import type { UserScheduleItem, UserScheduleResult, RawAwsScheduleResponse } from '../types/user-schedule.js';
+import type { FavoriteMutationResult, RawAwsFavoriteMutationResponse, RawAwsScheduleResponse, UserScheduleItem, UserScheduleResult } from '../types/user-schedule.js';
 
 import type { TokenStore } from '../auth/token-store.js';
 
@@ -31,7 +31,6 @@ export interface AwsEventsClientOptions {
   readonly baseBackoffMs?: number;
   readonly mockMode?: boolean;
   readonly mockSessions?: readonly RawAwsSession[];
-  readonly mockUserSchedule?: readonly UserScheduleItem[];
 }
 
 export interface CatalogPageResult {
@@ -58,7 +57,7 @@ export class AwsEventsClient {
   private readonly baseBackoffMs: number;
   private readonly mockMode: boolean;
   private readonly mockSessions: readonly RawAwsSession[];
-  private mockUserScheduleList: UserScheduleItem[];
+  private mockSchedule: UserScheduleResult;
   private mockFavoriteIds: Set<string>;
 
   constructor(options: AwsEventsClientOptions = {}) {
@@ -71,12 +70,14 @@ export class AwsEventsClient {
     this.baseBackoffMs = options.baseBackoffMs ?? 50; // default short backoff for tests
     this.mockMode = options.mockMode ?? false;
     this.mockSessions = options.mockSessions ?? SAMPLE_RAW_SESSIONS;
-    this.mockUserScheduleList = [...(options.mockUserSchedule ?? SAMPLE_USER_SCHEDULE)];
-    this.mockFavoriteIds = new Set(
-      this.mockUserScheduleList
-        .filter((item) => item.type === 'favorite')
-        .map((item) => item.session?.id ?? item.id)
-    );
+    this.mockSchedule = {
+      reservedSessionIds: SAMPLE_USER_SCHEDULE.filter((item) => item.type === 'reserved').map((item) => item.session?.id ?? item.id),
+      favoriteSessionIds: SAMPLE_USER_SCHEDULE.filter((item) => item.type === 'favorite').map((item) => item.session?.id ?? item.id),
+      personalTime: [],
+      lastSyncedAt: new Date().toISOString(),
+      items: SAMPLE_USER_SCHEDULE,
+    };
+    this.mockFavoriteIds = new Set(this.mockSchedule.favoriteSessionIds);
   }
 
   /**
@@ -195,7 +196,12 @@ export class AwsEventsClient {
     }
   }
 
-  private async requestWithRetry<T>(url: string, method: 'GET' | 'POST' | 'DELETE' = 'GET'): Promise<T> {
+  private async requestWithRetry<T>(
+    url: string,
+    method: 'GET' | 'POST' | 'DELETE' = 'GET',
+    body?: unknown,
+    safeToRetry = true,
+  ): Promise<T> {
     let attempt = 0;
 
     while (attempt <= this.maxRetries) {
@@ -206,6 +212,7 @@ export class AwsEventsClient {
         const headers: Record<string, string> = {
           'Accept': 'application/json',
         };
+        if (body !== undefined) headers['Content-Type'] = 'application/json';
         const bearerToken = this.tokenStore?.getAccessToken() ?? this.apiKey;
         if (bearerToken) {
           headers['Authorization'] = `Bearer ${bearerToken}`;
@@ -214,6 +221,7 @@ export class AwsEventsClient {
         const response = await fetch(url, {
           method,
           headers,
+          ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
           signal: controller.signal,
         });
 
@@ -242,7 +250,7 @@ export class AwsEventsClient {
           const retryAfterHeader = response.headers.get('Retry-After');
           const retryAfterSeconds = retryAfterHeader ? parseInt(retryAfterHeader, 10) : undefined;
 
-          if (attempt === this.maxRetries) {
+          if (!safeToRetry || attempt === this.maxRetries) {
             throw new AwsEventsThrottlingError('Max retries exceeded on 429 rate limit', retryAfterSeconds);
           }
 
@@ -255,7 +263,7 @@ export class AwsEventsClient {
         }
 
         if (response.status >= 500) {
-          if (attempt === this.maxRetries) {
+          if (!safeToRetry || attempt === this.maxRetries) {
             throw new AwsEventsError(`Server error HTTP ${response.status}`, response.status, false);
           }
           await this.sleep(this.calculateBackoff(attempt));
@@ -271,7 +279,7 @@ export class AwsEventsClient {
             throw err;
           }
         }
-        if (attempt >= this.maxRetries) {
+        if (!safeToRetry || attempt >= this.maxRetries) {
           throw err instanceof Error ? err : new Error(String(err));
         }
         await this.sleep(this.calculateBackoff(attempt));
@@ -322,14 +330,15 @@ export class AwsEventsClient {
     };
   }
 
-  /**
-   * Fetches the authenticated user's personal schedule (reservations, favorites, personal time).
-   * In non-mock mode, requires a valid token in the configured TokenStore.
-   */
+  /** Fetches the attendee's schedule; AWS Events is the source of truth. */
   public async getPersonalSchedule(): Promise<UserScheduleResult> {
     if (this.mockMode) {
       return {
-        items: [...this.mockUserScheduleList],
+        ...this.mockSchedule,
+        reservedSessionIds: [...this.mockSchedule.reservedSessionIds],
+        favoriteSessionIds: [...this.mockSchedule.favoriteSessionIds],
+        personalTime: [...this.mockSchedule.personalTime],
+        items: [...this.mockSchedule.items],
         lastSyncedAt: new Date().toISOString(),
       };
     }
@@ -339,37 +348,32 @@ export class AwsEventsClient {
       throw new AwsEventsUnauthorizedError('Cannot fetch personal schedule without an active access token.');
     }
 
-    const url = `${this.baseUrl}/user/schedule`;
+    const url = `${this.eventUrl('/schedule')}`;
     const rawResponse = await this.requestWithRetry<RawAwsScheduleResponse>(url);
-
-    const items: UserScheduleItem[] = [];
-    for (const rawItem of rawResponse.data ?? []) {
-      let session: SessionCandidate | undefined;
-      if (rawItem.session_id) {
-        try {
-          session = (await this.fetchSessionById(rawItem.session_id)) ?? undefined;
-        } catch {
-          // If session details fail to fetch, proceed with minimal schedule info
-        }
-      }
-
-      const itemType = rawItem.type.toLowerCase() as UserScheduleItem['type'];
-      items.push({
-        id: rawItem.id,
-        type: itemType,
-        session,
-        title: rawItem.title ?? session?.title ?? 'Scheduled Item',
-        day: rawItem.day ?? session?.schedule?.day ?? rawItem.start_time.split('T')[0] ?? '',
-        startTime: rawItem.start_time,
-        endTime: rawItem.end_time,
-        venue: rawItem.venue ?? session?.location?.venue,
-        room: rawItem.room ?? session?.location?.room,
-      });
+    const schedule = rawResponse.schedule;
+    if (!schedule) {
+      const legacyItems = rawResponse.data ?? [];
+      return {
+        reservedSessionIds: legacyItems.filter((item) => item.type.toLowerCase() === 'reserved').map((item) => item.session_id ?? item.id),
+        favoriteSessionIds: legacyItems.filter((item) => item.type.toLowerCase() === 'favorite').map((item) => item.session_id ?? item.id),
+        personalTime: [],
+        lastSyncedAt: rawResponse.sync_time ?? new Date().toISOString(),
+        items: legacyItems.map((item) => ({ id: item.id, type: item.type.toLowerCase() as UserScheduleItem['type'], title: item.title ?? 'Scheduled Item', day: item.day ?? item.start_time.split('T')[0] ?? '', startTime: item.start_time, endTime: item.end_time, venue: item.venue, room: item.room })),
+      };
     }
-
+    const reservedSessionIds = schedule.reserved ?? [];
+    const favoriteSessionIds = schedule.favorites ?? [];
+    const personalTime = schedule.personalTime ?? [];
     return {
-      items,
-      lastSyncedAt: rawResponse.sync_time ?? new Date().toISOString(),
+      reservedSessionIds,
+      favoriteSessionIds,
+      personalTime,
+      lastSyncedAt: new Date().toISOString(),
+      items: [
+        ...reservedSessionIds.map((id) => ({ id, type: 'reserved' as const, title: `Session ${id}`, day: '', startTime: '', endTime: '' })),
+        ...favoriteSessionIds.map((id) => ({ id, type: 'favorite' as const, title: `Session ${id}`, day: '', startTime: '', endTime: '' })),
+        ...personalTime.map((item) => ({ id: item.personalTimeId, type: 'personal_time' as const, title: item.title, day: item.startDateTime.split('T')[0] ?? '', startTime: item.startDateTime, endTime: item.endDateTime, notes: item.description, ...(item.location ? { venue: item.location } : {}) })),
+      ],
     };
   }
 
@@ -382,32 +386,17 @@ export class AwsEventsClient {
     }
 
     const schedule = await this.getPersonalSchedule();
-    return schedule.items
-      .filter((item) => item.type === 'favorite')
-      .map((item) => item.session?.id ?? item.id);
+    return schedule.favoriteSessionIds;
   }
 
   /**
    * Adds a session to user favorites.
    */
-  public async addFavorite(sessionId: string): Promise<void> {
+  public async addFavorite(sessionId: string): Promise<FavoriteMutationResult> {
     if (this.mockMode) {
       this.mockFavoriteIds.add(sessionId);
-      if (!this.mockUserScheduleList.some((item) => (item.session?.id ?? item.id) === sessionId)) {
-        const session = await this.fetchSessionById(sessionId);
-        this.mockUserScheduleList.push({
-          id: `fav-${sessionId}`,
-          type: 'favorite',
-          session: session ?? undefined,
-          title: session?.title ?? `Session ${sessionId}`,
-          day: session?.schedule?.day ?? '',
-          startTime: session?.schedule?.startTime ?? '',
-          endTime: session?.schedule?.endTime ?? '',
-          venue: session?.location?.venue,
-          room: session?.location?.room,
-        });
-      }
-      return;
+      this.mockSchedule = { ...this.mockSchedule, favoriteSessionIds: Array.from(this.mockFavoriteIds), items: this.mockSchedule.items };
+      return { successfulSessionIds: [sessionId], failed: [] };
     }
 
     const token = this.tokenStore?.getAccessToken();
@@ -415,8 +404,12 @@ export class AwsEventsClient {
       throw new AwsEventsUnauthorizedError('Cannot add favorite without an active access token.');
     }
 
-    const url = `${this.baseUrl}/user/favorites/${encodeURIComponent(sessionId)}`;
-    await this.requestWithRetry<unknown>(url, 'POST');
+    const url = this.eventId ? this.eventUrl('/favorites') : `${this.baseUrl}/user/favorites/${encodeURIComponent(sessionId)}`;
+    const response = await this.requestWithRetry<RawAwsFavoriteMutationResponse>(url, 'POST', { sessionIds: [sessionId] }, false);
+    return {
+      successfulSessionIds: response.result.successful ?? [],
+      failed: response.result.failed ?? [],
+    };
   }
 
   /**
@@ -425,9 +418,7 @@ export class AwsEventsClient {
   public async removeFavorite(sessionId: string): Promise<void> {
     if (this.mockMode) {
       this.mockFavoriteIds.delete(sessionId);
-      this.mockUserScheduleList = this.mockUserScheduleList.filter(
-        (item) => (item.session?.id ?? item.id) !== sessionId && item.id !== `fav-${sessionId}`
-      );
+      this.mockSchedule = { ...this.mockSchedule, favoriteSessionIds: Array.from(this.mockFavoriteIds), items: this.mockSchedule.items };
       return;
     }
 
@@ -436,7 +427,12 @@ export class AwsEventsClient {
       throw new AwsEventsUnauthorizedError('Cannot remove favorite without an active access token.');
     }
 
-    const url = `${this.baseUrl}/user/favorites/${encodeURIComponent(sessionId)}`;
-    await this.requestWithRetry<unknown>(url, 'DELETE');
+    const url = this.eventId ? this.eventUrl(`/favorites/${encodeURIComponent(sessionId)}`) : `${this.baseUrl}/user/favorites/${encodeURIComponent(sessionId)}`;
+    await this.requestWithRetry<unknown>(url, 'DELETE', undefined, false);
+  }
+
+  private eventUrl(path: string): string {
+    if (!this.eventId) return `${this.baseUrl}/user${path}`;
+    return `${this.baseUrl}/events/${encodeURIComponent(this.eventId)}${path}`;
   }
 }
