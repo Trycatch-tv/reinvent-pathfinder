@@ -25,7 +25,7 @@ Phase: Maintenance
 Reason:
 
 - Roadmap available
-- 8 materialized work item(s)
+- 15 materialized work item(s)
 - Ownership coverage 100%
 
 Recommended next: roadmap-agent
@@ -38,7 +38,7 @@ Next step: Use the roadmap-agent to plan the next initiative.
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 8/8
+- Ownership coverage: 15/15
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -79,6 +79,8 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ INI-003-motor-de-conocimiento-y-recomendaciones.md
 - ✓ INI-004-experiencia-learning-path-y-reflexi-n.md
 - ✓ INI-005-cierre-de-ciclo-y-exposici-n.md
+- ✓ INI-006-habilitaci-n-de-ia-real-en-aws-bedrock-agentcore-m.md
+- ✓ INI-007-live-event-experience-disponibilidad-agenda-y-rese.md
 - ✓ WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md
 - ✓ WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md
 - ✓ WI-003-modelo-de-dominio-base-en-packages-domain.md
@@ -87,6 +89,13 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-006-agenda-personal-getschedule-favoritos-y-detecci-n-.md
 - ✓ WI-007-an-lisis-de-contexto-knowledge-profile-knowledge-g.md
 - ✓ WI-008-ingesta-sem-ntica-del-cat-logo-a-amazon-bedrock-ma.md
+- ✓ WI-009-recomendaciones-explicables-candidate-filtering-ra.md
+- ✓ WI-010-runtime-agentic-strands-agentcore-topolog-a-reduci.md
+- ✓ WI-011-ui-de-captura-de-contexto-y-visualizaci-n-de-knowl.md
+- ✓ WI-012-reconciliar-verificaci-n-de-delivery-y-tests-ausen.md
+- ✓ WI-013-construcci-n-y-visualizaci-n-del-learning-path-con.md
+- ✓ WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md
+- ✓ WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -101,16 +110,16 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 
 ## Current Knowledge
 
-> What is true about this product right now.
+No project knowledge summary found yet.
 
 ## Roadmap Status
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 8
+- Materialized Work Items: 15
 - Remaining Work Item candidates: 0
 
-> What we intend to build and why.
+No roadmap baseline found.
 
 ## Active Work Items
 
@@ -126,6 +135,13 @@ No active work items found.
 - WI-006 [feature] owns: packages/events-client/**
 - WI-007 [feature] owns: packages/contracts/**, ai/knowledge/**, services/api/**
 - WI-008 [feature] owns: ai/knowledge/**
+- WI-009 [feature] owns: packages/contracts/**, ai/knowledge/**, services/api/**
+- WI-010 [spike] owns: ai/contracts/**, ai/tools/**, ai/agents/**
+- WI-011 [feature] owns: apps/client/**
+- WI-012 [chore] owns: packages/contracts/**, packages/domain/**, packages/data/**, packages/shared/**, knowledge/delivery/work-items/**
+- WI-013 [feature] owns: apps/client/**, ai/knowledge/**
+- WI-014 [feature] owns: apps/client/**, ai/knowledge/**
+- WI-015 [feature] owns: packages/domain/src/types/**, packages/domain/src/fixtures/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
 
 ## Mapped Modules
 
@@ -184,7 +200,8 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Missing Context
 
-_None — all expected context is present._
+- No project knowledge summary found yet.
+- No roadmap baseline found.
 
 
 ### Metadata Health

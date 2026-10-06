@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-05T02:37:53.130Z",
+  "generatedAt": "2026-10-06T18:49:49.686Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -19,8 +19,8 @@
     "infrastructureFiles": []
   },
   "knowledge": {
-    "summary": "> What is true about this product right now.",
-    "roadmapSummary": "> What we intend to build and why.",
+    "summary": "",
+    "roadmapSummary": "",
     "inventoryAvailable": true,
     "workItems": [],
     "activeWorkItems": [],
@@ -66,8 +66,8 @@
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
-        "implementationStatus": "in-progress",
-        "validationStatus": "in-progress",
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -90,8 +90,8 @@
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
-        "implementationStatus": "in-progress",
-        "validationStatus": "in-progress",
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -114,8 +114,8 @@
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
-        "implementationStatus": "in-progress",
-        "validationStatus": "in-progress",
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -212,6 +212,173 @@
         },
         "implementationStatus": "completed",
         "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-009",
+        "type": "feature",
+        "title": "Recomendaciones explicables: candidate filtering + ranking contextual con Bedrock",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "recommendations"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-010",
+        "type": "spike",
+        "title": "Runtime agentic (Strands + AgentCore): topología reducida y tools",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-011",
+        "type": "feature",
+        "title": "UI de captura de contexto y visualización de Knowledge Profile / Gaps",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-012",
+        "type": "chore",
+        "title": "Reconciliar verificación de delivery y tests ausentes (deuda de WI-002..011)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "chat",
+          "imported_at": "2026-10-06",
+          "inferred": false
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-013",
+        "type": "feature",
+        "title": "Construcción y visualización del Learning Path (con reconciliación de agenda)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-014",
+        "type": "feature",
+        "title": "Reflexión post-sesión y adaptación del journey (re-ranking)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-015",
+        "type": "feature",
+        "title": "Modelo normalizado de disponibilidad de sesiones y fixtures",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -261,8 +428,8 @@
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
-        "implementationStatus": "in-progress",
-        "validationStatus": "in-progress",
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -285,8 +452,8 @@
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
-        "implementationStatus": "in-progress",
-        "validationStatus": "in-progress",
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -309,8 +476,8 @@
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
-        "implementationStatus": "in-progress",
-        "validationStatus": "in-progress",
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -407,6 +574,173 @@
         },
         "implementationStatus": "completed",
         "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-009",
+        "type": "feature",
+        "title": "Recomendaciones explicables: candidate filtering + ranking contextual con Bedrock",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "recommendations"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-010",
+        "type": "spike",
+        "title": "Runtime agentic (Strands + AgentCore): topología reducida y tools",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-011",
+        "type": "feature",
+        "title": "UI de captura de contexto y visualización de Knowledge Profile / Gaps",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-012",
+        "type": "chore",
+        "title": "Reconciliar verificación de delivery y tests ausentes (deuda de WI-002..011)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "platform",
+          "tech"
+        ],
+        "source": {
+          "type": "chat",
+          "imported_at": "2026-10-06",
+          "inferred": false
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-013",
+        "type": "feature",
+        "title": "Construcción y visualización del Learning Path (con reconciliación de agenda)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-014",
+        "type": "feature",
+        "title": "Reflexión post-sesión y adaptación del journey (re-ranking)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-015",
+        "type": "feature",
+        "title": "Modelo normalizado de disponibilidad de sesiones y fixtures",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -497,6 +831,82 @@
         "codeGlobs": [
           "ai/knowledge/**"
         ]
+      },
+      {
+        "id": "WI-009",
+        "type": "feature",
+        "title": "Recomendaciones explicables: candidate filtering + ranking contextual con Bedrock",
+        "summary": "",
+        "codeGlobs": [
+          "packages/contracts/**",
+          "ai/knowledge/**",
+          "services/api/**"
+        ]
+      },
+      {
+        "id": "WI-010",
+        "type": "spike",
+        "title": "Runtime agentic (Strands + AgentCore): topología reducida y tools",
+        "summary": "",
+        "codeGlobs": [
+          "ai/contracts/**",
+          "ai/tools/**",
+          "ai/agents/**"
+        ]
+      },
+      {
+        "id": "WI-011",
+        "type": "feature",
+        "title": "UI de captura de contexto y visualización de Knowledge Profile / Gaps",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/**"
+        ]
+      },
+      {
+        "id": "WI-012",
+        "type": "chore",
+        "title": "Reconciliar verificación de delivery y tests ausentes (deuda de WI-002..011)",
+        "summary": "Varios Work Items (WI-002, WI-003, WI-004, WI-009, WI-010, WI-011) fueron cerrados a lifecycle `completed` fuera de sesión, pero su evidencia interna quedó inconsistente: `implementation_status`/`validation_status: in-progress`, `validations: []`, y `changed_paths` mal copiado…",
+        "codeGlobs": [
+          "packages/contracts/**",
+          "packages/domain/**",
+          "packages/data/**",
+          "packages/shared/**",
+          "knowledge/delivery/work-items/**"
+        ]
+      },
+      {
+        "id": "WI-013",
+        "type": "feature",
+        "title": "Construcción y visualización del Learning Path (con reconciliación de agenda)",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/**",
+          "ai/knowledge/**"
+        ]
+      },
+      {
+        "id": "WI-014",
+        "type": "feature",
+        "title": "Reflexión post-sesión y adaptación del journey (re-ranking)",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/**",
+          "ai/knowledge/**"
+        ]
+      },
+      {
+        "id": "WI-015",
+        "type": "feature",
+        "title": "Modelo normalizado de disponibilidad de sesiones y fixtures",
+        "summary": "",
+        "codeGlobs": [
+          "packages/domain/src/types/**",
+          "packages/domain/src/fixtures/**",
+          "packages/domain/src/index.ts",
+          "packages/domain/src/domain.test.ts"
+        ]
       }
     ]
   },
@@ -534,6 +944,8 @@
         "INI-003-motor-de-conocimiento-y-recomendaciones.md",
         "INI-004-experiencia-learning-path-y-reflexi-n.md",
         "INI-005-cierre-de-ciclo-y-exposici-n.md",
+        "INI-006-habilitaci-n-de-ia-real-en-aws-bedrock-agentcore-m.md",
+        "INI-007-live-event-experience-disponibilidad-agenda-y-rese.md",
         "WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
         "WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md",
         "WI-003-modelo-de-dominio-base-en-packages-domain.md",
@@ -542,6 +954,13 @@
         "WI-006-agenda-personal-getschedule-favoritos-y-detecci-n-.md",
         "WI-007-an-lisis-de-contexto-knowledge-profile-knowledge-g.md",
         "WI-008-ingesta-sem-ntica-del-cat-logo-a-amazon-bedrock-ma.md",
+        "WI-009-recomendaciones-explicables-candidate-filtering-ra.md",
+        "WI-010-runtime-agentic-strands-agentcore-topolog-a-reduci.md",
+        "WI-011-ui-de-captura-de-contexto-y-visualizaci-n-de-knowl.md",
+        "WI-012-reconciliar-verificaci-n-de-delivery-y-tests-ausen.md",
+        "WI-013-construcci-n-y-visualizaci-n-del-learning-path-con.md",
+        "WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md",
+        "WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md",
         "roadmap.md"
       ]
     }
@@ -578,17 +997,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 8,
+    "materialized_work_items": 15,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 8,
+    "materialized": 15,
     "remaining": 0
   },
   "phase": {
     "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "8 materialized work item(s)",
+      "15 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
@@ -617,8 +1036,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 8,
-    "ownership_coverage": "8/8",
+    "total_work_items": 15,
+    "ownership_coverage": "15/15",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -668,30 +1087,30 @@
     }
   },
   "installedAssets": {
-    "version": "3.109.0",
+    "version": "3.113.0",
     "agents": {
       "total": 20,
       "installed": 20,
-      "outdated": 0,
+      "outdated": 20,
       "unknown_version": 0,
       "modified": 0
     },
     "skills": {
       "total": 10,
       "installed": 10,
-      "outdated": 0,
+      "outdated": 10,
       "unknown_version": 0,
       "modified": 0
     }
   },
   "workItemSummary": {
-    "total": 8,
+    "total": 15,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 8,
+    "completed": 15,
     "archived": 0,
     "summary": "completed-only"
   },
@@ -903,7 +1322,10 @@
   },
   "affectedModuleContexts": {},
   "isModuleRepo": false,
-  "missing": [],
+  "missing": [
+    "No project knowledge summary found yet.",
+    "No roadmap baseline found."
+  ],
   "handoff": {
     "recommendedAgents": [
       "roadmap-agent"

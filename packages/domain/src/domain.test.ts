@@ -7,12 +7,61 @@ import {
   recordReflectionOnJourney,
   type KnowledgeGap,
   type SessionCandidate,
+  type AvailabilityStatus,
+  type SessionAvailability,
+  SAMPLE_SESSION_AVAILABILITIES,
   type Reflection,
   type AttendeeJourney,
   type ProjectContext,
 } from './index.js';
 
 describe('Domain Models and Logic', () => {
+  describe('Session availability', () => {
+    it('exposes every supported provider-independent availability status', () => {
+      const statuses = new Set(SAMPLE_SESSION_AVAILABILITIES.map(({ status }) => status));
+      const expected: readonly AvailabilityStatus[] = [
+        'available',
+        'limited',
+        'full',
+        'walk-up',
+        'unavailable',
+        'unknown',
+      ];
+
+      expect(statuses).toEqual(new Set(expected));
+    });
+
+    it('keeps unknown explicit when provider metadata is absent', () => {
+      const unknown = SAMPLE_SESSION_AVAILABILITIES.find(({ status }) => status === 'unknown');
+
+      expect(unknown).toEqual({
+        sessionId: 'sess-unknown',
+        status: 'unknown',
+      });
+      expect(unknown?.capacityRemaining).toBeUndefined();
+      expect(unknown?.isReservable).toBeUndefined();
+      expect(unknown?.lastUpdatedAt).toBeUndefined();
+    });
+
+    it('associates availability with a session without inferring it from capacity', () => {
+      const session: SessionCandidate = {
+        id: 'sess-available',
+        code: 'ARC101',
+        title: 'Availability consumer',
+        description: '',
+        level: 100,
+        format: 'breakout',
+        topics: [],
+      };
+      const availability: SessionAvailability | undefined = SAMPLE_SESSION_AVAILABILITIES.find(
+        ({ sessionId }) => sessionId === session.id,
+      );
+
+      expect(availability?.status).toBe('available');
+      expect(availability?.capacityRemaining).toBe(48);
+    });
+  });
+
   describe('ProjectContext', () => {
     it('creates a typed project context successfully', () => {
       const context: ProjectContext = {

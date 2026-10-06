@@ -15,10 +15,11 @@ related_capabilities:
   - reservations
 created_at: '2026-10-06'
 external_links:
-  - https://docs.aws.amazon.com/events/latest/devguide/rest-op-listsessions.html
-  - https://docs.aws.amazon.com/events/latest/devguide/authentication.html
-  - https://docs.aws.amazon.com/events/latest/devguide/rest-op-getschedule.html
-  - https://docs.aws.amazon.com/events/latest/devguide/rest-op-reservesessions.html
+  - 'https://docs.aws.amazon.com/events/latest/devguide/rest-op-listsessions.html'
+  - 'https://docs.aws.amazon.com/events/latest/devguide/authentication.html'
+  - 'https://docs.aws.amazon.com/events/latest/devguide/rest-op-getschedule.html'
+  - >-
+    https://docs.aws.amazon.com/events/latest/devguide/rest-op-reservesessions.html
 candidates:
   - id: WI-CANDIDATE-001
     title: Modelo normalizado de disponibilidad de sesiones y fixtures
@@ -26,15 +27,19 @@ candidates:
     suggested_knowledge_level: K2
     expected_value: >-
       Introduce un contrato estable e independiente de AWS para disponibilidad,
-      reservabilidad y modalidad walk-up, apto para desarrollo y pruebas sin el API real.
+      reservabilidad y modalidad walk-up, apto para desarrollo y pruebas sin el
+      API real.
     notes: >-
       No asumir capacidad numérica exacta; tolerar campos ausentes y normalizar
       únicamente señales confiables a estados internos estables.
+    materialized_as: WI-015
   - id: WI-CANDIDATE-002
     title: Motor de proyección y filtrado para Availability Heatmap
     type: feature
     suggested_knowledge_level: K2
-    expected_value: Proyección por día, horario, venue y disponibilidad reutilizable por cualquier UI.
+    expected_value: >-
+      Proyección por día, horario, venue y disponibilidad reutilizable por
+      cualquier UI.
   - id: WI-CANDIDATE-003
     title: UI local-first del Session Availability Heatmap
     type: feature
@@ -45,12 +50,14 @@ candidates:
     type: feature
     suggested_knowledge_level: K3
     expected_value: UI autenticada contra AWS Events mediante el OAuth 2.0 + PKCE existente.
-    notes: Tokens solo en memoria; reutilizar AwsBuilderIdAuthClient, PKCE e InMemoryTokenStore.
+    notes: >-
+      Tokens solo en memoria; reutilizar AwsBuilderIdAuthClient, PKCE e
+      InMemoryTokenStore.
   - id: WI-CANDIDATE-005
     title: Integración live de disponibilidad con AWS Events
     type: feature
     suggested_knowledge_level: K3
-    expected_value: Catálogo real con paginación, throttling, refresh y degradación segura.
+    expected_value: 'Catálogo real con paginación, throttling, refresh y degradación segura.'
   - id: WI-CANDIDATE-006
     title: Integración de agenda personal y favoritos
     type: feature
@@ -60,7 +67,9 @@ candidates:
     title: Reserva y cancelación de sesiones desde Pathfinder
     type: feature
     suggested_knowledge_level: K3
-    expected_value: Reservas y cancelaciones con partial success y reconciliación posterior con GetSchedule.
+    expected_value: >-
+      Reservas y cancelaciones con partial success y reconciliación posterior
+      con GetSchedule.
   - id: WI-CANDIDATE-008
     title: Launcher local y distribución de la experiencia autenticada
     type: feature
@@ -177,12 +186,26 @@ ningún Work Item en esta iniciativa.
 
 ## Open Questions
 
-- [open] Confirmar campos y valores reales de availability en AWS Events y el mapping definitivo a `AvailabilityStatus`.
-- [open] Confirmar rutas del contrato OpenAPI para `ReserveSessions` y `CancelReservation`.
-- [open] Decidir si el primer release es solo `pnpm dev` o incluye `npx reinvent-pathfinder`.
-- [open] Validar UX cuando una sesión cambie de `available` a `full` mientras se observa.
-- [open] Definir el orden de venue u horario para mobile.
-- [open] Evaluar después availability como señal del Recommendation Engine y una visualización geográfica con datos confiables.
+- [assumed] Mientras se valida el catálogo real, el normalizador solo asigna un estado distinto
+  de `unknown` cuando AWS Events entregue una señal inequívoca. Los campos ausentes, ambiguos
+  o no mapeados se representan como `unknown`; no se infiere capacidad ni disponibilidad.
+  - note: Esto permite completar el primer slice con fixtures y protege a la UI contra cambios
+    del proveedor. El mapping definitivo se verificará durante WI-CANDIDATE-005.
+- [deferred] Confirmar rutas y semántica del contrato OpenAPI para `ReserveSessions` y
+  `CancelReservation`.
+  - note: Solo bloquea WI-CANDIDATE-007; no bloquea el modelo, las fixtures ni el heatmap.
+- [resolved] El primer release de la experiencia autenticada se ejecuta con `pnpm dev`.
+  - note: Alineado con la decisión de distribución local del MVP en
+    `knowledge/tech/codebase.md`. `npx reinvent-pathfinder` queda como extensión posterior.
+- [assumed] Si el estado observado cambia durante la interacción, la UI muestra el timestamp
+  del snapshot, refresca desde AWS Events y trata la respuesta reconciliada como fuente de
+  verdad; no confirma una reserva localmente hasta reconciliar `GetSchedule`.
+  - note: Evita promesas incorrectas sin requerir persistencia ni mecanismos de tiempo real.
+- [deferred] Definir si mobile prioriza venue u horario.
+  - note: Es una decisión de UX para WI-CANDIDATE-003, posterior al contrato de proyección.
+- [deferred] Incorporar availability al Recommendation Engine y explorar una visualización
+  geográfica cuando existan datos de ubicación confiables.
+  - note: Ambas extensiones permanecen fuera de INI-007 para preservar su independencia de IA.
 
 ## Learning
 
