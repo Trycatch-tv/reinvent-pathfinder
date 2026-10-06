@@ -61,6 +61,7 @@ candidates:
     type: feature
     suggested_knowledge_level: K3
     expected_value: 'Catálogo real con paginación, throttling, refresh y degradación segura.'
+    materialized_as: WI-019
   - id: WI-CANDIDATE-006
     title: Integración de agenda personal y favoritos
     type: feature

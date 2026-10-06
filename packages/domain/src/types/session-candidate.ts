@@ -1,4 +1,4 @@
-export type SessionLevel = 100 | 200 | 300 | 400;
+export type SessionLevel = 100 | 200 | 300 | 400 | 500;
 
 export type SessionFormat =
   | 'breakout'

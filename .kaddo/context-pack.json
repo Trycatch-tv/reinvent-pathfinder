@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-06T20:05:46.290Z",
+  "generatedAt": "2026-10-06T23:11:04.547Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -28,52 +28,8 @@
     "summary": "",
     "roadmapSummary": "",
     "inventoryAvailable": true,
-    "workItems": [
-      {
-        "id": "WI-018",
-        "type": "feature",
-        "title": "Integración del login con AWS Builder ID en apps/client",
-        "status": "ready",
-        "lifecycle": "ready",
-        "knowledgeLevel": "K3",
-        "domains": [
-          "aws-events",
-          "experience"
-        ],
-        "source": {
-          "type": "unknown",
-          "id": "WI-CANDIDATE-004",
-          "inferred": true,
-          "reason": "Invalid source value: \"initiative\"."
-        },
-        "affectedModules": [
-          "reinvent-pathfinder"
-        ]
-      }
-    ],
-    "activeWorkItems": [
-      {
-        "id": "WI-018",
-        "type": "feature",
-        "title": "Integración del login con AWS Builder ID en apps/client",
-        "status": "ready",
-        "lifecycle": "ready",
-        "knowledgeLevel": "K3",
-        "domains": [
-          "aws-events",
-          "experience"
-        ],
-        "source": {
-          "type": "unknown",
-          "id": "WI-CANDIDATE-004",
-          "inferred": true,
-          "reason": "Invalid source value: \"initiative\"."
-        },
-        "affectedModules": [
-          "reinvent-pathfinder"
-        ]
-      }
-    ],
+    "workItems": [],
+    "activeWorkItems": [],
     "completedWorkItems": [
       {
         "id": "WI-001",
@@ -477,6 +433,54 @@
         },
         "implementationStatus": "completed",
         "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-018",
+        "type": "feature",
+        "title": "Integración del login con AWS Builder ID en apps/client",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-019",
+        "type": "feature",
+        "title": "Integración live de disponibilidad con AWS Events",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-005",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -896,8 +900,8 @@
         "id": "WI-018",
         "type": "feature",
         "title": "Integración del login con AWS Builder ID en apps/client",
-        "status": "ready",
-        "lifecycle": "ready",
+        "status": "completed",
+        "lifecycle": "completed",
         "knowledgeLevel": "K3",
         "domains": [
           "aws-events",
@@ -909,6 +913,33 @@
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-019",
+        "type": "feature",
+        "title": "Integración live de disponibilidad con AWS Events",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-005",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
         ]
@@ -1110,6 +1141,26 @@
           "apps/client/src/auth/builder-id-transaction.ts",
           "apps/client/src/client.test.ts"
         ]
+      },
+      {
+        "id": "WI-019",
+        "type": "feature",
+        "title": "Integración live de disponibilidad con AWS Events",
+        "summary": "",
+        "codeGlobs": [
+          "packages/events-client/src/types/raw-aws-events.ts",
+          "packages/events-client/src/normalizer/normalize-session.ts",
+          "packages/events-client/src/normalizer/normalize-availability.ts",
+          "packages/events-client/src/client/aws-events-client.ts",
+          "packages/events-client/src/events-client.test.ts",
+          "apps/client/src/App.tsx",
+          "apps/client/src/components/AvailabilityHeatmap.tsx",
+          "apps/client/src/client.test.ts",
+          "apps/client/src/vite-env.d.ts",
+          "apps/client/vite.config.ts",
+          "packages/domain/src/types/session-candidate.ts",
+          "packages/domain/src/domain.test.ts"
+        ]
       }
     ]
   },
@@ -1167,6 +1218,7 @@
         "WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md",
         "WI-017-ui-local-first-del-session-availability-heatmap.md",
         "WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md",
+        "WI-019-integraci-n-live-de-disponibilidad-con-aws-events.md",
         "roadmap.md"
       ]
     }
@@ -1203,62 +1255,47 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 18,
+    "materialized_work_items": 19,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 18,
+    "materialized": 19,
     "remaining": 0
   },
   "phase": {
-    "phase": "Active Delivery",
+    "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "18 materialized work item(s)",
-      "ready: 1",
+      "19 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
-      "implementation-agent"
+      "roadmap-agent"
     ],
-    "nextStep": "Use implementation-agent to implement WI-018.",
+    "nextStep": "Use the roadmap-agent to plan the next initiative.",
     "llmInstructions": [
-      "Use the implementation-agent.",
-      "Suggest a branch name only.",
-      "Do not run git commands."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ]
   },
   "nextStepRecommendation": {
-    "id": "implement-work-item",
-    "phase": "Active Delivery",
-    "label": "Use implementation-agent to implement WI-018.",
-    "agent": "implementation-agent",
-    "skill": "implementation-planning",
-    "target": "WI-018",
-    "reason": "WI-018 is ready for implementation.",
-    "secondary": [
-      {
-        "id": "validate-work-item-modules",
-        "label": "Validate affected modules for multirepo Work Items before implementation.",
-        "reason": "1 ready Work Item(s) reference affected_modules."
-      }
-    ]
+    "id": "plan-next",
+    "phase": "Maintenance",
+    "label": "Use the roadmap-agent to plan the next initiative.",
+    "agent": "roadmap-agent",
+    "reason": "No active Work Items and no remaining roadmap candidates."
   },
   "deliveryState": {
-    "phase": "Active Delivery",
+    "phase": "Maintenance",
     "draft_work_items": 0,
     "refined_draft_work_items": 0,
     "refined_draft_ids": [],
-    "ready_work_items": 1,
-    "ready_work_item_ids": [
-      "WI-018"
-    ],
-    "ready_multirepo_wi_ids": [
-      "WI-018"
-    ],
+    "ready_work_items": 0,
+    "ready_work_item_ids": [],
+    "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 18,
-    "ownership_coverage": "18/18",
+    "total_work_items": 19,
+    "ownership_coverage": "19/19",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1325,19 +1362,17 @@
     }
   },
   "workItemSummary": {
-    "total": 18,
-    "active": 1,
+    "total": 19,
+    "active": 0,
     "draft": 0,
-    "ready": 1,
+    "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 17,
+    "completed": 19,
     "archived": 0,
-    "summary": "ready"
+    "summary": "completed-only"
   },
-  "deliveryMix": {
-    "feature": 1
-  },
+  "deliveryMix": {},
   "external": [],
   "graph": {
     "generatedAt": "2026-10-03T06:00:22.556Z",
@@ -1561,15 +1596,14 @@
   ],
   "handoff": {
     "recommendedAgents": [
-      "implementation-agent"
+      "roadmap-agent"
     ],
     "nextSteps": [
-      "Use implementation-agent to implement WI-018."
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "instructions": [
-      "Use the implementation-agent.",
-      "Suggest a branch name only.",
-      "Do not run git commands."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "operatingRules": [
       "**Never run `git commit`, `git push` or `git merge` without explicit human confirmation.**",

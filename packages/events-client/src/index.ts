@@ -7,6 +7,7 @@ export * from './types/user-schedule.js';
 
 // Normalizers
 export * from './normalizer/normalize-session.js';
+export * from './normalizer/normalize-availability.js';
 
 // Client
 export * from './client/aws-events-client.js';

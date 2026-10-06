@@ -1,7 +1,8 @@
-import type { SessionCandidate } from '@pathfinder/domain';
+import type { SessionAvailability, SessionCandidate } from '@pathfinder/domain';
 import type {
   RawAwsSession,
   RawAwsCatalogResponse,
+  RawAwsListSessionsResponse,
   CatalogQueryParams,
 } from '../types/raw-aws-events.js';
 import {
@@ -9,8 +10,10 @@ import {
   AwsEventsThrottlingError,
   AwsEventsNotFoundError,
   AwsEventsUnauthorizedError,
+  AwsEventsForbiddenError,
 } from '../types/errors.js';
 import { normalizeAwsSession } from '../normalizer/normalize-session.js';
+import { normalizeAwsAvailability } from '../normalizer/normalize-availability.js';
 import { SAMPLE_RAW_SESSIONS } from '../fixtures/sample-sessions.js';
 import { SAMPLE_USER_SCHEDULE } from '../fixtures/sample-user-schedule.js';
 import type { UserScheduleItem, UserScheduleResult, RawAwsScheduleResponse } from '../types/user-schedule.js';
@@ -19,6 +22,8 @@ import type { TokenStore } from '../auth/token-store.js';
 
 export interface AwsEventsClientOptions {
   readonly baseUrl?: string;
+  /** Non-secret AWS event id. Enables the official ListSessions endpoint. */
+  readonly eventId?: string;
   readonly apiKey?: string;
   readonly tokenStore?: TokenStore;
   readonly timeoutMs?: number;
@@ -31,12 +36,21 @@ export interface AwsEventsClientOptions {
 
 export interface CatalogPageResult {
   readonly sessions: readonly SessionCandidate[];
+  readonly availability: readonly SessionAvailability[];
   readonly nextCursor?: string;
   readonly totalCount?: number;
 }
 
+export interface AvailabilitySnapshot {
+  readonly sessions: readonly SessionCandidate[];
+  readonly availability: readonly SessionAvailability[];
+  /** Local instant when the provider snapshot was observed. */
+  readonly observedAt: string;
+}
+
 export class AwsEventsClient {
   private readonly baseUrl: string;
+  private readonly eventId?: string;
   private readonly apiKey?: string;
   private readonly tokenStore?: TokenStore;
   private readonly timeoutMs: number;
@@ -49,6 +63,7 @@ export class AwsEventsClient {
 
   constructor(options: AwsEventsClientOptions = {}) {
     this.baseUrl = options.baseUrl ?? 'https://api.awsevents.com/v1';
+    this.eventId = options.eventId;
     this.apiKey = options.apiKey;
     this.tokenStore = options.tokenStore;
     this.timeoutMs = options.timeoutMs ?? 5000;
@@ -73,36 +88,54 @@ export class AwsEventsClient {
     }
 
     const query = new URLSearchParams();
-    if (params.limit) query.set('limit', params.limit.toString());
-    if (params.cursor) query.set('cursor', params.cursor);
-    if (params.search) query.set('search', params.search);
-    if (params.topic) query.set('topic', params.topic);
-    if (params.level) query.set('level', params.level.toString());
+    let rawSessions: readonly RawAwsSession[];
+    let nextCursor: string | undefined;
+    let totalCount: number | undefined;
 
-    const url = `${this.baseUrl}/catalog?${query.toString()}`;
-    const rawResponse = await this.requestWithRetry<RawAwsCatalogResponse>(url);
+    if (this.eventId) {
+      const nextToken = params.nextToken ?? params.cursor;
+      if (nextToken) query.set('nextToken', nextToken);
+      const url = `${this.baseUrl}/events/${encodeURIComponent(this.eventId)}/sessions${query.size ? `?${query}` : ''}`;
+      const rawResponse = await this.requestWithRetry<RawAwsListSessionsResponse>(url);
+      rawSessions = rawResponse.items ?? [];
+      nextCursor = rawResponse.nextToken;
+      totalCount = rawResponse.totalCount;
+    } else {
+      // Kept solely for the pre-existing local catalog adapter and its fixtures.
+      if (params.limit) query.set('limit', params.limit.toString());
+      if (params.cursor) query.set('cursor', params.cursor);
+      if (params.search) query.set('search', params.search);
+      if (params.topic) query.set('topic', params.topic);
+      if (params.level) query.set('level', params.level.toString());
+      const url = `${this.baseUrl}/catalog?${query.toString()}`;
+      const rawResponse = await this.requestWithRetry<RawAwsCatalogResponse>(url);
+      rawSessions = rawResponse.data ?? [];
+      nextCursor = rawResponse.next_cursor;
+      totalCount = rawResponse.total_count;
+    }
 
-    const sessions = (rawResponse.data ?? []).map(normalizeAwsSession);
+    const observedAt = params.observedAt ?? new Date().toISOString();
+    const sessions = rawSessions.map(normalizeAwsSession);
     return {
       sessions,
-      nextCursor: rawResponse.next_cursor,
-      totalCount: rawResponse.total_count,
+      availability: rawSessions.map((session) => normalizeAwsAvailability(session, observedAt)),
+      nextCursor,
+      totalCount,
     };
   }
 
   /**
-   * Iterates through pages up to maxPages and returns all collected sessions.
+   * Iterates until AWS Events omits nextToken. A short page is not a terminal signal.
    */
   public async fetchAllSessions(options: {
     maxPages?: number;
     params?: CatalogQueryParams;
   } = {}): Promise<readonly SessionCandidate[]> {
-    const maxPages = options.maxPages ?? 10;
     const allSessions: SessionCandidate[] = [];
-    let currentCursor = options.params?.cursor;
+    let currentCursor = options.params?.nextToken ?? options.params?.cursor;
     let pagesFetched = 0;
 
-    while (pagesFetched < maxPages) {
+    while (true) {
       const pageResult = await this.fetchCatalogPage({
         ...options.params,
         cursor: currentCursor,
@@ -110,6 +143,10 @@ export class AwsEventsClient {
 
       allSessions.push(...pageResult.sessions);
       pagesFetched++;
+
+      if (options.maxPages !== undefined && pagesFetched >= options.maxPages) {
+        break;
+      }
 
       if (!pageResult.nextCursor) {
         break;
@@ -120,12 +157,29 @@ export class AwsEventsClient {
     return allSessions;
   }
 
+  /** Fetches sessions and their provider availability as one in-memory snapshot. */
+  public async fetchAvailabilitySnapshot(): Promise<AvailabilitySnapshot> {
+    const observedAt = new Date().toISOString();
+    const sessions: SessionCandidate[] = [];
+    const availability: SessionAvailability[] = [];
+    let nextToken: string | undefined;
+
+    do {
+      const page = await this.fetchCatalogPage({ nextToken, observedAt });
+      sessions.push(...page.sessions);
+      availability.push(...page.availability);
+      nextToken = page.nextCursor;
+    } while (nextToken);
+
+    return { sessions, availability, observedAt };
+  }
+
   /**
    * Fetches a single session by its session ID.
    */
   public async fetchSessionById(sessionId: string): Promise<SessionCandidate | null> {
     if (this.mockMode) {
-      const found = this.mockSessions.find((s) => s.session_id === sessionId);
+      const found = this.mockSessions.find((s) => (s.sessionId ?? s.session_id) === sessionId);
       return found ? normalizeAwsSession(found) : null;
     }
 
@@ -174,6 +228,14 @@ export class AwsEventsClient {
 
         if (response.status === 404) {
           throw new AwsEventsNotFoundError(`Resource at ${url} not found`);
+        }
+
+        if (response.status === 401) {
+          throw new AwsEventsUnauthorizedError();
+        }
+
+        if (response.status === 403) {
+          throw new AwsEventsForbiddenError();
         }
 
         if (response.status === 429) {
@@ -235,7 +297,7 @@ export class AwsEventsClient {
     if (params.search) {
       const q = params.search.toLowerCase();
       filtered = filtered.filter(
-        (s) => s.title.toLowerCase().includes(q) || (s.description ?? '').toLowerCase().includes(q)
+        (s) => (s.title ?? '').toLowerCase().includes(q) || (s.description ?? '').toLowerCase().includes(q)
       );
     }
 
@@ -254,6 +316,7 @@ export class AwsEventsClient {
 
     return {
       sessions: pageItems.map(normalizeAwsSession),
+      availability: pageItems.map((session) => normalizeAwsAvailability(session, params.observedAt ?? new Date().toISOString())),
       nextCursor,
       totalCount: filtered.length,
     };

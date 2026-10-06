@@ -18,6 +18,20 @@ import {
 
 describe('Domain Models and Logic', () => {
   describe('Session availability', () => {
+    it('supports the official session level 500', () => {
+      const session: SessionCandidate = {
+        id: 'sess-500',
+        code: 'AIM500',
+        title: 'Expert session',
+        description: '',
+        level: 500,
+        format: 'breakout',
+        topics: [],
+      };
+
+      expect(session.level).toBe(500);
+    });
+
     it('exposes every supported provider-independent availability status', () => {
       const statuses = new Set(SAMPLE_SESSION_AVAILABILITIES.map(({ status }) => status));
       const expected: readonly AvailabilityStatus[] = [

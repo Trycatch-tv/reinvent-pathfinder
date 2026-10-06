@@ -6,6 +6,13 @@ export default defineConfig({
   server: {
     port: 8484,
     strictPort: true,
+    proxy: {
+      '/aws-events': {
+        target: 'https://api.awsevents.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/aws-events/, ''),
+      },
+    },
   },
   test: {
     globals: true,

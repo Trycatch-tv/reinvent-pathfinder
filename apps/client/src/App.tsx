@@ -20,10 +20,15 @@ import {
   SAMPLE_RAW_SESSIONS,
   SAMPLE_USER_SCHEDULE,
   AwsBuilderIdAuthClient,
+  AwsEventsClient,
+  AwsEventsError,
+  AwsEventsForbiddenError,
+  AwsEventsThrottlingError,
+  AwsEventsUnauthorizedError,
   InMemoryTokenStore,
   normalizeAwsSession,
 } from "@pathfinder/events-client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
@@ -35,10 +40,38 @@ import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 // Catálogo demo normalizado (local-first; sin AWS). Decisión de alcance WI-013.
 const DEMO_SESSIONS: readonly SessionCandidate[] =
   SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
+const tokenStore = new InMemoryTokenStore()
 const authClient = new AwsBuilderIdAuthClient({
   redirectUri: "http://localhost:8484/callback",
-  tokenStore: new InMemoryTokenStore(),
+  tokenStore,
 })
+const liveEventId = import.meta.env.VITE_AWS_EVENT_ID
+export const eventsApiBaseUrl = import.meta.env.DEV
+  ? "/aws-events/v1"
+  : "https://api.awsevents.com/v1"
+const liveEventsClient = liveEventId
+  ? new AwsEventsClient({ baseUrl: eventsApiBaseUrl, eventId: liveEventId, tokenStore })
+  : null
+type LiveAvailabilitySnapshot = Awaited<ReturnType<AwsEventsClient["fetchAvailabilitySnapshot"]>>
+
+export function selectAvailabilitySnapshot(snapshot: LiveAvailabilitySnapshot | null) {
+  return snapshot
+    ? { ...snapshot, source: "live" as const }
+    : { sessions: DEMO_SESSIONS, availability: SAMPLE_HEATMAP_AVAILABILITY, source: "fixture" as const }
+}
+
+export function describeLiveAvailabilityError(error: unknown): string {
+  if (error instanceof AwsEventsUnauthorizedError || (error instanceof AwsEventsError && error.statusCode === 401)) {
+    return "Inicia sesión con Builder ID para actualizar la disponibilidad."
+  }
+  if (error instanceof AwsEventsForbiddenError || (error instanceof AwsEventsError && error.statusCode === 403)) {
+    return "Tu registro no tiene acceso a la disponibilidad de este evento."
+  }
+  if (error instanceof AwsEventsThrottlingError || (error instanceof AwsEventsError && error.statusCode === 429)) {
+    return "AWS Events está limitando las solicitudes. Espera un momento e inténtalo de nuevo."
+  }
+  return "No fue posible actualizar la disponibilidad desde AWS Events."
+}
 
 export const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] =
@@ -52,10 +85,26 @@ export const App: React.FC = () => {
   const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>([])
   const [isBuildingPath, setIsBuildingPath] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const isAvailabilityRoute =
-    typeof window !== "undefined" && window.location.pathname === "/availability"
-  const isCallbackRoute =
-    typeof window !== "undefined" && window.location.pathname === "/callback"
+  const [liveSnapshot, setLiveSnapshot] = useState<LiveAvailabilitySnapshot | null>(null)
+  const [isRefreshingAvailability, setIsRefreshingAvailability] = useState(false)
+  const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(null)
+  const [route, setRoute] = useState(() => typeof window === "undefined" ? "/" : window.location.pathname)
+  const isAvailabilityRoute = route === "/availability"
+  const isCallbackRoute = route === "/callback"
+  const availabilityView = selectAvailabilitySnapshot(liveSnapshot)
+
+  useEffect(() => {
+    const onPopState = () => setRoute(window.location.pathname)
+    window.addEventListener("popstate", onPopState)
+    return () => window.removeEventListener("popstate", onPopState)
+  }, [])
+
+  const navigate = (path: "/" | "/availability") => {
+    if (typeof window !== "undefined" && window.location.pathname !== path) {
+      window.history.pushState({}, "", path)
+    }
+    setRoute(path)
+  }
 
   const handleContextSubmit = async (request: AnalyzeContextRequest) => {
     setIsLoading(true)
@@ -141,6 +190,28 @@ export const App: React.FC = () => {
     setCurrentGaps([])
   }
 
+  const handleAvailabilityRefresh = async () => {
+    if (!liveEventsClient) {
+      setAvailabilityMessage("Configura VITE_AWS_EVENT_ID para consultar AWS Events.")
+      return
+    }
+    if (!isAuthenticated || !tokenStore.getAccessToken()) {
+      setAvailabilityMessage("Inicia sesión con Builder ID para actualizar la disponibilidad.")
+      return
+    }
+
+    setIsRefreshingAvailability(true)
+    setAvailabilityMessage(null)
+    try {
+      const snapshot = await liveEventsClient.fetchAvailabilitySnapshot()
+      setLiveSnapshot(snapshot)
+    } catch (err: unknown) {
+      setAvailabilityMessage(`${describeLiveAvailabilityError(err)}${liveSnapshot ? " Se conserva el último snapshot válido." : " Se mantiene el modo fixture local."}`)
+    } finally {
+      setIsRefreshingAvailability(false)
+    }
+  }
+
   return (
     <div
       style={{
@@ -167,14 +238,24 @@ export const App: React.FC = () => {
           AI companion que transforma el catálogo de AWS re:Invent en una ruta
           de aprendizaje adaptativa.
         </p>
-        {!isAvailabilityRoute && <p style={{ marginBottom: 0 }}><a href="/availability">Ver disponibilidad de sesiones</a></p>}
-        {!isCallbackRoute && <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => setIsAuthenticated(true)} onLogout={() => setIsAuthenticated(false)} />}
+        {!isAvailabilityRoute && <p style={{ marginBottom: 0 }}><a href="/availability" onClick={(event) => { event.preventDefault(); navigate("/availability") }}>Ver disponibilidad de sesiones</a></p>}
+        {!isCallbackRoute && <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => { setIsAuthenticated(true); setRoute("/") }} onLogout={() => setIsAuthenticated(false)} />}
       </header>
 
       {isAvailabilityRoute ? (
-        <AvailabilityHeatmap sessions={DEMO_SESSIONS} availability={SAMPLE_HEATMAP_AVAILABILITY} />
+        <AvailabilityHeatmap
+          sessions={availabilityView.sessions}
+          availability={availabilityView.availability}
+          source={availabilityView.source}
+          snapshotAt={liveSnapshot?.observedAt}
+          liveStatus={availabilityMessage ?? undefined}
+          isRefreshing={isRefreshingAvailability}
+          canRefreshLive={Boolean(liveEventsClient && isAuthenticated)}
+          onRefreshLive={handleAvailabilityRefresh}
+          onReturnHome={() => navigate("/")}
+        />
       ) : isCallbackRoute ? (
-        <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => setIsAuthenticated(true)} onLogout={() => setIsAuthenticated(false)} />
+        <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => { setIsAuthenticated(true); setRoute("/") }} onLogout={() => setIsAuthenticated(false)} />
       ) : (
         <>
 

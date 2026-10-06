@@ -10,7 +10,8 @@ import type {
 import React from "react"
 import { renderToString } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
-import { App } from "./App.js"
+import { App, describeLiveAvailabilityError, eventsApiBaseUrl, selectAvailabilitySnapshot } from "./App.js"
+import { AwsEventsForbiddenError, AwsEventsThrottlingError, AwsEventsUnauthorizedError } from "@pathfinder/events-client"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
@@ -161,6 +162,33 @@ describe("apps/client UI components", () => {
     expect(html).toContain("Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore: Disponible")
     expect(html).toContain("Disponibilidad desconocida")
     expect(html).toContain("Palazzo Ballroom E")
+    expect(html).toContain("Modo fixture local")
+  })
+
+  it("explains live availability failures without exposing provider details", () => {
+    expect(describeLiveAvailabilityError(new AwsEventsUnauthorizedError("token=secret"))).toContain("Inicia sesión")
+    expect(describeLiveAvailabilityError(new AwsEventsForbiddenError())).toContain("registro")
+    expect(describeLiveAvailabilityError(new AwsEventsThrottlingError())).toContain("limitando")
+  })
+
+  it("uses Vite's same-origin AWS Events proxy during development", () => {
+    expect(eventsApiBaseUrl).toBe("/aws-events/v1")
+  })
+
+  it("keeps a live snapshot selected after a failed refresh and otherwise falls back to fixtures", () => {
+    const fallback = selectAvailabilitySnapshot(null)
+    expect(fallback.source).toBe("fixture")
+
+    const snapshot = selectAvailabilitySnapshot({
+      sessions: heatmapSessions,
+      availability: SAMPLE_HEATMAP_AVAILABILITY,
+      observedAt: "2026-10-06T00:00:00.000Z",
+    })
+    expect(snapshot.source).toBe("live")
+    expect(snapshot.sessions).toBe(heatmapSessions)
+    if (snapshot.source === "live") {
+      expect(snapshot.observedAt).toBe("2026-10-06T00:00:00.000Z")
+    }
   })
 
   it("renders the availability route from App", () => {

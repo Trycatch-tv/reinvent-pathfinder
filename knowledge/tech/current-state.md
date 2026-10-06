@@ -20,6 +20,7 @@ El proyecto está en estado `new`: no existe todavía estructura de producción 
   - `ai` — bloque agentic con Strands Agents SDK, Amazon Bedrock AgentCore Runtime, modelos de Amazon Bedrock y Managed Knowledge Bases.
   - `packages` — `domain`, `events-client` (adapter de AWS Events REST API), `data` (repositorios DynamoDB), `contracts`, `shared`.
 - **Fuente de verdad**: AWS Events API para catálogo, agenda, favoritos, reservas y personal time. La Managed Knowledge Base es una representación optimizada para recuperación semántica, no la fuente de verdad.
+- **Disponibilidad live**: `packages/events-client` consume opcionalmente `ListSessions` de AWS Events por `eventId`, recorre `nextToken` hasta agotarlo y mapea señales explícitas de `seatAvailability` sin inferir capacidad. Los niveles oficiales 100–500 se preservan para el filtro. `apps/client` conserva fixtures locales hasta que exista un snapshot autorizado y guarda únicamente el último snapshot en memoria.
 - **Flujo de recomendación costo-consciente**: filtros determinísticos → recuperación semántica (Managed KB) → ranking contextual con Bedrock.
 - **Endpoints iniciales esperados** (contratos aún no estables): `GET /health`, `POST /v1/context/analyze`, `POST /v1/recommendations/rank`, `POST /v1/journey/adapt`.
 - **Entry points previstos**: `apps/client/src/main.tsx`, handlers bajo `services/api/src/handlers/`, agentes bajo `ai/agents/`.

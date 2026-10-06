@@ -12,6 +12,13 @@ export interface AvailabilityHeatmapProps {
   readonly sessions: readonly SessionCandidate[]
   readonly availability: readonly SessionAvailability[]
   readonly initialSelectedSessionId?: string | null
+  readonly source?: 'fixture' | 'live'
+  readonly snapshotAt?: string
+  readonly liveStatus?: string
+  readonly isRefreshing?: boolean
+  readonly canRefreshLive?: boolean
+  readonly onRefreshLive?: () => void
+  readonly onReturnHome?: () => void
 }
 
 export function createAvailabilityProjection(
@@ -66,6 +73,13 @@ export function AvailabilityHeatmap({
   sessions,
   availability,
   initialSelectedSessionId = null,
+  source = 'fixture',
+  snapshotAt,
+  liveStatus,
+  isRefreshing = false,
+  canRefreshLive = false,
+  onRefreshLive,
+  onReturnHome,
 }: AvailabilityHeatmapProps) {
   const days = uniqueSorted(sessions.flatMap((session) => session.schedule ? [session.schedule.day] : []))
   const venues = uniqueSorted(sessions.flatMap((session) => session.location ? [session.location.venue] : []))
@@ -91,9 +105,17 @@ export function AvailabilityHeatmap({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '1rem', flexWrap: 'wrap' }}>
         <div>
           <h2 id="availability-heading" style={{ marginBottom: '0.25rem' }}>Disponibilidad de sesiones</h2>
-          <p style={{ marginTop: 0, color: '#475569' }}>Demo local con datos de ejemplo; no consulta AWS Events.</p>
+          <p style={{ marginTop: 0, color: '#475569' }}>
+            {source === 'live'
+              ? `Snapshot live de AWS Events${snapshotAt ? ` observado el ${new Date(snapshotAt).toLocaleString()}` : ''}.`
+              : 'Modo fixture local: configura el evento e inicia sesión para consultar AWS Events.'}
+          </p>
+          {liveStatus && <p aria-live="polite" role="status" style={{ marginBottom: 0, color: source === 'live' ? '#475569' : '#9f1239' }}>{liveStatus}</p>}
         </div>
-        <a href="/">Volver a Pathfinder</a>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          {onRefreshLive && <button type="button" onClick={onRefreshLive} disabled={!canRefreshLive || isRefreshing}>{isRefreshing ? 'Actualizando…' : 'Actualizar disponibilidad'}</button>}
+          <button type="button" onClick={onReturnHome}>Volver a Pathfinder</button>
+        </div>
       </div>
 
       <fieldset style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '1rem', margin: '1rem 0' }}>

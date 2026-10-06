@@ -12,19 +12,18 @@
 
 ## Current Phase
 
-- Phase: Active Delivery
-- Recommended agent: implementation-agent
-- Recommended skill: implementation-planning
-- Next step: Use implementation-agent to implement WI-018.
-- Reason: WI-018 is ready for implementation.
+- Phase: Maintenance
+- Recommended agent: roadmap-agent
+- Next step: Use the roadmap-agent to plan the next initiative.
+- Reason: No active Work Items and no remaining roadmap candidates.
 
 ## Delivery State
 
 - Draft Work Items: 0
-- Ready Work Items: 1
+- Ready Work Items: 0
 - In-progress Work Items: 0
 - Blocked Work Items: 0
-- Ownership coverage: 18/18
+- Ownership coverage: 19/19
 - Remaining Work Item candidates: 0
 - Technical decision candidates: 0
 - Accepted ADRs: 0
@@ -39,22 +38,13 @@ Warnings:
 
 ## Recommended Agent Flow
 
-1. implementation-agent
+1. roadmap-agent
 
 ## Primary Recommendation
 
-- id: implement-work-item
-- agent: implementation-agent
-- skill: implementation-planning
-- reason: WI-018 is ready for implementation.
-
-## Secondary Recommendations
-
-1. Validate affected modules for multirepo Work Items before implementation.
-
-## Active Work Items
-
-- WI-018 [feature] ready — Integración del login con AWS Builder ID en apps/client
+- id: plan-next
+- agent: roadmap-agent
+- reason: No active Work Items and no remaining roadmap candidates.
 
 ## Context Pack
 
@@ -64,38 +54,26 @@ Use `.kaddo/context-pack.md` as the primary input.
 
 Use:
 
-- `knowledge/agents/delivery/implementation-agent.md`
-- `knowledge/skills/implementation-planning/skill.md`
+- `knowledge/agents/delivery/roadmap-agent.md`
 - `.kaddo/context-pack.md`
 
 ## Expected Outputs
 
-The LLM should produce:
-
-- `WI-018`
-- Implementation plan or code changes guided by the Work Item.
+_See the primary recommendation above._
 
 ## Copy/Paste Instructions
 
 Paste the following into your LLM chat:
 
-1. `knowledge/agents/delivery/implementation-agent.md`
-2. `knowledge/skills/implementation-planning/skill.md`
-3. `.kaddo/context-pack.md`
+1. `knowledge/agents/delivery/roadmap-agent.md`
+2. `.kaddo/context-pack.md`
 
-Ask the LLM to follow the implementation-agent instructions.
+Ask the LLM to follow the roadmap-agent instructions.
 
 ## Next Steps
 
-1. Use implementation-agent to implement WI-018.
-2. Validate affected modules for multirepo Work Items before implementation.
-3. Re-run `kaddo explain`.
-
-## Branch Strategy
-
-**WI-018** affects: reinvent-pathfinder
-
-- `reinvent-pathfinder`: branch `wi-018/integraci-n-del-login-con-aws-builder-id`
+1. Use the roadmap-agent to plan the next initiative.
+2. Re-run `kaddo explain`.
 
 ## Metadata Health
 

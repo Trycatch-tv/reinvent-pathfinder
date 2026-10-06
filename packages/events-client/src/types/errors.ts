@@ -33,3 +33,10 @@ export class AwsEventsUnauthorizedError extends AwsEventsError {
     this.name = 'AwsEventsUnauthorizedError';
   }
 }
+
+export class AwsEventsForbiddenError extends AwsEventsError {
+  constructor(message = 'Access denied for this event registration.') {
+    super(message, 403, false);
+    this.name = 'AwsEventsForbiddenError';
+  }
+}

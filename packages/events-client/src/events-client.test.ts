@@ -4,6 +4,9 @@ import {
   AwsEventsClient,
   SAMPLE_RAW_SESSIONS,
   AwsEventsThrottlingError,
+  AwsEventsForbiddenError,
+  AwsEventsUnauthorizedError,
+  normalizeAwsAvailability,
   type RawAwsSession,
 } from './index.js';
 
@@ -52,6 +55,16 @@ describe('AWS Events Client & Normalizer', () => {
       expect(candidate.format).toBe('chalk-talk');
     });
 
+    it('preserves the official level 500 for filtering', () => {
+      const candidate = normalizeAwsSession({
+        sessionId: 'sess-500',
+        title: 'Expert session',
+        level: 'Level 500',
+      });
+
+      expect(candidate.level).toBe(500);
+    });
+
     it('gracefully handles missing optional fields', () => {
       const minimalRaw: RawAwsSession = {
         session_id: 'min-1',
@@ -67,6 +80,21 @@ describe('AWS Events Client & Normalizer', () => {
       expect(candidate.topics).toEqual([]);
       expect(candidate.schedule).toBeUndefined();
       expect(candidate.location).toBeUndefined();
+    });
+
+    it('normalizes the official sessionTime date, time and length fields', () => {
+      const candidate = normalizeAwsSession({
+        sessionId: 'official-time-1',
+        abbreviation: 'AIM401',
+        title: 'Official timed session',
+        sessionTime: { date: '2026-12-03', time: '23:30', length: '90', timezone: 'America/Los_Angeles' },
+      });
+
+      expect(candidate.schedule).toEqual({
+        day: '2026-12-03',
+        startTime: '23:30',
+        endTime: '01:00',
+      });
     });
   });
 
@@ -103,6 +131,48 @@ describe('AWS Events Client & Normalizer', () => {
       const result = await client.fetchCatalogPage({ search: 'dynamodb' });
       expect(result.sessions.length).toBeGreaterThanOrEqual(1);
       expect(result.sessions[0]?.title).toContain('DynamoDB');
+    });
+  });
+
+  describe('AWS Events ListSessions availability', () => {
+    const officialSession: RawAwsSession = {
+      sessionId: 'official-1',
+      abbreviation: 'AIM401',
+      title: 'Official session',
+      type: 'Breakout session',
+      sessionTime: { startTime: '2026-12-01T10:00:00Z', endTime: '2026-12-01T11:00:00Z' },
+      isReservable: true,
+      seatAvailability: 'veryLimited',
+    };
+
+    it.each([
+      ['available', 'available'],
+      ['limited', 'limited'],
+      ['veryLimited', 'limited'],
+      ['unavailable', 'unavailable'],
+      ['walkUp', 'walk-up'],
+      [undefined, 'unknown'],
+      ['not-a-provider-value', 'unknown'],
+    ] as const)('maps %s conservatively to %s', (seatAvailability, status) => {
+      const availability = normalizeAwsAvailability({ ...officialSession, seatAvailability }, '2026-10-06T00:00:00.000Z');
+      expect(availability).toMatchObject({ sessionId: 'official-1', status, isReservable: true, lastUpdatedAt: '2026-10-06T00:00:00.000Z' });
+    });
+
+    it('uses ListSessions pages until nextToken is absent, even when a page is short', async () => {
+      const mockFetch = vi.fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ items: [officialSession], totalCount: 2, nextToken: 'page-2' }), { status: 200 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify({ items: [{ ...officialSession, sessionId: 'official-2', seatAvailability: 'walkUp' }], totalCount: 2 }), { status: 200 }));
+      vi.stubGlobal('fetch', mockFetch);
+      const client = new AwsEventsClient({ baseUrl: 'https://events.example/v1', eventId: 'evt/2026' });
+
+      const snapshot = await client.fetchAvailabilitySnapshot();
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch.mock.calls[0]?.[0]).toBe('https://events.example/v1/events/evt%2F2026/sessions');
+      expect(mockFetch.mock.calls[1]?.[0]).toBe('https://events.example/v1/events/evt%2F2026/sessions?nextToken=page-2');
+      expect(snapshot.sessions.map((session) => session.id)).toEqual(['official-1', 'official-2']);
+      expect(snapshot.availability.map((item) => item.status)).toEqual(['limited', 'walk-up']);
+      expect(new Set(snapshot.availability.map((item) => item.lastUpdatedAt))).toEqual(new Set([snapshot.observedAt]));
     });
   });
 
@@ -177,6 +247,16 @@ describe('AWS Events Client & Normalizer', () => {
 
       const result = await client.fetchSessionById('missing-404');
       expect(result).toBeNull();
+    });
+
+    it.each([
+      [401, AwsEventsUnauthorizedError],
+      [403, AwsEventsForbiddenError],
+      [429, AwsEventsThrottlingError],
+    ])('exposes actionable error type for HTTP %i', async (status, ErrorType) => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status, headers: { 'Retry-After': '0' } })));
+      const client = new AwsEventsClient({ baseUrl: 'https://fake-events-api.aws/api', eventId: 'evt', maxRetries: 0 });
+      await expect(client.fetchAvailabilitySnapshot()).rejects.toThrow(ErrorType);
     });
   });
 });

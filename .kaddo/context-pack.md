@@ -20,39 +20,33 @@
 
 ## Current Phase
 
-Phase: Active Delivery
+Phase: Maintenance
 
 Reason:
 
 - Roadmap available
-- 18 materialized work item(s)
-- ready: 1
+- 19 materialized work item(s)
 - Ownership coverage 100%
 
-Recommended next: implementation-agent
+Recommended next: roadmap-agent
 
-Next step: Use implementation-agent to implement WI-018.
+Next step: Use the roadmap-agent to plan the next initiative.
 
 ## Delivery State
 
-- Phase: Active Delivery
+- Phase: Maintenance
 - Draft Work Items: 0
-- Ready Work Items: 1
+- Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 18/18
+- Ownership coverage: 19/19
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use implementation-agent to implement WI-018.
-  - id: implement-work-item
-  - reason: WI-018 is ready for implementation.
-  - agent: implementation-agent
-  - skill: implementation-planning
-
-Also (secondary):
-
-- Validate affected modules for multirepo Work Items before implementation.
+- Use the roadmap-agent to plan the next initiative.
+  - id: plan-next
+  - reason: No active Work Items and no remaining roadmap candidates.
+  - agent: roadmap-agent
 
 ## Project Route
 
@@ -105,6 +99,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md
 - ✓ WI-017-ui-local-first-del-session-availability-heatmap.md
 - ✓ WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md
+- ✓ WI-019-integraci-n-live-de-disponibilidad-con-aws-events.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -128,20 +123,14 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 18
+- Materialized Work Items: 19
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
 
 ## Active Work Items
 
-- WI-018 [feature] [K3] (ready) — Integración del login con AWS Builder ID en apps/client · domains: aws-events, experience
-
-## Delivery Mix
-
-Active Work Items by type:
-
-- Features: 1
+No active work items found.
 
 ## Artifacts and Ownership
 
@@ -163,6 +152,7 @@ Active Work Items by type:
 - WI-016 [feature] owns: packages/domain/src/types/**, packages/domain/src/logic/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
 - WI-017 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/fixtures/availability-heatmap.ts, apps/client/src/client.test.ts
 - WI-018 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/BuilderIdLogin.tsx, apps/client/src/auth/builder-id-transaction.ts, apps/client/src/client.test.ts
+- WI-019 [feature] owns: packages/events-client/src/types/raw-aws-events.ts, packages/events-client/src/normalizer/normalize-session.ts, packages/events-client/src/normalizer/normalize-availability.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts, apps/client/src/vite-env.d.ts, apps/client/vite.config.ts, packages/domain/src/types/session-candidate.ts, packages/domain/src/domain.test.ts
 
 ## Mapped Modules
 
@@ -233,16 +223,15 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Active Delivery** phase:
+Recommended next for the **Maintenance** phase:
 
-1. implementation-agent
+1. roadmap-agent
 
 Next step:
 
-- Use implementation-agent to implement WI-018.
+- Use the roadmap-agent to plan the next initiative.
 
 ## Instructions for the LLM
 
-- Use the implementation-agent.
-- Suggest a branch name only.
-- Do not run git commands.
+- No active work.
+- Use the roadmap-agent to plan the next initiative.
