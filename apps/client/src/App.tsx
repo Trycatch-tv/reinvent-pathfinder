@@ -26,6 +26,8 @@ import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
+import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
+import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 
 // Catálogo demo normalizado (local-first; sin AWS). Decisión de alcance WI-013.
 const DEMO_SESSIONS: readonly SessionCandidate[] =
@@ -42,6 +44,8 @@ export const App: React.FC = () => {
   >([])
   const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>([])
   const [isBuildingPath, setIsBuildingPath] = useState(false)
+  const isAvailabilityRoute =
+    typeof window !== "undefined" && window.location.pathname === "/availability"
 
   const handleContextSubmit = async (request: AnalyzeContextRequest) => {
     setIsLoading(true)
@@ -153,7 +157,13 @@ export const App: React.FC = () => {
           AI companion que transforma el catálogo de AWS re:Invent en una ruta
           de aprendizaje adaptativa.
         </p>
+        {!isAvailabilityRoute && <p style={{ marginBottom: 0 }}><a href="/availability">Ver disponibilidad de sesiones</a></p>}
       </header>
+
+      {isAvailabilityRoute ? (
+        <AvailabilityHeatmap sessions={DEMO_SESSIONS} availability={SAMPLE_HEATMAP_AVAILABILITY} />
+      ) : (
+        <>
 
       {error && (
         <div
@@ -264,6 +274,8 @@ export const App: React.FC = () => {
             />
           )}
         </section>
+      )}
+        </>
       )}
     </div>
   )

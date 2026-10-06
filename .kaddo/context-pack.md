@@ -25,13 +25,13 @@ Phase: Active Delivery
 Reason:
 
 - Roadmap available
-- 16 materialized work item(s)
+- 17 materialized work item(s)
 - ready: 1
 - Ownership coverage 100%
 
 Recommended next: implementation-agent
 
-Next step: Use implementation-agent to implement WI-016.
+Next step: Use implementation-agent to implement WI-017.
 
 ## Delivery State
 
@@ -39,14 +39,14 @@ Next step: Use implementation-agent to implement WI-016.
 - Draft Work Items: 0
 - Ready Work Items: 1
 - In-progress Work Items: 0
-- Ownership coverage: 16/16
+- Ownership coverage: 17/17
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use implementation-agent to implement WI-016.
+- Use implementation-agent to implement WI-017.
   - id: implement-work-item
-  - reason: WI-016 is ready for implementation.
+  - reason: WI-017 is ready for implementation.
   - agent: implementation-agent
   - skill: implementation-planning
 
@@ -103,17 +103,21 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md
 - ✓ WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md
 - ✓ WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md
+- ✓ WI-017-ui-local-first-del-session-availability-heatmap.md
 - ✓ roadmap.md
 
 ## Technical Inventory
 
-- Language: unknown
+- Language: typescript
 - Framework: unknown
-- Package manager: unknown
+- Package manager: pnpm
+- Infrastructure:
+  - .github/workflows/
 
 ## Scan Signals
 
-- Tests: No test directory detected
+- Tests: Vitest
+- Infrastructure: GitHub Actions
 
 ## Current Knowledge
 
@@ -123,14 +127,14 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 16
+- Materialized Work Items: 17
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
 
 ## Active Work Items
 
-- WI-016 [feature] [K2] (ready) — Motor de proyección y filtrado para Availability Heatmap · domains: aws-events, experience
+- WI-017 [feature] [K2] (ready) — UI local-first del Session Availability Heatmap · domains: experience, aws-events
 
 ## Delivery Mix
 
@@ -156,6 +160,7 @@ Active Work Items by type:
 - WI-014 [feature] owns: apps/client/**, ai/knowledge/**
 - WI-015 [feature] owns: packages/domain/src/types/**, packages/domain/src/fixtures/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
 - WI-016 [feature] owns: packages/domain/src/types/**, packages/domain/src/logic/**, packages/domain/src/index.ts, packages/domain/src/domain.test.ts
+- WI-017 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/fixtures/availability-heatmap.ts, apps/client/src/client.test.ts
 
 ## Mapped Modules
 
@@ -232,7 +237,7 @@ Recommended next for the **Active Delivery** phase:
 
 Next step:
 
-- Use implementation-agent to implement WI-016.
+- Use implementation-agent to implement WI-017.
 
 ## Instructions for the LLM
 

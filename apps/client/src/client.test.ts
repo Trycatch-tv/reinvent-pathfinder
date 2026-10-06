@@ -9,13 +9,16 @@ import type {
 } from "@pathfinder/domain"
 import React from "react"
 import { renderToString } from "react-dom/server"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { App } from "./App.js"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
 import { ReflectionForm } from "./components/ReflectionForm.js"
+import { AvailabilityHeatmap, createAvailabilityProjection } from "./components/AvailabilityHeatmap.js"
+import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
+import { SAMPLE_RAW_SESSIONS, normalizeAwsSession } from "@pathfinder/events-client"
 
 const mockProfile: KnowledgeProfile = {
   id: "prof-1",
@@ -62,6 +65,43 @@ const mockGaps: KnowledgeGap[] = [
 ]
 
 describe("apps/client UI components", () => {
+  const heatmapSessions = SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
+
+  it("renders the local availability heatmap and session detail from fixtures", () => {
+    const html = renderToString(
+      React.createElement(AvailabilityHeatmap, {
+        sessions: heatmapSessions,
+        availability: SAMPLE_HEATMAP_AVAILABILITY,
+        initialSelectedSessionId: "sess-aim-301",
+      }),
+    )
+
+    expect(html).toContain("Matriz de disponibilidad por horario y venue")
+    expect(html).toContain("Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore: Disponible")
+    expect(html).toContain("Disponibilidad desconocida")
+    expect(html).toContain("Palazzo Ballroom E")
+  })
+
+  it("renders the availability route from App", () => {
+    vi.stubGlobal("window", { location: { pathname: "/availability" } })
+    try {
+      const html = renderToString(React.createElement(App))
+      expect(html).toContain("Disponibilidad de sesiones")
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it("applies availability filters through the domain projection", () => {
+    const result = createAvailabilityProjection(
+      heatmapSessions,
+      SAMPLE_HEATMAP_AVAILABILITY,
+      { availability: ["limited"] },
+    )
+
+    expect(result.groups).toHaveLength(1)
+    expect(result.groups[0]?.sessions[0]?.session.code).toBe("DAT304")
+  })
   it("ContextForm renders form inputs and buttons properly", () => {
     const html = renderToString(
       React.createElement(ContextForm, { onSubmit: () => {} }),

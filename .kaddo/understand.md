@@ -15,8 +15,8 @@
 - Phase: Active Delivery
 - Recommended agent: implementation-agent
 - Recommended skill: implementation-planning
-- Next step: Use implementation-agent to implement WI-016.
-- Reason: WI-016 is ready for implementation.
+- Next step: Use implementation-agent to implement WI-017.
+- Reason: WI-017 is ready for implementation.
 
 ## Delivery State
 
@@ -24,7 +24,7 @@
 - Ready Work Items: 1
 - In-progress Work Items: 0
 - Blocked Work Items: 0
-- Ownership coverage: 16/16
+- Ownership coverage: 17/17
 - Remaining Work Item candidates: 0
 - Technical decision candidates: 0
 - Accepted ADRs: 0
@@ -46,7 +46,7 @@ Warnings:
 - id: implement-work-item
 - agent: implementation-agent
 - skill: implementation-planning
-- reason: WI-016 is ready for implementation.
+- reason: WI-017 is ready for implementation.
 
 ## Secondary Recommendations
 
@@ -54,7 +54,7 @@ Warnings:
 
 ## Active Work Items
 
-- WI-016 [feature] ready — Motor de proyección y filtrado para Availability Heatmap
+- WI-017 [feature] ready — UI local-first del Session Availability Heatmap
 
 ## Context Pack
 
@@ -72,7 +72,7 @@ Use:
 
 The LLM should produce:
 
-- `WI-016`
+- `WI-017`
 - Implementation plan or code changes guided by the Work Item.
 
 ## Copy/Paste Instructions
@@ -87,15 +87,15 @@ Ask the LLM to follow the implementation-agent instructions.
 
 ## Next Steps
 
-1. Use implementation-agent to implement WI-016.
+1. Use implementation-agent to implement WI-017.
 2. Validate affected modules for multirepo Work Items before implementation.
 3. Re-run `kaddo explain`.
 
 ## Branch Strategy
 
-**WI-016** affects: reinvent-pathfinder
+**WI-017** affects: reinvent-pathfinder
 
-- `reinvent-pathfinder`: branch `wi-016/motor-de-proyecci-n-y-filtrado-para-avai`
+- `reinvent-pathfinder`: branch `wi-017/ui-local-first-del-session-availability-`
 
 ## Metadata Health
 

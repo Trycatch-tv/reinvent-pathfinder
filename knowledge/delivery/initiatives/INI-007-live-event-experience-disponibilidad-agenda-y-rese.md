@@ -46,6 +46,7 @@ candidates:
     type: feature
     suggested_knowledge_level: K2
     expected_value: Matriz accesible de disponibilidad con filtros y estados visuales claros.
+    materialized_as: WI-017
   - id: WI-CANDIDATE-004
     title: Integración del login con AWS Builder ID en apps/client
     type: feature

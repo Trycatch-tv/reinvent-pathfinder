@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-06T19:01:00.846Z",
+  "generatedAt": "2026-10-06T19:15:49.806Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -10,13 +10,19 @@
   },
   "scan": {
     "available": true,
-    "languages": [],
+    "languages": [
+      "typescript"
+    ],
     "frameworks": [],
-    "packageManagers": [],
+    "packageManagers": [
+      "pnpm"
+    ],
     "sourceDirectories": [],
     "migrationDirectories": [],
     "contractFiles": [],
-    "infrastructureFiles": []
+    "infrastructureFiles": [
+      ".github/workflows/"
+    ]
   },
   "knowledge": {
     "summary": "",
@@ -24,19 +30,19 @@
     "inventoryAvailable": true,
     "workItems": [
       {
-        "id": "WI-016",
+        "id": "WI-017",
         "type": "feature",
-        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "title": "UI local-first del Session Availability Heatmap",
         "status": "ready",
         "lifecycle": "ready",
         "knowledgeLevel": "K2",
         "domains": [
-          "aws-events",
-          "experience"
+          "experience",
+          "aws-events"
         ],
         "source": {
           "type": "unknown",
-          "id": "WI-CANDIDATE-002",
+          "id": "WI-CANDIDATE-003",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -47,19 +53,19 @@
     ],
     "activeWorkItems": [
       {
-        "id": "WI-016",
+        "id": "WI-017",
         "type": "feature",
-        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "title": "UI local-first del Session Availability Heatmap",
         "status": "ready",
         "lifecycle": "ready",
         "knowledgeLevel": "K2",
         "domains": [
-          "aws-events",
-          "experience"
+          "experience",
+          "aws-events"
         ],
         "source": {
           "type": "unknown",
-          "id": "WI-CANDIDATE-002",
+          "id": "WI-CANDIDATE-003",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -418,6 +424,30 @@
         "source": {
           "type": "unknown",
           "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-016",
+        "type": "feature",
+        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -794,8 +824,8 @@
         "id": "WI-016",
         "type": "feature",
         "title": "Motor de proyección y filtrado para Availability Heatmap",
-        "status": "ready",
-        "lifecycle": "ready",
+        "status": "completed",
+        "lifecycle": "completed",
         "knowledgeLevel": "K2",
         "domains": [
           "aws-events",
@@ -804,6 +834,30 @@
         "source": {
           "type": "unknown",
           "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-017",
+        "type": "feature",
+        "title": "UI local-first del Session Availability Heatmap",
+        "status": "ready",
+        "lifecycle": "ready",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -984,6 +1038,18 @@
           "packages/domain/src/index.ts",
           "packages/domain/src/domain.test.ts"
         ]
+      },
+      {
+        "id": "WI-017",
+        "type": "feature",
+        "title": "UI local-first del Session Availability Heatmap",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/src/App.tsx",
+          "apps/client/src/components/AvailabilityHeatmap.tsx",
+          "apps/client/src/fixtures/availability-heatmap.ts",
+          "apps/client/src/client.test.ts"
+        ]
       }
     ]
   },
@@ -1039,6 +1105,7 @@
         "WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md",
         "WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md",
         "WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md",
+        "WI-017-ui-local-first-del-session-availability-heatmap.md",
         "roadmap.md"
       ]
     }
@@ -1075,24 +1142,24 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 16,
+    "materialized_work_items": 17,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 16,
+    "materialized": 17,
     "remaining": 0
   },
   "phase": {
     "phase": "Active Delivery",
     "reasons": [
       "Roadmap available",
-      "16 materialized work item(s)",
+      "17 materialized work item(s)",
       "ready: 1",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
       "implementation-agent"
     ],
-    "nextStep": "Use implementation-agent to implement WI-016.",
+    "nextStep": "Use implementation-agent to implement WI-017.",
     "llmInstructions": [
       "Use the implementation-agent.",
       "Suggest a branch name only.",
@@ -1102,11 +1169,11 @@
   "nextStepRecommendation": {
     "id": "implement-work-item",
     "phase": "Active Delivery",
-    "label": "Use implementation-agent to implement WI-016.",
+    "label": "Use implementation-agent to implement WI-017.",
     "agent": "implementation-agent",
     "skill": "implementation-planning",
-    "target": "WI-016",
-    "reason": "WI-016 is ready for implementation.",
+    "target": "WI-017",
+    "reason": "WI-017 is ready for implementation.",
     "secondary": [
       {
         "id": "validate-work-item-modules",
@@ -1122,15 +1189,15 @@
     "refined_draft_ids": [],
     "ready_work_items": 1,
     "ready_work_item_ids": [
-      "WI-016"
+      "WI-017"
     ],
     "ready_multirepo_wi_ids": [
-      "WI-016"
+      "WI-017"
     ],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 16,
-    "ownership_coverage": "16/16",
+    "total_work_items": 17,
+    "ownership_coverage": "17/17",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1197,13 +1264,13 @@
     }
   },
   "workItemSummary": {
-    "total": 16,
+    "total": 17,
     "active": 1,
     "draft": 0,
     "ready": 1,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 15,
+    "completed": 16,
     "archived": 0,
     "summary": "ready"
   },
@@ -1267,14 +1334,24 @@
     "tests": [
       {
         "type": "tests",
-        "label": "No test directory detected",
+        "label": "Vitest",
         "confidence": "high",
-        "evidence": [],
-        "recommended_review": "Confirm how this project is validated before production changes."
+        "evidence": [
+          "package.json"
+        ]
       }
     ],
     "security": [],
-    "infrastructure": [],
+    "infrastructure": [
+      {
+        "type": "infrastructure",
+        "label": "GitHub Actions",
+        "confidence": "high",
+        "evidence": [
+          ".github/workflows/"
+        ]
+      }
+    ],
     "external_integrations": [],
     "environment": []
   },
@@ -1426,7 +1503,7 @@
       "implementation-agent"
     ],
     "nextSteps": [
-      "Use implementation-agent to implement WI-016."
+      "Use implementation-agent to implement WI-017."
     ],
     "instructions": [
       "Use the implementation-agent.",
