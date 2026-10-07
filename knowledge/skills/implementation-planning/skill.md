@@ -3,7 +3,7 @@ type: skill
 id: implementation-planning
 name: implementation-planning
 title: Implementation Planning Skill
-version: 3.111.0
+version: 3.115.0
 group: delivery
 applies_to:
   - implementation-agent

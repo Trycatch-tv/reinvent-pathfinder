@@ -3,7 +3,7 @@ type: skill
 id: ownership-suggestion
 name: ownership-suggestion
 title: Ownership Suggestion Skill
-version: 3.111.0
+version: 3.115.0
 group: tech
 applies_to:
   - ownership-agent

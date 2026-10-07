@@ -3,7 +3,7 @@ type: skill
 id: capsule-writing
 name: capsule-writing
 title: Capsule Writing Skill
-version: 3.111.0
+version: 3.115.0
 group: integration
 applies_to:
   - capsule-agent
