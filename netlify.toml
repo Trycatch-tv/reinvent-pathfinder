@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "24"
+  VITE_AUTH_REDIRECT_URI = "https://charlasreinvent.netlify.app/callback"
 
 [[redirects]]
   from = "/*"

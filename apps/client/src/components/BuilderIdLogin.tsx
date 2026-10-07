@@ -38,7 +38,9 @@ export function BuilderIdLogin({
 }: BuilderIdLoginProps) {
   const [isWorking, setIsWorking] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const isCallback = typeof window !== 'undefined' && window.location.pathname === '/callback'
+  const search = typeof window !== 'undefined' && window.location?.search ? window.location.search : ''
+  const pathname = typeof window !== 'undefined' && window.location?.pathname ? window.location.pathname : ''
+  const isCallback = pathname === '/callback' || (search.includes('code=') && search.includes('state='))
 
   useEffect(() => {
     if (!isCallback) return

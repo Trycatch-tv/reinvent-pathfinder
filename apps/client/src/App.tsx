@@ -38,12 +38,21 @@ import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 
+export function resolveAuthRedirectUri(
+  envUri = import.meta.env.VITE_AUTH_REDIRECT_URI,
+  windowOrigin = typeof window !== "undefined" && window.location?.origin ? window.location.origin : null,
+): string {
+  if (envUri) return envUri
+  if (windowOrigin) return `${windowOrigin}/callback`
+  return "https://charlasreinvent.netlify.app/callback"
+}
+
 // Catálogo demo normalizado (local-first; sin AWS). Decisión de alcance WI-013.
 const DEMO_SESSIONS: readonly SessionCandidate[] =
   SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
 const tokenStore = new InMemoryTokenStore()
 const authClient = new AwsBuilderIdAuthClient({
-  redirectUri: "http://localhost:8484/callback",
+  redirectUri: resolveAuthRedirectUri(),
   tokenStore,
 })
 const liveEventId = import.meta.env.VITE_AWS_EVENT_ID

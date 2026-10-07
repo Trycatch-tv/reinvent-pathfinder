@@ -10,7 +10,7 @@ import type {
 import React from "react"
 import { renderToString } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
-import { App, describeLiveAvailabilityError, describeLiveReservationError, describeReservationFailures, describeReservationReconciliation, eventsApiBaseUrl, selectAvailabilitySnapshot } from "./App.js"
+import { App, describeLiveAvailabilityError, describeLiveReservationError, describeReservationFailures, describeReservationReconciliation, eventsApiBaseUrl, resolveAuthRedirectUri, selectAvailabilitySnapshot } from "./App.js"
 import { AwsEventsForbiddenError, AwsEventsThrottlingError, AwsEventsUnauthorizedError } from "@pathfinder/events-client"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
@@ -232,6 +232,12 @@ describe("apps/client UI components", () => {
 
   it("uses Vite's same-origin AWS Events proxy during development", () => {
     expect(eventsApiBaseUrl).toBe("/aws-events/v1")
+  })
+
+  it("resolves auth redirect URI prioritizing env, then window origin, then fallback", () => {
+    expect(resolveAuthRedirectUri("https://custom.example/callback", "https://other.example")).toBe("https://custom.example/callback")
+    expect(resolveAuthRedirectUri(undefined, "https://charlasreinvent.netlify.app")).toBe("https://charlasreinvent.netlify.app/callback")
+    expect(resolveAuthRedirectUri(undefined, null)).toBe("https://charlasreinvent.netlify.app/callback")
   })
 
   it("keeps a live snapshot selected after a failed refresh and otherwise falls back to fixtures", () => {
