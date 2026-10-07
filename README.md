@@ -423,6 +423,28 @@ and handle:
 http://localhost:8484/callback
 ```
 
+### Environment variables
+
+To consume AWS Events (live session availability and personal schedule) the client
+(`apps/client`) requires the event id to be defined as an environment variable:
+
+```bash
+VITE_AWS_EVENT_ID=reinvent2026
+```
+
+Copy `apps/client/.env.example` to `apps/client/.env` and keep that value. Without
+`VITE_AWS_EVENT_ID` the client runs in local fixture mode and the **"Actualizar
+disponibilidad"** button stays disabled (there is no event to query). Only `VITE_`-prefixed
+variables are exposed to the browser, and `.env` is git-ignored (never commit real values).
+
+Optional:
+
+```bash
+# OAuth 2.0 + PKCE callback for AWS Builder ID.
+# Defaults to window.location.origin + "/callback" when omitted.
+VITE_AUTH_REDIRECT_URI=http://localhost:8484/callback
+```
+
 A later distribution may package the application behind `npx reinvent-pathfinder` or a desktop app if that adds enough user value. Desktop packaging is **not required for the initial MVP**.
 
 ---
