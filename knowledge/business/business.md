@@ -25,14 +25,11 @@ Las herramientas tradicionales de catálogo y planificación parten principalmen
 
 re:Invent Pathfinder busca cerrar esa brecha conectando:
 
-```text
-Lo que estoy construyendo
-        ↓
-Lo que necesito aprender
-        ↓
-Lo que re:Invent puede enseñarme
-        ↓
-Qué debería hacer después
+```mermaid
+flowchart TD
+    A["Lo que estoy construyendo"] --> B["Lo que necesito aprender"]
+    B --> C["Lo que re:Invent puede enseñarme"]
+    C --> D["Qué debería hacer después"]
 ```
 
 El proyecto también busca demostrar una forma abierta y reproducible de construir software asistido por IA, usando Knowledge-Driven Development (KDD), Kaddo, Kiro y contribuciones de la comunidad.

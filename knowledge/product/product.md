@@ -1,8 +1,9 @@
 ---
 type: product
-project_state: new
+project_state: ai-assisted
 generated_by: kaddo-bootstrap
 template_version: 1
+refined_by: capability-agent
 ---
 
 > Idioma del proyecto: **español**. Escribe este conocimiento en español. Mantén en inglés el código, los nombres de archivo, los comandos y las claves de configuración.
@@ -23,22 +24,16 @@ El producto no termina al generar una agenda inicial. Después de asistir a una 
 
 La visión puede resumirse así:
 
-```text
-What are you building?
-        ↓
-Knowledge Profile
-        ↓
-Knowledge Gaps
-        ↓
-Relevant Sessions
-        ↓
-Learning Path
-        ↓
-Attend + Reflect
-        ↓
-Knowledge Changes
-        ↓
-Recommendations Adapt
+```mermaid
+flowchart TD
+    A["¿Qué estás construyendo?"] --> B["Knowledge Profile"]
+    B --> C["Knowledge Gaps"]
+    C --> D["Sesiones relevantes"]
+    D --> E["Learning Path"]
+    E --> F["Asistir + Reflexionar"]
+    F --> G["Cambia el conocimiento"]
+    G --> H["Se adaptan las recomendaciones"]
+    H -.->|repite el ciclo| C
 ```
 
 Pathfinder no busca reemplazar el catálogo oficial de re:Invent. Busca agregar la capa de inteligencia que conecta **el contexto real del usuario con el conocimiento disponible en el evento**.
@@ -193,24 +188,17 @@ Pathfinder no busca reemplazar el catálogo oficial de re:Invent. Busca agregar 
 
 El producto se considera funcional cuando un usuario puede completar de extremo a extremo este ciclo:
 
-```text
-Describe project
-      ↓
-Knowledge Profile
-      ↓
-Knowledge Gaps
-      ↓
-Real AWS Events Catalog
-      ↓
-Explainable Recommendations
-      ↓
-Learning Path
-      ↓
-Reflection
-      ↓
-Knowledge changes
-      ↓
-Adapted recommendations
+```mermaid
+flowchart TD
+    A["Describe el proyecto"] --> B["Knowledge Profile"]
+    B --> C["Knowledge Gaps"]
+    C --> D["Catálogo real de AWS Events"]
+    D --> E["Recomendaciones explicables"]
+    E --> F["Learning Path"]
+    F --> G["Reflexión"]
+    G --> H["Cambia el conocimiento"]
+    H --> I["Recomendaciones adaptadas"]
+    I -.->|repite| C
 ```
 
 Además:

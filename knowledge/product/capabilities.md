@@ -27,20 +27,17 @@ Events (catálogo, disponibilidad, agenda, favoritos, reservas) y la autenticaci
 
 Encadenamiento real de las capacidades implementadas (todas local-first salvo la integración live):
 
-```text
-Captura de contexto (ContextForm)
-        ↓
-Knowledge Profile ──► Knowledge Gaps          [ai/knowledge: HeuristicContextAnalyzer]
-        ↓
-Candidate filtering + ranking explicable       [ai/knowledge: candidate-filter + HeuristicSessionReranker]
-        ↓
-Learning Path ◄──► Integración live AWS Events  [events-client: catálogo, agenda, favoritos, reservas]
-        ↓            (conflictos, disponibilidad)   (requiere VITE_AWS_EVENT_ID + Builder ID)
-Reflexión post-sesión (ReflectionForm)
-        ↓
-Adaptación de recomendaciones  ──►  (repite el ciclo)   [adaptLearningPathFromReflection]
-        ↓
-Cierre de ciclo: Learning Report                [buildLearningReport → LearningReportView]
+```mermaid
+flowchart TD
+    CTX["Captura de contexto<br/>(ContextForm)"] --> KP["Knowledge Profile + Gaps<br/>(HeuristicContextAnalyzer)"]
+    KP --> REC["Candidate filtering + ranking explicable<br/>(candidate-filter + HeuristicSessionReranker)"]
+    REC --> LP["Learning Path<br/>(buildLearningPath)"]
+    LP <--> EVT["Integración live AWS Events<br/>(catálogo, agenda, favoritos, reservas)"]
+    LP --> REF["Reflexión post-sesión<br/>(ReflectionForm)"]
+    REF --> ADA["Adaptación de recomendaciones<br/>(adaptLearningPathFromReflection)"]
+    ADA -.->|repite el ciclo| REC
+    ADA --> RPT["Cierre de ciclo: Learning Report<br/>(buildLearningReport → LearningReportView)"]
+    AUTH["Builder ID + VITE_AWS_EVENT_ID"] -.->|habilita modo live| EVT
 ```
 
 Exposición pública: la landing (`/about`) y la demo (`/availability`, modo fixture) dan acceso al

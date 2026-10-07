@@ -78,6 +78,42 @@ reinvent-pathfinder/
 > No existen todavía `infra/`, `docs/` ni plantillas de `.github/ISSUE_TEMPLATE`; eran intención
 > del bootstrap. Se crearán solo cuando aparezca necesidad real.
 
+### Arquitectura de módulos (dependencias reales)
+
+```mermaid
+flowchart LR
+    subgraph client["apps/client (React + Vite, desplegado)"]
+        UI["components + App.tsx<br/>(routing /, /availability, /about, /callback)"]
+        AUTH["auth (Builder ID + PKCE)"]
+    end
+
+    subgraph pkgs["packages/@pathfinder/*"]
+        DOM["domain"]
+        EVT["events-client<br/>(AwsEventsClient)"]
+        CON["contracts"]
+        SHA["shared"]
+        DATA["data (parcial, sin tests)"]
+    end
+
+    subgraph ai["ai/*"]
+        AIK["ai-knowledge<br/>(heurístico, local-first)"]
+        AGT["agents / tools / contracts<br/>(spike)"]
+    end
+
+    SVC["services/api<br/>(tests; sin despliegue activo)"]
+    AWSAPI["AWS Events API<br/>(fuente de verdad)"]
+
+    UI --> AIK
+    UI --> DOM
+    UI --> EVT
+    AUTH --> EVT
+    AIK --> DOM
+    EVT --> AWSAPI
+    AIK -. "VITE_AWS_EVENT_ID" .- EVT
+    SVC --> CON
+    AGT -. "planificado INI-006" .- AIK
+```
+
 ### Límites principales
 
 #### `apps/client` — implementado y desplegado
@@ -127,20 +163,19 @@ heurísticos, construcción de Learning Path, adaptación por reflexión y Learn
 
 Flujo de datos real (local-first, sin red salvo integración live de AWS Events):
 
-```text
-ProjectContext (ContextForm)
-        ↓
-HeuristicContextAnalyzer ──► KnowledgeProfile + KnowledgeGaps
-        ↓
-candidate-filter (determinístico)
-        ↓
-HeuristicSessionReranker ──► SessionRecommendation[] (explicables)
-        ↓
-buildLearningPath ──► LearningPath (concilia con agenda)
-        ↓
-adaptLearningPathFromReflection ◄── Reflection (recalcula gaps/recos/ruta)
-        ↓
-buildLearningReport ──► LearningReport (cierre de ciclo)
+```mermaid
+flowchart TD
+    PC["ProjectContext<br/>(ContextForm)"] --> HCA["HeuristicContextAnalyzer"]
+    HCA --> KPG["KnowledgeProfile + KnowledgeGaps"]
+    KPG --> CF["candidate-filter<br/>(determinístico)"]
+    CF --> HSR["HeuristicSessionReranker"]
+    HSR --> SR["SessionRecommendation[]<br/>(explicables)"]
+    SR --> BLP["buildLearningPath"]
+    BLP --> LP["LearningPath<br/>(concilia con agenda)"]
+    REFL["Reflection"] --> ALP["adaptLearningPathFromReflection"]
+    ALP -.->|recalcula gaps/recos/ruta| CF
+    LP --> BLR["buildLearningReport"]
+    BLR --> LR["LearningReport<br/>(cierre de ciclo)"]
 ```
 
 - `HeuristicContextAnalyzer` (`context-analyzer.ts`): deriva `KnowledgeProfile` y `KnowledgeGaps`.
@@ -159,16 +194,13 @@ Evidencia: `ai/knowledge/src/**`, `ai/knowledge/src/context-analyzer.test.ts`,
 Pipeline semántico **planificado** (INI-006, aún no implementado); hoy su equivalente lo cubre la
 heurística anterior:
 
-```text
-AWS Events API (fuente de verdad del catálogo)
-        ↓
-Catalog Ingestion → Normalized session documents   [preparado en ai/knowledge/src/kb/]
-        ↓
-Amazon Bedrock Managed Knowledge Bases
-        ↓
-Semantic retrieval (por Knowledge Gaps)
-        ↓
-Re-ranking explicable con Bedrock → Agent / Recommendation Tool
+```mermaid
+flowchart TD
+    AWS["AWS Events API<br/>(fuente de verdad del catálogo)"] --> ING["Catalog Ingestion →<br/>Normalized session documents<br/>(preparado en ai/knowledge/src/kb/)"]
+    ING --> KB["Amazon Bedrock<br/>Managed Knowledge Bases"]
+    KB --> RET["Semantic retrieval<br/>(por Knowledge Gaps)"]
+    RET --> RR["Re-ranking explicable con Bedrock"]
+    RR --> AGT["Agent / Recommendation Tool"]
 ```
 
 #### `ai/agents`, `ai/tools`, `ai/contracts` — spike / base
