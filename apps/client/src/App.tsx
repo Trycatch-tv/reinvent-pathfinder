@@ -3,6 +3,8 @@ import {
   HeuristicSessionReranker,
   adaptLearningPathFromReflection,
   buildLearningPath,
+  buildLearningReport,
+  type LearningReport,
 } from "@pathfinder/ai-knowledge"
 import type {
   AnalyzeContextRequest,
@@ -36,6 +38,7 @@ import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
+import { LearningReportView } from "./components/LearningReportView.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 
 export function resolveAuthRedirectUri(
@@ -179,6 +182,10 @@ export const App: React.FC = () => {
     readonly SessionRecommendation[]
   >([])
   const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>([])
+  const [initialGaps, setInitialGaps] = useState<readonly KnowledgeGap[]>([])
+  const [learningReport, setLearningReport] = useState<LearningReport | null>(
+    null,
+  )
   const [isBuildingPath, setIsBuildingPath] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [liveSnapshot, setLiveSnapshot] =
@@ -259,6 +266,9 @@ export const App: React.FC = () => {
 
       setRecommendations(ranked.recommendations)
       setCurrentGaps(analysisResult.knowledgeGaps)
+      // Snapshot inicial de gaps para el Learning Report (Journey 6).
+      setInitialGaps(analysisResult.knowledgeGaps)
+      setLearningReport(null)
       setLearningPath(path)
     } catch (err: unknown) {
       setError(
@@ -269,6 +279,12 @@ export const App: React.FC = () => {
     } finally {
       setIsBuildingPath(false)
     }
+  }
+
+  // Cierra el ciclo del producto (Journey 6): contrasta los gaps iniciales con
+  // los actuales (tras reflexiones) y genera el Learning Report. Local-first.
+  const handleGenerateReport = () => {
+    setLearningReport(buildLearningReport({ initialGaps, currentGaps }))
   }
 
   // Cierra el ciclo adaptativo (Journey 5): aplica la reflexión, recalcula gaps,
@@ -299,6 +315,8 @@ export const App: React.FC = () => {
     setLearningPath(null)
     setRecommendations([])
     setCurrentGaps([])
+    setInitialGaps([])
+    setLearningReport(null)
   }
 
   const handleAvailabilityRefresh = async () => {
@@ -624,6 +642,31 @@ export const App: React.FC = () => {
                   onReflectionSubmit={handleReflectionSubmit}
                 />
               )}
+
+              {learningPath && (
+                <div style={{ marginTop: "1.5rem", textAlign: "right" }}>
+                  <button
+                    type="button"
+                    onClick={handleGenerateReport}
+                    style={{
+                      padding: "0.6rem 1.2rem",
+                      backgroundColor: "#0f766e",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                      fontSize: "0.9rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {learningReport
+                      ? "Actualizar Learning Report"
+                      : "Generar Learning Report (cierre de ciclo) →"}
+                  </button>
+                </div>
+              )}
+
+              {learningReport && <LearningReportView report={learningReport} />}
             </section>
           )}
         </>

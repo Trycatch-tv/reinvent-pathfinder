@@ -1,4 +1,7 @@
-import { buildLearningPath } from "@pathfinder/ai-knowledge"
+import {
+  buildLearningPath,
+  buildLearningReport,
+} from "@pathfinder/ai-knowledge"
 import type {
   KnowledgeGap,
   KnowledgeProfile,
@@ -7,19 +10,26 @@ import type {
   SessionCandidate,
   SessionRecommendation,
 } from "@pathfinder/domain"
+import {
+  AwsEventsForbiddenError,
+  AwsEventsThrottlingError,
+  AwsEventsUnauthorizedError,
+  SAMPLE_RAW_SESSIONS,
+  normalizeAwsSession,
+} from "@pathfinder/events-client"
 import React from "react"
 import { renderToString } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
-import { App, describeLiveAvailabilityError, describeLiveReservationError, describeReservationFailures, describeReservationReconciliation, eventsApiBaseUrl, resolveAuthRedirectUri, selectAvailabilitySnapshot } from "./App.js"
-import { AwsEventsForbiddenError, AwsEventsThrottlingError, AwsEventsUnauthorizedError } from "@pathfinder/events-client"
-import { ContextForm } from "./components/ContextForm.js"
-import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
-import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
-import { LearningPathView } from "./components/LearningPathView.js"
-import { ReflectionForm } from "./components/ReflectionForm.js"
-import { AvailabilityHeatmap, createAvailabilityProjection } from "./components/AvailabilityHeatmap.js"
-import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
-import { SAMPLE_RAW_SESSIONS, normalizeAwsSession } from "@pathfinder/events-client"
+import {
+  App,
+  describeLiveAvailabilityError,
+  describeLiveReservationError,
+  describeReservationFailures,
+  describeReservationReconciliation,
+  eventsApiBaseUrl,
+  resolveAuthRedirectUri,
+  selectAvailabilitySnapshot,
+} from "./App.js"
 import {
   completeBuilderIdCallback,
   initiateBuilderIdLogin,
@@ -27,6 +37,17 @@ import {
   type BuilderIdAuthClient,
   type TransactionStorage,
 } from "./auth/builder-id-transaction.js"
+import {
+  AvailabilityHeatmap,
+  createAvailabilityProjection,
+} from "./components/AvailabilityHeatmap.js"
+import { ContextForm } from "./components/ContextForm.js"
+import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
+import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
+import { LearningPathView } from "./components/LearningPathView.js"
+import { LearningReportView } from "./components/LearningReportView.js"
+import { ReflectionForm } from "./components/ReflectionForm.js"
+import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 
 const mockProfile: KnowledgeProfile = {
   id: "prof-1",
@@ -75,20 +96,30 @@ const mockGaps: KnowledgeGap[] = [
 describe("apps/client UI components", () => {
   const heatmapSessions = SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
 
-  const createStorage = (): TransactionStorage & { readonly values: Map<string, string> } => {
+  const createStorage = (): TransactionStorage & {
+    readonly values: Map<string, string>
+  } => {
     const values = new Map<string, string>()
     return {
       values,
       getItem: (key) => values.get(key) ?? null,
-      setItem: (key, value) => { values.set(key, value) },
-      removeItem: (key) => { values.delete(key) },
+      setItem: (key, value) => {
+        values.set(key, value)
+      },
+      removeItem: (key) => {
+        values.delete(key)
+      },
     }
   }
 
   const createAuthClient = () => {
-    const handleCallback = vi.fn().mockImplementation(({ state, expectedState }) =>
-      state === expectedState ? Promise.resolve({}) : Promise.reject(new Error("Invalid state")),
-    )
+    const handleCallback = vi
+      .fn()
+      .mockImplementation(({ state, expectedState }) =>
+        state === expectedState
+          ? Promise.resolve({})
+          : Promise.reject(new Error("Invalid state")),
+      )
     const logout = vi.fn()
 
     return {
@@ -106,7 +137,9 @@ describe("apps/client UI components", () => {
     const storage = createStorage()
     const client = createAuthClient()
 
-    await expect(initiateBuilderIdLogin(client, storage)).resolves.toBe("https://builder-id.example/authorize")
+    await expect(initiateBuilderIdLogin(client, storage)).resolves.toBe(
+      "https://builder-id.example/authorize",
+    )
     expect([...storage.values.entries()]).toEqual([
       ["pathfinder.builder-id.state", "csrf-state"],
       ["pathfinder.builder-id.verifier", "pkce-verifier"],
@@ -118,7 +151,13 @@ describe("apps/client UI components", () => {
     const client = createAuthClient()
     await initiateBuilderIdLogin(client, storage)
 
-    await expect(completeBuilderIdCallback(client, storage, new URLSearchParams("code=authorization-code&state=csrf-state"))).resolves.toBe("authenticated")
+    await expect(
+      completeBuilderIdCallback(
+        client,
+        storage,
+        new URLSearchParams("code=authorization-code&state=csrf-state"),
+      ),
+    ).resolves.toBe("authenticated")
     expect(client.handleCallback).toHaveBeenCalledWith({
       code: "authorization-code",
       state: "csrf-state",
@@ -133,7 +172,13 @@ describe("apps/client UI components", () => {
     const client = createAuthClient()
     await initiateBuilderIdLogin(client, storage)
 
-    await expect(completeBuilderIdCallback(client, storage, new URLSearchParams("code=authorization-code&state=wrong"))).resolves.toBe("invalid-callback")
+    await expect(
+      completeBuilderIdCallback(
+        client,
+        storage,
+        new URLSearchParams("code=authorization-code&state=wrong"),
+      ),
+    ).resolves.toBe("invalid-callback")
     expect(client.handleCallback).toHaveBeenCalledTimes(1)
     expect(storage.values).toEqual(new Map())
   })
@@ -168,13 +213,17 @@ describe("apps/client UI components", () => {
     )
 
     expect(html).toContain("Matriz de disponibilidad por horario y venue")
-    expect(html).toContain("Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore: Disponible")
+    expect(html).toContain(
+      "Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore: Disponible",
+    )
     expect(html).toContain("Disponibilidad desconocida")
     expect(html).toContain("Palazzo Ballroom E")
     expect(html).toContain("Modo fixture local")
     expect(html).toContain("Mi agenda")
     expect(html).toContain("Sesiones confirmadas")
-    expect(html).toContain("AIM301 — Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore")
+    expect(html).toContain(
+      "AIM301 — Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore",
+    )
     expect(html).toContain("Quitar de favoritos")
     expect(html).toContain("Cancelar reserva")
     expect(html).toContain('aria-label="Leyenda de disponibilidad"')
@@ -199,17 +248,65 @@ describe("apps/client UI components", () => {
   })
 
   it("explains live availability failures without exposing provider details", () => {
-    expect(describeLiveAvailabilityError(new AwsEventsUnauthorizedError("token=secret"))).toContain("Inicia sesión")
-    expect(describeLiveAvailabilityError(new AwsEventsForbiddenError())).toContain("registro")
-    expect(describeLiveAvailabilityError(new AwsEventsThrottlingError())).toContain("limitando")
-    expect(describeLiveReservationError(new (class extends Error { statusCode = 404 })())).toContain("reserva")
-    expect(describeReservationFailures([{ code: "SessionFull" }])).toContain("llena")
-    expect(describeReservationFailures([{ code: "ScheduleConflict" }])).toContain("conflicto")
-    expect(describeReservationFailures([{ code: "AlreadyReserved" }])).toContain("ya estaba reservada")
-    expect(describeReservationReconciliation({ wasReserved: false, sessionId: "session-1", reservedSessionIds: ["session-1"], failed: [] })).toContain("Reserva confirmada")
-    expect(describeReservationReconciliation({ wasReserved: false, sessionId: "session-1", reservedSessionIds: [], failed: [] })).toContain("no confirmó la reserva")
-    expect(describeReservationReconciliation({ wasReserved: true, sessionId: "session-1", reservedSessionIds: [], failed: [] })).toContain("Cancelación de reserva confirmada")
-    expect(describeReservationReconciliation({ wasReserved: true, sessionId: "session-1", reservedSessionIds: ["session-1"], failed: [] })).toContain("no confirmó la cancelación")
+    expect(
+      describeLiveAvailabilityError(
+        new AwsEventsUnauthorizedError("token=secret"),
+      ),
+    ).toContain("Inicia sesión")
+    expect(
+      describeLiveAvailabilityError(new AwsEventsForbiddenError()),
+    ).toContain("registro")
+    expect(
+      describeLiveAvailabilityError(new AwsEventsThrottlingError()),
+    ).toContain("limitando")
+    expect(
+      describeLiveReservationError(
+        new (class extends Error {
+          statusCode = 404
+        })(),
+      ),
+    ).toContain("reserva")
+    expect(describeReservationFailures([{ code: "SessionFull" }])).toContain(
+      "llena",
+    )
+    expect(
+      describeReservationFailures([{ code: "ScheduleConflict" }]),
+    ).toContain("conflicto")
+    expect(
+      describeReservationFailures([{ code: "AlreadyReserved" }]),
+    ).toContain("ya estaba reservada")
+    expect(
+      describeReservationReconciliation({
+        wasReserved: false,
+        sessionId: "session-1",
+        reservedSessionIds: ["session-1"],
+        failed: [],
+      }),
+    ).toContain("Reserva confirmada")
+    expect(
+      describeReservationReconciliation({
+        wasReserved: false,
+        sessionId: "session-1",
+        reservedSessionIds: [],
+        failed: [],
+      }),
+    ).toContain("no confirmó la reserva")
+    expect(
+      describeReservationReconciliation({
+        wasReserved: true,
+        sessionId: "session-1",
+        reservedSessionIds: [],
+        failed: [],
+      }),
+    ).toContain("Cancelación de reserva confirmada")
+    expect(
+      describeReservationReconciliation({
+        wasReserved: true,
+        sessionId: "session-1",
+        reservedSessionIds: ["session-1"],
+        failed: [],
+      }),
+    ).toContain("no confirmó la cancelación")
   })
 
   it("reports schedule IDs that are not part of the loaded catalog", () => {
@@ -227,7 +324,9 @@ describe("apps/client UI components", () => {
       }),
     )
 
-    expect(html).toContain("1 sesión(es) de tu agenda aún no aparecen en el catálogo cargado.")
+    expect(html).toContain(
+      "1 sesión(es) de tu agenda aún no aparecen en el catálogo cargado.",
+    )
   })
 
   it("uses Vite's same-origin AWS Events proxy during development", () => {
@@ -235,9 +334,18 @@ describe("apps/client UI components", () => {
   })
 
   it("resolves auth redirect URI prioritizing env, then window origin, then fallback", () => {
-    expect(resolveAuthRedirectUri("https://custom.example/callback", "https://other.example")).toBe("https://custom.example/callback")
-    expect(resolveAuthRedirectUri(undefined, "https://charlasreinvent.netlify.app")).toBe("https://charlasreinvent.netlify.app/callback")
-    expect(resolveAuthRedirectUri(undefined, null)).toBe("https://charlasreinvent.netlify.app/callback")
+    expect(
+      resolveAuthRedirectUri(
+        "https://custom.example/callback",
+        "https://other.example",
+      ),
+    ).toBe("https://custom.example/callback")
+    expect(
+      resolveAuthRedirectUri(undefined, "https://charlasreinvent.netlify.app"),
+    ).toBe("https://charlasreinvent.netlify.app/callback")
+    expect(resolveAuthRedirectUri(undefined, null)).toBe(
+      "https://charlasreinvent.netlify.app/callback",
+    )
   })
 
   it("keeps a live snapshot selected after a failed refresh and otherwise falls back to fixtures", () => {
@@ -452,5 +560,45 @@ describe("apps/client UI components", () => {
     )
 
     expect(html).toContain("Reflexionar")
+  })
+
+  it("LearningReportView renders coverage counts and the next-route pending gaps", () => {
+    const initialGaps: readonly KnowledgeGap[] = [
+      {
+        id: "g1",
+        topic: "Amazon Bedrock AgentCore",
+        description: "d1",
+        targetProficiency: "professional",
+        severity: "critical",
+        status: "open",
+        rationale: "r1",
+        addressedBySessionIds: [],
+      },
+      {
+        id: "g2",
+        topic: "DynamoDB single-table",
+        description: "d2",
+        targetProficiency: "professional",
+        severity: "important",
+        status: "open",
+        rationale: "r2",
+        addressedBySessionIds: [],
+      },
+    ]
+    const currentGaps: readonly KnowledgeGap[] = [
+      { ...initialGaps[0]!, status: "closed", addressedBySessionIds: ["s1"] },
+      { ...initialGaps[1]! },
+    ]
+
+    const report = buildLearningReport({ initialGaps, currentGaps })
+    const html = renderToString(
+      React.createElement(LearningReportView, { report }),
+    )
+
+    expect(html).toContain("Learning Report")
+    expect(html).toContain("Cubiertos:")
+    expect(html).toContain("Pendientes:")
+    expect(html).toContain("Ruta de aprendizaje posterior")
+    expect(html).toContain("DynamoDB single-table")
   })
 })

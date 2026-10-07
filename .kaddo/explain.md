@@ -53,6 +53,7 @@
 - ✓ WI-023-heat-map-visual-de-disponibilidad-de-sesiones.md
 - ✓ WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md
 - ✓ WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md
+- ✓ WI-026-learning-report-y-ruta-post-evento.md
 - ✓ roadmap.md
 
 ## Detected Stack
@@ -74,25 +75,25 @@
 - Agents: available
 - Roadmap initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 25
-- Ownership coverage: 25/25 work items
+- Materialized Work Items: 26
+- Ownership coverage: 26/26 work items
 
 ## Work Items
 - Draft: 0
 - Ready: 0
 - In Progress: 0
 - Blocked: 0
-- Completed: 25
+- Completed: 26
 - Archived: 0
 
 ## Work Items by Type
-- Features: 19
+- Features: 20
 - Chores: 3
 - Bugfixs: 2
 - Spikes: 1
 
 ## Work Item Sources
-- Unknown: 24
+- Unknown: 25
 - Chat: 1
 
 ## Work Items by Initiative
@@ -100,6 +101,7 @@
 - INI-002 — Completed: 3
 - INI-003 — Completed: 4
 - INI-004 — Completed: 3
+- INI-005 — Completed: 1
 - INI-006 — Completed: 1
 - INI-007 — Completed: 10
 - Unassigned — Completed: 1
@@ -301,6 +303,14 @@ Affected modules: reinvent-pathfinder
 - Release: not-assessed
 Affected modules: reinvent-pathfinder
 
+### WI-026
+- Lifecycle: Completed
+- Implementation: completed
+- Validation: completed
+- Release: not-assessed
+Repositories:
+- core — completed
+
 ## Domains
 - platform, tech, aws-events, integration, ai, knowledge, recommendations, experience, product
 
@@ -333,6 +343,7 @@ Groups:
   - WI-011 — UI de captura de contexto y visualización de Knowledge Profile / Gaps
   - WI-015 — Modelo normalizado de disponibilidad de sesiones y fixtures
   - WI-025 — Integración del SDK de Bedrock y activación de analyzer/reranker reales
+  - WI-026 — Learning Report y ruta post-evento
 - same source candidate (WI-CANDIDATE-002):
   - WI-002 — Tooling de calidad y CI (lint, typecheck, Vitest, pipeline de PR)
   - WI-005 — Autenticación OAuth 2.0 + PKCE con AWS Builder ID (callback local)
@@ -372,14 +383,14 @@ Progress: 10/12
 - Phase: Maintenance
 - Reason:
   - Roadmap available
-  - 25 materialized work item(s)
+  - 26 materialized work item(s)
   - Ownership coverage 100%
 - Next step: This project uses the standard new-project Kaddo flow.
 
 ## Delivery Summary
-- Completed Work Items: 25
+- Completed Work Items: 26
 - Active Work Items: 0
-- Implementation completed: 16
+- Implementation completed: 17
 
 ## Suggested Next Steps
 1. Use the roadmap-agent to plan the next initiative.
@@ -403,7 +414,7 @@ Discovery:
 ## Roadmap Status
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 25
+- Materialized Work Items: 26
 - Remaining Work Item candidates: 0
 
 ## Installed Assets

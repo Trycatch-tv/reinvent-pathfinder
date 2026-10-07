@@ -3,7 +3,7 @@ type: feature
 id: WI-026
 title: Learning Report y ruta post-evento
 knowledge_level: K2
-status: ready
+status: completed
 phase: now
 initiative: INI-005
 domains:
@@ -19,6 +19,29 @@ source: initiative
 source_id: WI-CANDIDATE-001
 source_initiative: INI-005
 ready_at: '2026-10-07'
+completed_at: '2026-10-07'
+implementation_evidence:
+  repositories:
+    core:
+      role: core
+      status: completed
+      changed_paths:
+        - ai/knowledge/src/recommendations/learning-report-builder.ts
+        - ai/knowledge/src/recommendations/learning-report-builder.test.ts
+        - ai/knowledge/src/index.ts
+        - apps/client/src/components/LearningReportView.tsx
+        - apps/client/src/App.tsx
+        - apps/client/src/client.test.ts
+      validations:
+        - command: 'tsc -b'
+          status: passed
+          reason: 'Typecheck del workspace sin errores (exit 0).'
+        - command: 'pnpm -r test'
+          status: passed
+          reason: 'Workspace en verde; ai/knowledge 76 tests (incl. 6 del learning-report), apps/client 21 tests (incl. LearningReportView).'
+implementation_status: completed
+validation_status: completed
+verified_at: '2026-10-07'
 ---
 
 # Learning Report y ruta post-evento
@@ -78,11 +101,11 @@ _Expected value:_ Compara perfil inicial vs. post-evento; identifica gaps cubier
 
 ## Acceptance Criteria
 
-- [ ] Existe `buildLearningReport` que, dados los gaps iniciales y los actuales, devuelve conteos de cubiertos/parciales/pendientes y el detalle por gap.
-- [ ] La ruta post-evento lista los gaps aún `open`, priorizados por severidad (`critical` → `important` → `nice-to-have`).
-- [ ] `apps/client` muestra el Learning Report (conteos + detalle + ruta pendiente) al cerrar el flujo del Learning Path.
-- [ ] **End-to-end:** desde un journey con al menos una reflexión que cerró un gap, el reporte refleja ese gap como cubierto y lo excluye de la ruta pendiente. Local-first, sin AWS.
-- [ ] Tests Vitest cubren el generador y el componente; `pnpm -r test` y `tsc -b` en verde.
+- [x] Existe `buildLearningReport` que, dados los gaps iniciales y los actuales, devuelve conteos de cubiertos/parciales/pendientes y el detalle por gap. → `ai/knowledge/.../learning-report-builder.ts`.
+- [x] La ruta post-evento lista los gaps aún `open`, priorizados por severidad (`critical` → `important` → `nice-to-have`). → `nextRoute`; verificado por test.
+- [x] `apps/client` muestra el Learning Report (conteos + detalle + ruta pendiente) al cerrar el flujo del Learning Path. → `LearningReportView` + botón en `App.tsx`.
+- [x] **End-to-end:** desde un journey con al menos una reflexión que cerró un gap, el reporte refleja ese gap como cubierto y lo excluye de la ruta pendiente. Local-first, sin AWS. → `initialGaps` snapshot vs. `currentGaps` (actualizados por reflexión); verificado por test de builder y de componente.
+- [x] Tests Vitest cubren el generador y el componente; `pnpm -r test` y `tsc -b` en verde. → ai/knowledge 76, apps/client 21; suite exit 0.
 
 ## Validation
 
@@ -110,4 +133,20 @@ _Resueltas durante el refinamiento (2026-10-07):_
 
 ## Learning
 
-_What did we learn? Update after completion._
+_Capturado al cierre (2026-10-07):_
+
+- **Qué se entregó:** `buildLearningReport` (`ai/knowledge`) que contrasta los gaps iniciales con los actuales, clasifica cada uno en cubierto/parcial/pendiente (sobre `KnowledgeGap.status`) y produce la ruta posterior (pendientes priorizados por severidad). Componente `LearningReportView` y cableado en `App.tsx` (snapshot de `initialGaps` al construir el path; botón "Generar Learning Report" tras el Learning Path). Determinístico y local-first.
+- **Reutilización:** se apoyó en el `status` de los gaps que ya actualiza el flujo de reflexión (WI-014); sin duplicar lógica de dominio. Cierra el Journey 6.
+- **Decisiones:** reporte determinístico (no narrativa por IA en este corte; eso dependería de INI-006).
+- **Hallazgo recurrente:** el reformateador del editor volvió a descartar imports añadidos en `App.tsx` y `client.test.ts`; se repararon. Patrón ya visto en WI-013/WI-014.
+- **Verificación:** `tsc -b` exit 0; `pnpm -r test` exit 0 (ai/knowledge 76, apps/client 21).
+
+### Conocimiento a actualizar
+
+- Ninguna ADR nueva; sigue decisiones ya establecidas (local-first, reutilización de dominio).
+- Con WI-026, el **candidato 1 de INI-005 queda entregado**; resta WI-CANDIDATE-002 (landing pública) para completar INI-005.
+
+### Pendientes
+
+- [open] Narrativa del reporte generada por IA (mejora futura, dependiente de INI-006).
+- [open] Persistencia del journey/report (hoy en memoria/cliente).
