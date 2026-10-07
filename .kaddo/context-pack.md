@@ -20,43 +20,37 @@
 
 ## Current Phase
 
-Phase: Active Delivery
+Phase: Maintenance
 
 Reason:
 
 - Roadmap available
 - 25 materialized work item(s)
-- draft: 1
-- Ownership coverage 96%
+- Ownership coverage 100%
 
-Recommended next: work-item-agent
+Recommended next: roadmap-agent
 
-Next step: Refine the existing draft Work Item with the work-item-agent.
+Next step: Use the roadmap-agent to plan the next initiative.
 
 ## Delivery State
 
-- Phase: Active Delivery
-- Draft Work Items: 1
+- Phase: Maintenance
+- Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 24/25
+- Ownership coverage: 25/25
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Refine the existing draft Work Item with the work-item-agent.
-  - id: refine-work-item
-  - reason: There is 1 draft Work Item. Refine before defining roadmap candidates.
-  - agent: work-item-agent
-  - skill: work-item-refinement
-
-Also (secondary):
-
-- Run `kaddo owners suggest` for Work Items without code ownership.
+- Use the roadmap-agent to plan the next initiative.
+  - id: plan-next
+  - reason: No active Work Items and no remaining roadmap candidates.
+  - agent: roadmap-agent
 
 ## Project Route
 
-Route: new · Progress: 9/12
+Route: new · Progress: 10/12
 
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
@@ -142,13 +136,7 @@ No roadmap baseline found.
 
 ## Active Work Items
 
-- WI-025 [feature] [K3] (draft) — Integración del SDK de Bedrock y activación de analyzer/reranker reales
-
-## Delivery Mix
-
-Active Work Items by type:
-
-- Features: 1
+No active work items found.
 
 ## Artifacts and Ownership
 
@@ -176,6 +164,7 @@ Active Work Items by type:
 - WI-022 [feature] owns: package.json, apps/client/package.json, apps/client/vite.config.ts, apps/client/src/App.tsx, README.md
 - WI-023 [bugfix] owns: apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
 - WI-024 [bugfix] owns: apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
+- WI-025 [feature] owns: ai/knowledge/package.json, ai/knowledge/src/context-analyzer.ts, ai/knowledge/src/context-analyzer.test.ts, ai/knowledge/src/recommendations/session-reranker.ts, ai/knowledge/src/recommendations/recommendations.test.ts
 
 ## Mapped Modules
 
@@ -246,17 +235,15 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Active Delivery** phase:
+Recommended next for the **Maintenance** phase:
 
-1. work-item-agent
+1. roadmap-agent
 
 Next step:
 
-- Refine the existing draft Work Item with the work-item-agent.
+- Use the roadmap-agent to plan the next initiative.
 
 ## Instructions for the LLM
 
-- Refine draft Work Items to ready.
-- Use the work-item-agent.
-- Do not implement unless the user explicitly asks.
-- Ownership is incomplete — propose `code:` globs (run `kaddo owners suggest`).
+- No active work.
+- Use the roadmap-agent to plan the next initiative.

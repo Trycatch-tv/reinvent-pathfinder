@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import type { SessionCandidate, KnowledgeGap, ProjectContext } from '@pathfinder/domain';
 import { CandidateFilter } from './candidate-filter.js';
 import { HeuristicSessionReranker, BedrockSessionReranker } from './session-reranker.js';
+import type { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 
 const mockSessions: SessionCandidate[] = [
   {
@@ -157,5 +158,73 @@ describe('BedrockSessionReranker', () => {
 
     expect(res.recommendations.length).toBeGreaterThan(0);
     expect(res.modelId).toBeDefined();
+  });
+
+  it('invokes Bedrock Converse API to rerank candidates with semantic explanations', async () => {
+    const mockBedrockClient = {
+      send: async () => ({
+        output: {
+          message: {
+            content: [
+              {
+                text: JSON.stringify([
+                  {
+                    sessionId: 's-1',
+                    score: 0.98,
+                    coveredGapIds: ['gap-1'],
+                    explanation: 'Sesión imprescindible para dominar agentes autónomos en Bedrock.',
+                    logisticsScore: 0.9,
+                  },
+                  {
+                    sessionId: 's-2',
+                    score: 0.85,
+                    coveredGapIds: [],
+                    explanation: 'Complemento sólido para persistencia DynamoDB.',
+                    logisticsScore: 0.8,
+                  },
+                ]),
+              },
+            ],
+          },
+        },
+      }),
+    };
+
+    const reranker = new BedrockSessionReranker({
+      modelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      bedrockClient: mockBedrockClient as unknown as BedrockRuntimeClient,
+    });
+
+    const res = await reranker.rank({
+      knowledgeGaps: mockGaps,
+      candidateSessions: mockSessions,
+      maxRecommendations: 2,
+    });
+
+    expect(res.modelId).toBe('anthropic.claude-3-5-sonnet-20241022-v2:0');
+    expect(res.recommendations).toHaveLength(2);
+    expect(res.recommendations[0]?.sessionCode).toBe('AIM301');
+    expect(res.recommendations[0]?.relevanceScore).toBe(0.98);
+    expect(res.recommendations[0]?.explanation).toContain('imprescindible');
+  });
+
+  it('gracefully degrades to heuristic reranker when Bedrock throws an exception', async () => {
+    const failingClient = {
+      send: async () => {
+        throw new Error('ServiceUnavailableException: Bedrock is temporarily unavailable');
+      },
+    };
+
+    const reranker = new BedrockSessionReranker({
+      bedrockClient: failingClient as unknown as BedrockRuntimeClient,
+    });
+
+    const res = await reranker.rank({
+      knowledgeGaps: mockGaps,
+      candidateSessions: mockSessions,
+    });
+
+    expect(res.recommendations.length).toBeGreaterThan(0);
+    expect(res.modelId).toBe('heuristic-reranker-v1');
   });
 });

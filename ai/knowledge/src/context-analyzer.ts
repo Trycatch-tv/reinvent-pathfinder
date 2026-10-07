@@ -172,37 +172,175 @@ export class HeuristicContextAnalyzer implements ContextAnalyzerProvider {
   }
 }
 
+import {
+  BedrockRuntimeClient,
+  ConverseCommand,
+} from '@aws-sdk/client-bedrock-runtime';
+
+function extractJsonBlock(text: string): string {
+  const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  return match?.[1] ? match[1].trim() : text.trim();
+}
+
 export interface BedrockAnalyzerOptions {
   readonly modelId?: string;
   readonly region?: string;
-  readonly bedrockClient?: unknown; // AWS SDK BedrockRuntimeClient if provided
+  readonly bedrockClient?: BedrockRuntimeClient;
 }
 
 /**
  * Bedrock Converse API Context Analyzer.
  * Uses structured JSON prompting against Amazon Bedrock foundation models (Claude 3.5 Sonnet / Haiku).
- * Automatically falls back to Heuristic analyzer when AWS is unavailable.
+ * Automatically falls back to Heuristic analyzer when AWS is unavailable or calls fail.
  */
 export class BedrockContextAnalyzer implements ContextAnalyzerProvider {
-  private readonly modelId: string;
+  public readonly modelId: string;
+  public readonly region: string;
   private readonly fallbackAnalyzer: HeuristicContextAnalyzer;
+  private client: BedrockRuntimeClient | null;
 
   constructor(options: BedrockAnalyzerOptions = {}) {
     this.modelId = options.modelId ?? process.env.BEDROCK_MODEL_ID ?? 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+    this.region = options.region ?? process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-1';
     this.fallbackAnalyzer = new HeuristicContextAnalyzer();
+    this.client = options.bedrockClient ?? null;
+  }
+
+  private getClient(): BedrockRuntimeClient | null {
+    if (this.client) return this.client;
+    if (process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION) {
+      try {
+        this.client = new BedrockRuntimeClient({ region: this.region });
+        return this.client;
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 
   public async analyze(request: AnalyzeContextRequest): Promise<AnalyzeContextResponse> {
+    const client = this.getClient();
+    if (!client) {
+      return this.fallbackAnalyzer.analyze(request);
+    }
+
     try {
-      // In development or when credentials are not configured, fallback gracefully
-      if (!process.env.AWS_REGION && !process.env.AWS_DEFAULT_REGION) {
-        return await this.fallbackAnalyzer.analyze(request);
+      const prompt = `Analiza el siguiente proyecto técnico para el evento AWS re:Invent:
+Nombre: ${request.projectName}
+Descripción: ${request.description}
+Seniority: ${request.seniority ?? 'intermediate'}
+Stack actual: ${(request.currentStack ?? []).join(', ') || 'No especificado'}
+Objetivos: ${(request.goals ?? []).join('; ') || 'Aprender y construir'}
+Restricciones: ${(request.constraints ?? []).join('; ') || 'Ninguna'}
+
+Devuelve un objeto JSON estricto con la siguiente estructura:
+{
+  "skills": [
+    { "topic": "NOMBRE_SKILL", "proficiency": "foundational" | "associate" | "professional" | "specialty" }
+  ],
+  "targetDomains": ["Dominio 1", "Dominio 2"],
+  "knowledgeGaps": [
+    {
+      "id": "gap-1",
+      "topic": "Tema de la brecha",
+      "description": "Descripción de la brecha",
+      "targetProficiency": "associate",
+      "severity": "critical" | "important" | "beneficial",
+      "status": "open",
+      "rationale": "Por qué es relevante para el proyecto"
+    }
+  ]
+}
+Responde ÚNICAMENTE con el bloque JSON válido.`;
+
+      const command = new ConverseCommand({
+        modelId: this.modelId,
+        messages: [
+          {
+            role: 'user',
+            content: [{ text: prompt }],
+          },
+        ],
+        inferenceConfig: {
+          maxTokens: 2048,
+          temperature: 0.1,
+        },
+      });
+
+      const response = await client.send(command);
+      const outputText = response.output?.message?.content?.[0]?.text;
+      if (!outputText) {
+        return this.fallbackAnalyzer.analyze(request);
       }
 
-      // If credentials are present, invoke Converse API (or fallback if call fails)
-      return await this.fallbackAnalyzer.analyze(request);
+      const parsed = JSON.parse(extractJsonBlock(outputText));
+      if (!parsed || !Array.isArray(parsed.skills) || !Array.isArray(parsed.knowledgeGaps)) {
+        return this.fallbackAnalyzer.analyze(request);
+      }
+
+      const now = new Date().toISOString();
+      const userId = request.userId ?? 'anonymous-attendee';
+
+      const detectedSkills: KnowledgeSkill[] = parsed.skills.map((s: { topic?: unknown; proficiency?: unknown }) => ({
+        topic: String(s.topic ?? '').toUpperCase(),
+        proficiency: (typeof s.proficiency === 'string' && ['foundational', 'associate', 'professional', 'specialty'].includes(s.proficiency)
+          ? s.proficiency
+          : 'associate') as SkillProficiency,
+      }));
+
+      const targetDomains: string[] = Array.isArray(parsed.targetDomains) && parsed.targetDomains.length > 0
+        ? parsed.targetDomains.map(String)
+        : ['Cloud Architecture'];
+
+      const knowledgeGaps: KnowledgeGap[] = parsed.knowledgeGaps.map((g: {
+        id?: unknown;
+        topic?: unknown;
+        description?: unknown;
+        targetProficiency?: unknown;
+        severity?: unknown;
+        rationale?: unknown;
+      }, index: number) => ({
+        id: String(g.id ?? `gap-${index + 1}`),
+        topic: String(g.topic ?? 'General Gap'),
+        description: String(g.description ?? ''),
+        targetProficiency: (typeof g.targetProficiency === 'string' && ['foundational', 'associate', 'professional', 'specialty'].includes(g.targetProficiency)
+          ? g.targetProficiency
+          : 'associate') as SkillProficiency,
+        severity: (typeof g.severity === 'string' && ['critical', 'important', 'beneficial'].includes(g.severity) ? g.severity : 'important') as KnowledgeGap['severity'],
+        status: 'open',
+        rationale: String(g.rationale ?? ''),
+        addressedBySessionIds: [],
+      }));
+
+      const projectContext: ProjectContext = {
+        id: `ctx-${Date.now()}`,
+        name: request.projectName,
+        currentStack: request.currentStack ?? detectedSkills.map((s) => s.topic),
+        seniority: request.seniority ?? 'intermediate',
+        goals: request.goals ?? ['Build resilient cloud architecture'],
+        constraints: request.constraints,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      const knowledgeProfile: KnowledgeProfile = {
+        id: `profile-${Date.now()}`,
+        userId,
+        skills: detectedSkills,
+        targetDomains,
+        updatedAt: now,
+      };
+
+      return {
+        projectContext,
+        knowledgeProfile,
+        knowledgeGaps,
+        analyzedAt: now,
+        modelId: this.modelId,
+      };
     } catch {
-      return await this.fallbackAnalyzer.analyze(request);
+      return this.fallbackAnalyzer.analyze(request);
     }
   }
 }

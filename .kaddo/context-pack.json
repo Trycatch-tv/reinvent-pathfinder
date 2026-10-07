@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-07T01:45:09.762Z",
+  "generatedAt": "2026-10-07T02:46:17.641Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -28,40 +28,8 @@
     "summary": "",
     "roadmapSummary": "",
     "inventoryAvailable": true,
-    "workItems": [
-      {
-        "id": "WI-025",
-        "type": "feature",
-        "title": "Integración del SDK de Bedrock y activación de analyzer/reranker reales",
-        "status": "draft",
-        "lifecycle": "draft",
-        "knowledgeLevel": "K3",
-        "domains": [],
-        "source": {
-          "type": "unknown",
-          "id": "WI-CANDIDATE-001",
-          "inferred": true,
-          "reason": "Invalid source value: \"initiative\"."
-        }
-      }
-    ],
-    "activeWorkItems": [
-      {
-        "id": "WI-025",
-        "type": "feature",
-        "title": "Integración del SDK de Bedrock y activación de analyzer/reranker reales",
-        "status": "draft",
-        "lifecycle": "draft",
-        "knowledgeLevel": "K3",
-        "domains": [],
-        "source": {
-          "type": "unknown",
-          "id": "WI-CANDIDATE-001",
-          "inferred": true,
-          "reason": "Invalid source value: \"initiative\"."
-        }
-      }
-    ],
+    "workItems": [],
+    "activeWorkItems": [],
     "completedWorkItems": [
       {
         "id": "WI-001",
@@ -630,6 +598,30 @@
           "id": "WI-021",
           "inferred": true,
           "reason": "Invalid source value: \"validation-gap\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-025",
+        "type": "feature",
+        "title": "Integración del SDK de Bedrock y activación de analyzer/reranker reales",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
         },
         "implementationStatus": "not-assessed",
         "validationStatus": "not-assessed",
@@ -1220,16 +1212,25 @@
         "id": "WI-025",
         "type": "feature",
         "title": "Integración del SDK de Bedrock y activación de analyzer/reranker reales",
-        "status": "draft",
-        "lifecycle": "draft",
+        "status": "completed",
+        "lifecycle": "completed",
         "knowledgeLevel": "K3",
-        "domains": [],
+        "domains": [
+          "ai",
+          "tech"
+        ],
         "source": {
           "type": "unknown",
           "id": "WI-CANDIDATE-001",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
-        }
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -1510,6 +1511,19 @@
           "apps/client/src/components/AvailabilityHeatmap.tsx",
           "apps/client/src/client.test.ts"
         ]
+      },
+      {
+        "id": "WI-025",
+        "type": "feature",
+        "title": "Integración del SDK de Bedrock y activación de analyzer/reranker reales",
+        "summary": "",
+        "codeGlobs": [
+          "ai/knowledge/package.json",
+          "ai/knowledge/src/context-analyzer.ts",
+          "ai/knowledge/src/context-analyzer.test.ts",
+          "ai/knowledge/src/recommendations/session-reranker.ts",
+          "ai/knowledge/src/recommendations/recommendations.test.ts"
+        ]
       }
     ]
   },
@@ -1617,43 +1631,31 @@
     "remaining": 0
   },
   "phase": {
-    "phase": "Active Delivery",
+    "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
       "25 materialized work item(s)",
-      "draft: 1",
-      "Ownership coverage 96%"
+      "Ownership coverage 100%"
     ],
     "recommendedAgents": [
-      "work-item-agent"
+      "roadmap-agent"
     ],
-    "nextStep": "Refine the existing draft Work Item with the work-item-agent.",
+    "nextStep": "Use the roadmap-agent to plan the next initiative.",
     "llmInstructions": [
-      "Refine draft Work Items to ready.",
-      "Use the work-item-agent.",
-      "Do not implement unless the user explicitly asks.",
-      "Ownership is incomplete — propose `code:` globs (run `kaddo owners suggest`)."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ]
   },
   "nextStepRecommendation": {
-    "id": "refine-work-item",
-    "phase": "Active Delivery",
-    "label": "Refine the existing draft Work Item with the work-item-agent.",
-    "agent": "work-item-agent",
-    "skill": "work-item-refinement",
-    "reason": "There is 1 draft Work Item. Refine before defining roadmap candidates.",
-    "secondary": [
-      {
-        "id": "suggest-ownership",
-        "label": "Run `kaddo owners suggest` for Work Items without code ownership.",
-        "command": "kaddo owners suggest",
-        "reason": "Ownership coverage is 24/25."
-      }
-    ]
+    "id": "plan-next",
+    "phase": "Maintenance",
+    "label": "Use the roadmap-agent to plan the next initiative.",
+    "agent": "roadmap-agent",
+    "reason": "No active Work Items and no remaining roadmap candidates."
   },
   "deliveryState": {
-    "phase": "Active Delivery",
-    "draft_work_items": 1,
+    "phase": "Maintenance",
+    "draft_work_items": 0,
     "refined_draft_work_items": 0,
     "refined_draft_ids": [],
     "ready_work_items": 0,
@@ -1662,7 +1664,7 @@
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
     "total_work_items": 25,
-    "ownership_coverage": "24/25",
+    "ownership_coverage": "25/25",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1712,7 +1714,7 @@
     }
   },
   "installedAssets": {
-    "version": "3.113.0",
+    "version": "3.115.0",
     "agents": {
       "total": 20,
       "installed": 20,
@@ -1730,18 +1732,16 @@
   },
   "workItemSummary": {
     "total": 25,
-    "active": 1,
-    "draft": 1,
+    "active": 0,
+    "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 24,
+    "completed": 25,
     "archived": 0,
-    "summary": "draft-only"
+    "summary": "completed-only"
   },
-  "deliveryMix": {
-    "feature": 1
-  },
+  "deliveryMix": {},
   "external": [],
   "graph": {
     "generatedAt": "2026-10-03T06:00:22.556Z",
@@ -1823,9 +1823,9 @@
   "projectRoute": {
     "type": "new",
     "currentStep": "create-work-source",
-    "completed": 9,
+    "completed": 10,
     "total": 12,
-    "progressPercent": 75,
+    "progressPercent": 83,
     "steps": [
       {
         "id": "enable-kaddo",
@@ -1893,9 +1893,7 @@
       {
         "id": "suggest-ownership",
         "label": "Suggest ownership",
-        "status": "next",
-        "reason": "Ownership coverage is 24/25.",
-        "command": "kaddo owners suggest"
+        "status": "done"
       },
       {
         "id": "prepare-implementation",
@@ -1967,16 +1965,14 @@
   ],
   "handoff": {
     "recommendedAgents": [
-      "work-item-agent"
+      "roadmap-agent"
     ],
     "nextSteps": [
-      "Refine the existing draft Work Item with the work-item-agent."
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "instructions": [
-      "Refine draft Work Items to ready.",
-      "Use the work-item-agent.",
-      "Do not implement unless the user explicitly asks.",
-      "Ownership is incomplete — propose `code:` globs (run `kaddo owners suggest`)."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "operatingRules": [
       "**Never run `git commit`, `git push` or `git merge` without explicit human confirmation.**",

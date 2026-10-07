@@ -11,8 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@pathfinder/domain": "workspace:*",
+    "@aws-sdk/client-bedrock-runtime": "^3.1146.0",
     "@pathfinder/contracts": "workspace:*",
+    "@pathfinder/domain": "workspace:*",
     "@pathfinder/events-client": "workspace:*"
   }
 }

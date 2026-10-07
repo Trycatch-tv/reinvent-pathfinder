@@ -210,9 +210,21 @@ export class HeuristicSessionReranker implements SessionRerankerProvider {
   }
 }
 
+import {
+  BedrockRuntimeClient,
+  ConverseCommand,
+} from '@aws-sdk/client-bedrock-runtime';
+
+function extractJsonBlock(text: string): string {
+  const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  return match?.[1] ? match[1].trim() : text.trim();
+}
+
 export interface BedrockRerankerOptions {
   readonly modelId?: string;
   readonly region?: string;
+  readonly bedrockClient?: BedrockRuntimeClient;
+  readonly weights?: ScoringWeights;
 }
 
 /**
@@ -220,25 +232,164 @@ export interface BedrockRerankerOptions {
  * Uses Amazon Bedrock to perform LLM reranking and contextual reasoning with graceful heuristic fallback.
  */
 export class BedrockSessionReranker implements SessionRerankerProvider {
-  private readonly fallbackReranker: HeuristicSessionReranker;
   public readonly modelId: string;
+  public readonly region: string;
+  private readonly fallbackReranker: HeuristicSessionReranker;
+  private readonly filter: CandidateFilter;
+  private client: BedrockRuntimeClient | null;
 
   constructor(options: BedrockRerankerOptions = {}) {
     this.modelId = options.modelId ?? process.env.BEDROCK_MODEL_ID ?? 'anthropic.claude-3-5-sonnet-20241022-v2:0';
-    this.fallbackReranker = new HeuristicSessionReranker();
+    this.region = options.region ?? process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-1';
+    this.fallbackReranker = new HeuristicSessionReranker(options.weights);
+    this.filter = new CandidateFilter();
+    this.client = options.bedrockClient ?? null;
+  }
+
+  private getClient(): BedrockRuntimeClient | null {
+    if (this.client) return this.client;
+    if (process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION) {
+      try {
+        this.client = new BedrockRuntimeClient({ region: this.region });
+        return this.client;
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 
   public async rank(request: RankRecommendationsRequest): Promise<RankRecommendationsResponse> {
+    const totalCandidatesEvaluated = request.candidateSessions.length;
+    const filteredSessions = this.filter.filter(request.candidateSessions, {
+      targetLevels: request.targetLevels,
+      preferredFormats: request.preferredFormats,
+    });
+    const filteredCandidatesCount = filteredSessions.length;
+
+    if (filteredCandidatesCount === 0) {
+      return {
+        recommendations: [],
+        totalCandidatesEvaluated,
+        filteredCandidatesCount: 0,
+        rankedAt: new Date().toISOString(),
+        modelId: this.modelId,
+      };
+    }
+
+    const client = this.getClient();
+    if (!client) {
+      return this.fallbackReranker.rank(request);
+    }
+
     try {
-      // If no AWS environment configured, fallback to deterministic heuristic
-      if (!process.env.AWS_REGION && !process.env.AWS_DEFAULT_REGION) {
-        return await this.fallbackReranker.rank(request);
+      const candidatesPayload = filteredSessions.slice(0, 20).map((s) => ({
+        id: s.id,
+        code: s.code,
+        title: s.title,
+        level: s.level,
+        format: s.format,
+        topics: s.topics,
+      }));
+
+      const gapsPayload = request.knowledgeGaps.map((g) => ({
+        id: g.id,
+        topic: g.topic,
+        description: g.description,
+        severity: g.severity,
+      }));
+
+      const prompt = `Pondera y rankea las siguientes sesiones de AWS re:Invent según su relevancia para resolver las brechas de conocimiento (Knowledge Gaps) del asistente:
+Brechas: ${JSON.stringify(gapsPayload)}
+Sesiones candidatas: ${JSON.stringify(candidatesPayload)}
+
+Devuelve un JSON array con las recomendaciones ordenadas por score (de 0.0 a 1.0):
+[
+  {
+    "sessionId": "id-de-sesion",
+    "score": 0.95,
+    "coveredGapIds": ["id-de-brecha"],
+    "explanation": "Explicación contextual de por qué se recomienda.",
+    "logisticsScore": 0.8
+  }
+]
+Responde ÚNICAMENTE con el bloque JSON array válido.`;
+
+      const command = new ConverseCommand({
+        modelId: this.modelId,
+        messages: [
+          {
+            role: 'user',
+            content: [{ text: prompt }],
+          },
+        ],
+        inferenceConfig: {
+          maxTokens: 2048,
+          temperature: 0.1,
+        },
+      });
+
+      const response = await client.send(command);
+      const outputText = response.output?.message?.content?.[0]?.text;
+      if (!outputText) {
+        return this.fallbackReranker.rank(request);
       }
 
-      // In production Bedrock runtime, we can invoke Bedrock Converse API with structured JSON
-      return await this.fallbackReranker.rank(request);
+      const parsed = JSON.parse(extractJsonBlock(outputText));
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        return this.fallbackReranker.rank(request);
+      }
+
+      const sessionsById = new Map(filteredSessions.map((s) => [s.id, s]));
+      const limit = request.maxRecommendations ?? 10;
+      const recommendations: SessionRecommendation[] = [];
+
+      for (const item of parsed) {
+        const session = sessionsById.get(String(item.sessionId));
+        if (!session) continue;
+
+        const relevanceScore = typeof item.score === 'number'
+          ? Math.min(Math.max(item.score, 0.0), 1.0)
+          : 0.5;
+
+        const coveredGapIds = Array.isArray(item.coveredGapIds)
+          ? item.coveredGapIds.map(String)
+          : [];
+
+        const explanation = typeof item.explanation === 'string' && item.explanation.length > 0
+          ? item.explanation
+          : `Recomendada (${session.code} nivel ${session.level}) para cubrir tus brechas en re:Invent.`;
+
+        const logisticsScore = typeof item.logisticsScore === 'number'
+          ? Math.min(Math.max(item.logisticsScore, 0.0), 1.0)
+          : undefined;
+
+        recommendations.push({
+          sessionId: session.id,
+          sessionCode: session.code,
+          title: session.title,
+          relevanceScore,
+          coveredGapIds,
+          explanation,
+          logisticsScore,
+        });
+
+        if (recommendations.length >= limit) break;
+      }
+
+      if (recommendations.length === 0) {
+        return this.fallbackReranker.rank(request);
+      }
+
+      return {
+        recommendations,
+        totalCandidatesEvaluated,
+        filteredCandidatesCount,
+        rankedAt: new Date().toISOString(),
+        modelId: this.modelId,
+      };
     } catch {
-      return await this.fallbackReranker.rank(request);
+      return this.fallbackReranker.rank(request);
     }
   }
 }

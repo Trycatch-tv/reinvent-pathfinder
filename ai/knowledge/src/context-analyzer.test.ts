@@ -4,6 +4,7 @@ import {
   BedrockContextAnalyzer,
 } from './context-analyzer.js';
 import type { AnalyzeContextRequest } from '@pathfinder/contracts';
+import type { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
 
 describe('Context Analyzer (AI Knowledge)', () => {
   describe('HeuristicContextAnalyzer', () => {
@@ -82,6 +83,77 @@ describe('Context Analyzer (AI Knowledge)', () => {
       const result = await analyzer.analyze(request);
       expect(result.projectContext.name).toBe('Offline Test Project');
       expect(result.knowledgeGaps.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('invokes Bedrock Converse API with structured JSON output when client is provided', async () => {
+      const mockBedrockClient = {
+        send: async () => ({
+          output: {
+            message: {
+              content: [
+                {
+                  text: JSON.stringify({
+                    skills: [
+                      { topic: 'BEDROCK', proficiency: 'specialty' },
+                      { topic: 'AGENTCORE', proficiency: 'professional' },
+                    ],
+                    targetDomains: ['Artificial Intelligence', 'Serverless'],
+                    knowledgeGaps: [
+                      {
+                        id: 'gap-bedrock-1',
+                        topic: 'Advanced Multi-Agent Orchestration',
+                        description: 'Implementing custom agent tools and state handoff.',
+                        targetProficiency: 'specialty',
+                        severity: 'critical',
+                        status: 'open',
+                        rationale: 'Core architecture requirement',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        }),
+      };
+
+      const analyzer = new BedrockContextAnalyzer({
+        modelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
+        bedrockClient: mockBedrockClient as unknown as BedrockRuntimeClient,
+      });
+
+      const result = await analyzer.analyze({
+        projectName: 'Agentic Pathfinder',
+        description: 'Building multi-agent companion for re:Invent.',
+      });
+
+      expect(result.modelId).toBe('anthropic.claude-3-5-sonnet-20241022-v2:0');
+      expect(result.knowledgeProfile.skills.map((s) => s.topic)).toContain('BEDROCK');
+      expect(result.knowledgeProfile.skills.map((s) => s.topic)).toContain('AGENTCORE');
+      expect(result.knowledgeGaps).toHaveLength(1);
+      expect(result.knowledgeGaps[0]?.topic).toBe('Advanced Multi-Agent Orchestration');
+      expect(result.knowledgeGaps[0]?.severity).toBe('critical');
+    });
+
+    it('gracefully degrades to heuristic fallback when Bedrock call rejects', async () => {
+      const failingClient = {
+        send: async () => {
+          throw new Error('ThrottlingException: Rate exceeded');
+        },
+      };
+
+      const analyzer = new BedrockContextAnalyzer({
+        bedrockClient: failingClient as unknown as BedrockRuntimeClient,
+      });
+
+      const result = await analyzer.analyze({
+        projectName: 'Resilient Project',
+        description: 'Testing Bedrock fallback under error.',
+      });
+
+      expect(result.projectContext.name).toBe('Resilient Project');
+      expect(result.knowledgeGaps.length).toBeGreaterThanOrEqual(1);
+      expect(result.modelId).toBe('heuristic-offline-v1');
     });
   });
 });
