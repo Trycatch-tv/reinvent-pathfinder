@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-07T01:32:59.185Z",
+  "generatedAt": "2026-10-07T01:42:28.234Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -28,94 +28,8 @@
     "summary": "",
     "roadmapSummary": "",
     "inventoryAvailable": true,
-    "workItems": [
-      {
-        "id": "WI-023",
-        "type": "bugfix",
-        "title": "Heat map visual de disponibilidad de sesiones",
-        "status": "in-progress",
-        "lifecycle": "in-progress",
-        "knowledgeLevel": "K2",
-        "domains": [
-          "experience",
-          "aws-events"
-        ],
-        "source": {
-          "type": "unknown",
-          "id": "WI-017",
-          "inferred": true,
-          "reason": "Invalid source value: \"validation-gap\"."
-        },
-        "affectedModules": [
-          "reinvent-pathfinder"
-        ]
-      },
-      {
-        "id": "WI-024",
-        "type": "bugfix",
-        "title": "Visibilidad de agenda y confirmación de reservas",
-        "status": "ready",
-        "lifecycle": "ready",
-        "knowledgeLevel": "K2",
-        "domains": [
-          "experience",
-          "aws-events"
-        ],
-        "source": {
-          "type": "unknown",
-          "id": "WI-021",
-          "inferred": true,
-          "reason": "Invalid source value: \"validation-gap\"."
-        },
-        "affectedModules": [
-          "reinvent-pathfinder"
-        ]
-      }
-    ],
-    "activeWorkItems": [
-      {
-        "id": "WI-023",
-        "type": "bugfix",
-        "title": "Heat map visual de disponibilidad de sesiones",
-        "status": "in-progress",
-        "lifecycle": "in-progress",
-        "knowledgeLevel": "K2",
-        "domains": [
-          "experience",
-          "aws-events"
-        ],
-        "source": {
-          "type": "unknown",
-          "id": "WI-017",
-          "inferred": true,
-          "reason": "Invalid source value: \"validation-gap\"."
-        },
-        "affectedModules": [
-          "reinvent-pathfinder"
-        ]
-      },
-      {
-        "id": "WI-024",
-        "type": "bugfix",
-        "title": "Visibilidad de agenda y confirmación de reservas",
-        "status": "ready",
-        "lifecycle": "ready",
-        "knowledgeLevel": "K2",
-        "domains": [
-          "experience",
-          "aws-events"
-        ],
-        "source": {
-          "type": "unknown",
-          "id": "WI-021",
-          "inferred": true,
-          "reason": "Invalid source value: \"validation-gap\"."
-        },
-        "affectedModules": [
-          "reinvent-pathfinder"
-        ]
-      }
-    ],
+    "workItems": [],
+    "activeWorkItems": [],
     "completedWorkItems": [
       {
         "id": "WI-001",
@@ -639,6 +553,54 @@
         },
         "implementationStatus": "in-progress",
         "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-023",
+        "type": "bugfix",
+        "title": "Heat map visual de disponibilidad de sesiones",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-017",
+          "inferred": true,
+          "reason": "Invalid source value: \"validation-gap\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-024",
+        "type": "bugfix",
+        "title": "Visibilidad de agenda y confirmación de reservas",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-021",
+          "inferred": true,
+          "reason": "Invalid source value: \"validation-gap\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
         "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
@@ -1178,8 +1140,8 @@
         "id": "WI-023",
         "type": "bugfix",
         "title": "Heat map visual de disponibilidad de sesiones",
-        "status": "in-progress",
-        "lifecycle": "in-progress",
+        "status": "completed",
+        "lifecycle": "completed",
         "knowledgeLevel": "K2",
         "domains": [
           "experience",
@@ -1191,6 +1153,9 @@
           "inferred": true,
           "reason": "Invalid source value: \"validation-gap\"."
         },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
         ]
@@ -1199,8 +1164,8 @@
         "id": "WI-024",
         "type": "bugfix",
         "title": "Visibilidad de agenda y confirmación de reservas",
-        "status": "ready",
-        "lifecycle": "ready",
+        "status": "completed",
+        "lifecycle": "completed",
         "knowledgeLevel": "K2",
         "domains": [
           "experience",
@@ -1212,6 +1177,9 @@
           "inferred": true,
           "reason": "Invalid source value: \"validation-gap\"."
         },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
         "affectedModules": [
           "reinvent-pathfinder"
         ]
@@ -1601,52 +1569,37 @@
     "remaining": 0
   },
   "phase": {
-    "phase": "Active Delivery",
+    "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
       "24 materialized work item(s)",
-      "ready: 1, in-progress: 1",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
-      "implementation-agent"
+      "roadmap-agent"
     ],
-    "nextStep": "Use implementation-agent to implement WI-024.",
+    "nextStep": "Use the roadmap-agent to plan the next initiative.",
     "llmInstructions": [
-      "Use the implementation-agent.",
-      "Suggest a branch name only.",
-      "Do not run git commands."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ]
   },
   "nextStepRecommendation": {
-    "id": "implement-work-item",
-    "phase": "Active Delivery",
-    "label": "Use implementation-agent to implement WI-024.",
-    "agent": "implementation-agent",
-    "skill": "implementation-planning",
-    "target": "WI-024",
-    "reason": "WI-024 is ready for implementation.",
-    "secondary": [
-      {
-        "id": "validate-work-item-modules",
-        "label": "Validate affected modules for multirepo Work Items before implementation.",
-        "reason": "1 ready Work Item(s) reference affected_modules."
-      }
-    ]
+    "id": "plan-next",
+    "phase": "Maintenance",
+    "label": "Use the roadmap-agent to plan the next initiative.",
+    "agent": "roadmap-agent",
+    "reason": "No active Work Items and no remaining roadmap candidates."
   },
   "deliveryState": {
-    "phase": "Active Delivery",
+    "phase": "Maintenance",
     "draft_work_items": 0,
     "refined_draft_work_items": 0,
     "refined_draft_ids": [],
-    "ready_work_items": 1,
-    "ready_work_item_ids": [
-      "WI-024"
-    ],
-    "ready_multirepo_wi_ids": [
-      "WI-024"
-    ],
-    "in_progress_work_items": 1,
+    "ready_work_items": 0,
+    "ready_work_item_ids": [],
+    "ready_multirepo_wi_ids": [],
+    "in_progress_work_items": 0,
     "blocked_work_items": 0,
     "total_work_items": 24,
     "ownership_coverage": "24/24",
@@ -1717,18 +1670,16 @@
   },
   "workItemSummary": {
     "total": 24,
-    "active": 2,
+    "active": 0,
     "draft": 0,
-    "ready": 1,
-    "in_progress": 1,
+    "ready": 0,
+    "in_progress": 0,
     "blocked": 0,
-    "completed": 22,
+    "completed": 24,
     "archived": 0,
-    "summary": "active"
+    "summary": "completed-only"
   },
-  "deliveryMix": {
-    "bugfix": 2
-  },
+  "deliveryMix": {},
   "external": [],
   "graph": {
     "generatedAt": "2026-10-03T06:00:22.556Z",
@@ -1809,7 +1760,7 @@
   },
   "projectRoute": {
     "type": "new",
-    "currentStep": "run-guard",
+    "currentStep": "create-work-source",
     "completed": 10,
     "total": 12,
     "progressPercent": 83,
@@ -1890,8 +1841,7 @@
       {
         "id": "run-guard",
         "label": "Run guard",
-        "status": "current",
-        "command": "kaddo guard"
+        "status": "pending"
       },
       {
         "id": "capture-learning",
@@ -1953,15 +1903,14 @@
   ],
   "handoff": {
     "recommendedAgents": [
-      "implementation-agent"
+      "roadmap-agent"
     ],
     "nextSteps": [
-      "Use implementation-agent to implement WI-024."
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "instructions": [
-      "Use the implementation-agent.",
-      "Suggest a branch name only.",
-      "Do not run git commands."
+      "No active work.",
+      "Use the roadmap-agent to plan the next initiative."
     ],
     "operatingRules": [
       "**Never run `git commit`, `git push` or `git merge` without explicit human confirmation.**",

@@ -208,6 +208,8 @@ describe("apps/client UI components", () => {
     expect(describeReservationFailures([{ code: "AlreadyReserved" }])).toContain("ya estaba reservada")
     expect(describeReservationReconciliation({ wasReserved: false, sessionId: "session-1", reservedSessionIds: ["session-1"], failed: [] })).toContain("Reserva confirmada")
     expect(describeReservationReconciliation({ wasReserved: false, sessionId: "session-1", reservedSessionIds: [], failed: [] })).toContain("no confirmó la reserva")
+    expect(describeReservationReconciliation({ wasReserved: true, sessionId: "session-1", reservedSessionIds: [], failed: [] })).toContain("Cancelación de reserva confirmada")
+    expect(describeReservationReconciliation({ wasReserved: true, sessionId: "session-1", reservedSessionIds: ["session-1"], failed: [] })).toContain("no confirmó la cancelación")
   })
 
   it("reports schedule IDs that are not part of the loaded catalog", () => {

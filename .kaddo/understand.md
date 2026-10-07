@@ -12,17 +12,16 @@
 
 ## Current Phase
 
-- Phase: Active Delivery
-- Recommended agent: implementation-agent
-- Recommended skill: implementation-planning
-- Next step: Use implementation-agent to implement WI-024.
-- Reason: WI-024 is ready for implementation.
+- Phase: Maintenance
+- Recommended agent: roadmap-agent
+- Next step: Use the roadmap-agent to plan the next initiative.
+- Reason: No active Work Items and no remaining roadmap candidates.
 
 ## Delivery State
 
 - Draft Work Items: 0
-- Ready Work Items: 1
-- In-progress Work Items: 1
+- Ready Work Items: 0
+- In-progress Work Items: 0
 - Blocked Work Items: 0
 - Ownership coverage: 24/24
 - Remaining Work Item candidates: 0
@@ -34,31 +33,18 @@
 
 Route: new · Progress: 10/12
 
-Current:
-- Run guard
-
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
 
 ## Recommended Agent Flow
 
-1. implementation-agent
+1. roadmap-agent
 
 ## Primary Recommendation
 
-- id: implement-work-item
-- agent: implementation-agent
-- skill: implementation-planning
-- reason: WI-024 is ready for implementation.
-
-## Secondary Recommendations
-
-1. Validate affected modules for multirepo Work Items before implementation.
-
-## Active Work Items
-
-- WI-023 [bugfix] in-progress — Heat map visual de disponibilidad de sesiones
-- WI-024 [bugfix] ready — Visibilidad de agenda y confirmación de reservas
+- id: plan-next
+- agent: roadmap-agent
+- reason: No active Work Items and no remaining roadmap candidates.
 
 ## Context Pack
 
@@ -68,42 +54,26 @@ Use `.kaddo/context-pack.md` as the primary input.
 
 Use:
 
-- `knowledge/agents/delivery/implementation-agent.md`
-- `knowledge/skills/implementation-planning/skill.md`
+- `knowledge/agents/delivery/roadmap-agent.md`
 - `.kaddo/context-pack.md`
 
 ## Expected Outputs
 
-The LLM should produce:
-
-- `WI-024`
-- Implementation plan or code changes guided by the Work Item.
+_See the primary recommendation above._
 
 ## Copy/Paste Instructions
 
 Paste the following into your LLM chat:
 
-1. `knowledge/agents/delivery/implementation-agent.md`
-2. `knowledge/skills/implementation-planning/skill.md`
-3. `.kaddo/context-pack.md`
+1. `knowledge/agents/delivery/roadmap-agent.md`
+2. `.kaddo/context-pack.md`
 
-Ask the LLM to follow the implementation-agent instructions.
+Ask the LLM to follow the roadmap-agent instructions.
 
 ## Next Steps
 
-1. Use implementation-agent to implement WI-024.
-2. Validate affected modules for multirepo Work Items before implementation.
-3. Re-run `kaddo explain`.
-
-## Branch Strategy
-
-**WI-023** affects: reinvent-pathfinder
-
-- `reinvent-pathfinder`: branch `wi-023/heat-map-visual-de-disponibilidad-de-ses`
-
-**WI-024** affects: reinvent-pathfinder
-
-- `reinvent-pathfinder`: branch `wi-024/visibilidad-de-agenda-y-confirmaci-n-de-`
+1. Use the roadmap-agent to plan the next initiative.
+2. Re-run `kaddo explain`.
 
 ## Metadata Health
 

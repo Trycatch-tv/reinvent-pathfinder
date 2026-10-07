@@ -3,7 +3,7 @@ type: bugfix
 id: WI-024
 title: Visibilidad de agenda y confirmación de reservas
 knowledge_level: K2
-status: ready
+status: completed
 phase: now
 initiative: INI-007
 domains:
@@ -68,10 +68,10 @@ El objetivo es renderizar un panel “Mi agenda confirmada” con sesiones del c
 
 ## Acceptance Criteria
 
-- [ ] Tras “Actualizar mi agenda”, la UI lista reservas y favoritos cuyos IDs estén presentes en el catálogo live, y comunica el número de IDs no enriquecidos sin lecturas N+1.
-- [ ] Tras intentar reservar, la UI muestra “Reserva confirmada” solo si el ID objetivo aparece en `reservedSessionIds` del snapshot reconciliado; en caso contrario explica que AWS no la confirmó.
-- [ ] El panel conserva etiquetas y navegación accesibles, no expone tokens y mantiene el último snapshot confirmado ante fallo.
-- [ ] Las pruebas cubren lista de agenda, IDs desconocidos, reserva confirmada y respuesta de reserva no confirmada tras reconciliación.
+- [x] Tras “Actualizar mi agenda”, la UI lista reservas y favoritos cuyos IDs estén presentes en el catálogo live, y comunica el número de IDs no enriquecidos sin lecturas N+1.
+- [x] Tras intentar reservar, la UI muestra “Reserva confirmada” solo si el ID objetivo aparece en `reservedSessionIds` del snapshot reconciliado; en caso contrario explica que AWS no la confirmó.
+- [x] El panel conserva etiquetas y navegación accesibles, no expone tokens y mantiene el último snapshot confirmado ante fallo.
+- [x] Las pruebas cubren lista de agenda, IDs desconocidos, reserva confirmada y respuesta de reserva no confirmada tras reconciliación.
 
 ## Out of Scope
 
@@ -99,4 +99,4 @@ No hay preguntas bloqueantes. IDs que AWS devuelve pero el catálogo live no con
 
 ## Learning
 
-_What did we learn? Update after completion._
+La confirmación de estado de reservas y cancelaciones se valida directamente contra el snapshot reconciliado de `GetSchedule` en lugar de confiar ciegamente en respuestas parciales o códigos 200 aislados. Además, la visualización de la agenda contabiliza IDs no resueltos contra el catálogo visible sin incurrir en lecturas N+1.

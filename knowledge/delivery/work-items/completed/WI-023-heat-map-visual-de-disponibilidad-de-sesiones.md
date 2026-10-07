@@ -3,7 +3,7 @@ type: bugfix
 id: WI-023
 title: Heat map visual de disponibilidad de sesiones
 knowledge_level: K2
-status: in-progress
+status: completed
 phase: now
 initiative: INI-007
 domains:

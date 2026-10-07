@@ -20,46 +20,37 @@
 
 ## Current Phase
 
-Phase: Active Delivery
+Phase: Maintenance
 
 Reason:
 
 - Roadmap available
 - 24 materialized work item(s)
-- ready: 1, in-progress: 1
 - Ownership coverage 100%
 
-Recommended next: implementation-agent
+Recommended next: roadmap-agent
 
-Next step: Use implementation-agent to implement WI-024.
+Next step: Use the roadmap-agent to plan the next initiative.
 
 ## Delivery State
 
-- Phase: Active Delivery
+- Phase: Maintenance
 - Draft Work Items: 0
-- Ready Work Items: 1
-- In-progress Work Items: 1
+- Ready Work Items: 0
+- In-progress Work Items: 0
 - Ownership coverage: 24/24
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use implementation-agent to implement WI-024.
-  - id: implement-work-item
-  - reason: WI-024 is ready for implementation.
-  - agent: implementation-agent
-  - skill: implementation-planning
-
-Also (secondary):
-
-- Validate affected modules for multirepo Work Items before implementation.
+- Use the roadmap-agent to plan the next initiative.
+  - id: plan-next
+  - reason: No active Work Items and no remaining roadmap candidates.
+  - agent: roadmap-agent
 
 ## Project Route
 
 Route: new · Progress: 10/12
-
-Current:
-- Run guard
 
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
@@ -144,14 +135,7 @@ No roadmap baseline found.
 
 ## Active Work Items
 
-- WI-023 [bugfix] [K2] (in-progress) — Heat map visual de disponibilidad de sesiones · domains: experience, aws-events
-- WI-024 [bugfix] [K2] (ready) — Visibilidad de agenda y confirmación de reservas · domains: experience, aws-events
-
-## Delivery Mix
-
-Active Work Items by type:
-
-- Bugfixs: 2
+No active work items found.
 
 ## Artifacts and Ownership
 
@@ -249,16 +233,15 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Active Delivery** phase:
+Recommended next for the **Maintenance** phase:
 
-1. implementation-agent
+1. roadmap-agent
 
 Next step:
 
-- Use implementation-agent to implement WI-024.
+- Use the roadmap-agent to plan the next initiative.
 
 ## Instructions for the LLM
 
-- Use the implementation-agent.
-- Suggest a branch name only.
-- Do not run git commands.
+- No active work.
+- Use the roadmap-agent to plan the next initiative.

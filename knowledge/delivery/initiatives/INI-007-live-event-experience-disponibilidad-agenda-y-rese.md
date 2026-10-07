@@ -2,7 +2,7 @@
 type: initiative
 id: INI-007
 title: 'Live Event Experience — disponibilidad, agenda y reservas'
-status: planned
+status: completed
 knowledge_level: K2
 domains:
   - aws-events
