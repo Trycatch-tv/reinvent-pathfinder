@@ -17,8 +17,6 @@ import type {
   SessionRecommendation,
 } from "@pathfinder/domain"
 import {
-  SAMPLE_RAW_SESSIONS,
-  SAMPLE_USER_SCHEDULE,
   AwsBuilderIdAuthClient,
   AwsEventsClient,
   AwsEventsError,
@@ -27,20 +25,24 @@ import {
   AwsEventsThrottlingError,
   AwsEventsUnauthorizedError,
   InMemoryTokenStore,
+  SAMPLE_RAW_SESSIONS,
+  SAMPLE_USER_SCHEDULE,
   normalizeAwsSession,
 } from "@pathfinder/events-client"
 import React, { useEffect, useState } from "react"
+import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
+import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
-import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
-import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 
 export function resolveAuthRedirectUri(
   envUri = import.meta.env.VITE_AUTH_REDIRECT_URI,
-  windowOrigin = typeof window !== "undefined" && window.location?.origin ? window.location.origin : null,
+  windowOrigin = typeof window !== "undefined" && window.location?.origin
+    ? window.location.origin
+    : null,
 ): string {
   if (envUri) return envUri
   if (windowOrigin) return `${windowOrigin}/callback`
@@ -60,49 +62,91 @@ export const eventsApiBaseUrl = import.meta.env.DEV
   ? "/aws-events/v1"
   : "https://api.awsevents.com/v1"
 const liveEventsClient = liveEventId
-  ? new AwsEventsClient({ baseUrl: eventsApiBaseUrl, eventId: liveEventId, tokenStore })
+  ? new AwsEventsClient({
+      baseUrl: eventsApiBaseUrl,
+      eventId: liveEventId,
+      tokenStore,
+    })
   : null
-type LiveAvailabilitySnapshot = Awaited<ReturnType<AwsEventsClient["fetchAvailabilitySnapshot"]>>
-type LiveScheduleSnapshot = Awaited<ReturnType<AwsEventsClient["getPersonalSchedule"]>>
+type LiveAvailabilitySnapshot = Awaited<
+  ReturnType<AwsEventsClient["fetchAvailabilitySnapshot"]>
+>
+type LiveScheduleSnapshot = Awaited<
+  ReturnType<AwsEventsClient["getPersonalSchedule"]>
+>
 
-export function selectAvailabilitySnapshot(snapshot: LiveAvailabilitySnapshot | null) {
+export function selectAvailabilitySnapshot(
+  snapshot: LiveAvailabilitySnapshot | null,
+) {
   return snapshot
     ? { ...snapshot, source: "live" as const }
-    : { sessions: DEMO_SESSIONS, availability: SAMPLE_HEATMAP_AVAILABILITY, source: "fixture" as const }
+    : {
+        sessions: DEMO_SESSIONS,
+        availability: SAMPLE_HEATMAP_AVAILABILITY,
+        source: "fixture" as const,
+      }
 }
 
 export function describeLiveAvailabilityError(error: unknown): string {
-  if (error instanceof AwsEventsUnauthorizedError || (error instanceof AwsEventsError && error.statusCode === 401)) {
+  if (
+    error instanceof AwsEventsUnauthorizedError ||
+    (error instanceof AwsEventsError && error.statusCode === 401)
+  ) {
     return "Inicia sesión con Builder ID para actualizar la disponibilidad."
   }
-  if (error instanceof AwsEventsForbiddenError || (error instanceof AwsEventsError && error.statusCode === 403)) {
+  if (
+    error instanceof AwsEventsForbiddenError ||
+    (error instanceof AwsEventsError && error.statusCode === 403)
+  ) {
     return "Tu registro no tiene acceso a la disponibilidad de este evento."
   }
-  if (error instanceof AwsEventsThrottlingError || (error instanceof AwsEventsError && error.statusCode === 429)) {
+  if (
+    error instanceof AwsEventsThrottlingError ||
+    (error instanceof AwsEventsError && error.statusCode === 429)
+  ) {
     return "AWS Events está limitando las solicitudes. Espera un momento e inténtalo de nuevo."
   }
   return "No fue posible actualizar la disponibilidad desde AWS Events."
 }
 
 export function describeLiveScheduleError(error: unknown): string {
-  if (error instanceof AwsEventsNotFoundError || (error instanceof AwsEventsError && error.statusCode === 404)) {
+  if (
+    error instanceof AwsEventsNotFoundError ||
+    (error instanceof AwsEventsError && error.statusCode === 404)
+  ) {
     return "Ese favorito ya no existe en AWS Events; actualiza tu agenda para reconciliarla."
   }
-  return describeLiveAvailabilityError(error).replace("la disponibilidad", "tu agenda")
+  return describeLiveAvailabilityError(error).replace(
+    "la disponibilidad",
+    "tu agenda",
+  )
 }
 
 export function describeLiveReservationError(error: unknown): string {
-  if (error instanceof AwsEventsNotFoundError || (error instanceof AwsEventsError && error.statusCode === 404)) {
+  if (
+    error instanceof AwsEventsNotFoundError ||
+    (error instanceof AwsEventsError && error.statusCode === 404)
+  ) {
     return "Esa reserva ya no existe en AWS Events; actualiza tu agenda para reconciliarla."
   }
-  return describeLiveAvailabilityError(error).replace("la disponibilidad", "tu reserva")
+  return describeLiveAvailabilityError(error).replace(
+    "la disponibilidad",
+    "tu reserva",
+  )
 }
 
-export function describeReservationFailures(failed: readonly { readonly code?: string }[]): string {
+export function describeReservationFailures(
+  failed: readonly { readonly code?: string }[],
+): string {
   const codes = failed.map((failure) => failure.code?.toLowerCase() ?? "")
-  if (codes.some((code) => code.includes("full"))) return "La sesión está llena; se mostró la agenda confirmada."
-  if (codes.some((code) => code.includes("conflict"))) return "La sesión entra en conflicto con tu agenda; se mostró la agenda confirmada."
-  if (codes.some((code) => code.includes("already") || code.includes("reserved"))) return "La sesión ya estaba reservada; se mostró la agenda confirmada."
+  if (codes.some((code) => code.includes("full")))
+    return "La sesión está llena; se mostró la agenda confirmada."
+  if (codes.some((code) => code.includes("conflict")))
+    return "La sesión entra en conflicto con tu agenda; se mostró la agenda confirmada."
+  if (
+    codes.some((code) => code.includes("already") || code.includes("reserved"))
+  )
+    return "La sesión ya estaba reservada; se mostró la agenda confirmada."
   return `AWS Events rechazó ${failed.length} reserva(s); se mostró la agenda confirmada.`
 }
 
@@ -112,11 +156,17 @@ export function describeReservationReconciliation(input: {
   readonly reservedSessionIds: readonly string[]
   readonly failed: readonly { readonly code?: string }[]
 }): string {
-  const reservationConfirmed = input.reservedSessionIds.includes(input.sessionId)
-  if (!input.wasReserved && reservationConfirmed) return "Reserva confirmada por AWS Events."
-  if (input.wasReserved && !reservationConfirmed) return "Cancelación de reserva confirmada por AWS Events."
+  const reservationConfirmed = input.reservedSessionIds.includes(
+    input.sessionId,
+  )
+  if (!input.wasReserved && reservationConfirmed)
+    return "Reserva confirmada por AWS Events."
+  if (input.wasReserved && !reservationConfirmed)
+    return "Cancelación de reserva confirmada por AWS Events."
   if (input.failed.length) return describeReservationFailures(input.failed)
-  return input.wasReserved ? "AWS Events no confirmó la cancelación de la reserva." : "AWS Events no confirmó la reserva."
+  return input.wasReserved
+    ? "AWS Events no confirmó la cancelación de la reserva."
+    : "AWS Events no confirmó la reserva."
 }
 
 export const App: React.FC = () => {
@@ -131,15 +181,25 @@ export const App: React.FC = () => {
   const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>([])
   const [isBuildingPath, setIsBuildingPath] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [liveSnapshot, setLiveSnapshot] = useState<LiveAvailabilitySnapshot | null>(null)
-  const [isRefreshingAvailability, setIsRefreshingAvailability] = useState(false)
-  const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(null)
-  const [scheduleSnapshot, setScheduleSnapshot] = useState<LiveScheduleSnapshot | null>(null)
+  const [liveSnapshot, setLiveSnapshot] =
+    useState<LiveAvailabilitySnapshot | null>(null)
+  const [isRefreshingAvailability, setIsRefreshingAvailability] =
+    useState(false)
+  const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(
+    null,
+  )
+  const [scheduleSnapshot, setScheduleSnapshot] =
+    useState<LiveScheduleSnapshot | null>(null)
   const [scheduleMessage, setScheduleMessage] = useState<string | null>(null)
   const [isRefreshingSchedule, setIsRefreshingSchedule] = useState(false)
-  const [favoriteMutationSessionId, setFavoriteMutationSessionId] = useState<string | null>(null)
-  const [reservationMutationSessionId, setReservationMutationSessionId] = useState<string | null>(null)
-  const [route, setRoute] = useState(() => typeof window === "undefined" ? "/" : window.location.pathname)
+  const [favoriteMutationSessionId, setFavoriteMutationSessionId] = useState<
+    string | null
+  >(null)
+  const [reservationMutationSessionId, setReservationMutationSessionId] =
+    useState<string | null>(null)
+  const [route, setRoute] = useState(() =>
+    typeof window === "undefined" ? "/" : window.location.pathname,
+  )
   const isAvailabilityRoute = route === "/availability"
   const isCallbackRoute = route === "/callback"
   const availabilityView = selectAvailabilitySnapshot(liveSnapshot)
@@ -243,11 +303,15 @@ export const App: React.FC = () => {
 
   const handleAvailabilityRefresh = async () => {
     if (!liveEventsClient) {
-      setAvailabilityMessage("Configura VITE_AWS_EVENT_ID para consultar AWS Events.")
+      setAvailabilityMessage(
+        "Configura VITE_AWS_EVENT_ID para consultar AWS Events.",
+      )
       return
     }
     if (!isAuthenticated || !tokenStore.getAccessToken()) {
-      setAvailabilityMessage("Inicia sesión con Builder ID para actualizar la disponibilidad.")
+      setAvailabilityMessage(
+        "Inicia sesión con Builder ID para actualizar la disponibilidad.",
+      )
       return
     }
 
@@ -257,21 +321,32 @@ export const App: React.FC = () => {
       const snapshot = await liveEventsClient.fetchAvailabilitySnapshot()
       setLiveSnapshot(snapshot)
     } catch (err: unknown) {
-      setAvailabilityMessage(`${describeLiveAvailabilityError(err)}${liveSnapshot ? " Se conserva el último snapshot válido." : " Se mantiene el modo fixture local."}`)
+      setAvailabilityMessage(
+        `${describeLiveAvailabilityError(err)}${liveSnapshot ? " Se conserva el último snapshot válido." : " Se mantiene el modo fixture local."}`,
+      )
     } finally {
       setIsRefreshingAvailability(false)
     }
   }
 
-  const canLoadSchedule = Boolean(liveEventsClient && isAuthenticated && tokenStore.getAccessToken() && liveSnapshot)
+  const canLoadSchedule = Boolean(
+    liveEventsClient &&
+    isAuthenticated &&
+    tokenStore.getAccessToken() &&
+    liveSnapshot,
+  )
 
   const handleScheduleRefresh = async () => {
     if (!liveEventsClient || !liveSnapshot) {
-      setScheduleMessage("Actualiza primero la disponibilidad live para consultar tu agenda.")
+      setScheduleMessage(
+        "Actualiza primero la disponibilidad live para consultar tu agenda.",
+      )
       return
     }
     if (!isAuthenticated || !tokenStore.getAccessToken()) {
-      setScheduleMessage("Inicia sesión con Builder ID para consultar tu agenda.")
+      setScheduleMessage(
+        "Inicia sesión con Builder ID para consultar tu agenda.",
+      )
       return
     }
     setIsRefreshingSchedule(true)
@@ -279,23 +354,33 @@ export const App: React.FC = () => {
     try {
       setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
     } catch (err: unknown) {
-      setScheduleMessage(`${describeLiveScheduleError(err)}${scheduleSnapshot ? " Se conserva la última agenda confirmada." : ""}`)
+      setScheduleMessage(
+        `${describeLiveScheduleError(err)}${scheduleSnapshot ? " Se conserva la última agenda confirmada." : ""}`,
+      )
     } finally {
       setIsRefreshingSchedule(false)
     }
   }
 
-  const handleToggleFavorite = async (sessionId: string, isFavorite: boolean) => {
+  const handleToggleFavorite = async (
+    sessionId: string,
+    isFavorite: boolean,
+  ) => {
     if (!liveEventsClient || !scheduleSnapshot || !canLoadSchedule) return
     setFavoriteMutationSessionId(sessionId)
     setScheduleMessage(null)
     try {
       const result = isFavorite
-        ? (await liveEventsClient.removeFavorite(sessionId), { successfulSessionIds: [sessionId], failed: [] })
+        ? (await liveEventsClient.removeFavorite(sessionId),
+          { successfulSessionIds: [sessionId], failed: [] })
         : await liveEventsClient.addFavorite(sessionId)
       const reconciled = await liveEventsClient.getPersonalSchedule()
       setScheduleSnapshot(reconciled)
-      setScheduleMessage(result.failed.length ? `AWS Events rechazó ${result.failed.length} favorito(s); se mostró la agenda confirmada.` : "Agenda reconciliada con AWS Events.")
+      setScheduleMessage(
+        result.failed.length
+          ? `AWS Events rechazó ${result.failed.length} favorito(s); se mostró la agenda confirmada.`
+          : "Agenda reconciliada con AWS Events.",
+      )
     } catch (err: unknown) {
       try {
         setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
@@ -308,17 +393,28 @@ export const App: React.FC = () => {
     }
   }
 
-  const handleToggleReservation = async (sessionId: string, isReserved: boolean) => {
+  const handleToggleReservation = async (
+    sessionId: string,
+    isReserved: boolean,
+  ) => {
     if (!liveEventsClient || !scheduleSnapshot || !canLoadSchedule) return
     setReservationMutationSessionId(sessionId)
     setScheduleMessage(null)
     try {
       const result = isReserved
-        ? (await liveEventsClient.cancelReservation(sessionId), { successfulSessionIds: [sessionId], failed: [] })
+        ? (await liveEventsClient.cancelReservation(sessionId),
+          { successfulSessionIds: [sessionId], failed: [] })
         : await liveEventsClient.reserveSession(sessionId)
       const reconciled = await liveEventsClient.getPersonalSchedule()
       setScheduleSnapshot(reconciled)
-      setScheduleMessage(describeReservationReconciliation({ wasReserved: isReserved, sessionId, reservedSessionIds: reconciled.reservedSessionIds, failed: result.failed }))
+      setScheduleMessage(
+        describeReservationReconciliation({
+          wasReserved: isReserved,
+          sessionId,
+          reservedSessionIds: reconciled.reservedSessionIds,
+          failed: result.failed,
+        }),
+      )
     } catch (err: unknown) {
       try {
         setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
@@ -357,8 +453,30 @@ export const App: React.FC = () => {
           AI companion que transforma el catálogo de AWS re:Invent en una ruta
           de aprendizaje adaptativa.
         </p>
-        {!isAvailabilityRoute && <p style={{ marginBottom: 0 }}><a href="/availability" onClick={(event) => { event.preventDefault(); navigate("/availability") }}>Ver disponibilidad de sesiones</a></p>}
-        {!isCallbackRoute && <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => { setIsAuthenticated(true); setRoute("/") }} onLogout={() => setIsAuthenticated(false)} />}
+        {!isAvailabilityRoute && (
+          <p style={{ marginBottom: 0 }}>
+            <a
+              href="/availability"
+              onClick={(event) => {
+                event.preventDefault()
+                navigate("/availability")
+              }}
+            >
+              Ver disponibilidad de sesiones
+            </a>
+          </p>
+        )}
+        {!isCallbackRoute && (
+          <BuilderIdLogin
+            client={authClient}
+            authenticated={isAuthenticated}
+            onAuthenticated={() => {
+              setIsAuthenticated(true)
+              setRoute("/")
+            }}
+            onLogout={() => setIsAuthenticated(false)}
+          />
+        )}
       </header>
 
       {isAvailabilityRoute ? (
@@ -369,7 +487,7 @@ export const App: React.FC = () => {
           snapshotAt={liveSnapshot?.observedAt}
           liveStatus={availabilityMessage ?? scheduleMessage ?? undefined}
           isRefreshing={isRefreshingAvailability}
-          canRefreshLive={Boolean(liveEventsClient && isAuthenticated)}
+          canRefreshLive={isAuthenticated}
           onRefreshLive={handleAvailabilityRefresh}
           onReturnHome={() => navigate("/")}
           schedule={scheduleSnapshot ?? undefined}
@@ -382,120 +500,132 @@ export const App: React.FC = () => {
           reservationMutationSessionId={reservationMutationSessionId}
         />
       ) : isCallbackRoute ? (
-        <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => { setIsAuthenticated(true); setRoute("/") }} onLogout={() => setIsAuthenticated(false)} />
+        <BuilderIdLogin
+          client={authClient}
+          authenticated={isAuthenticated}
+          onAuthenticated={() => {
+            setIsAuthenticated(true)
+            setRoute("/")
+          }}
+          onLogout={() => setIsAuthenticated(false)}
+        />
       ) : (
         <>
-
-      {error && (
-        <div
-          style={{
-            backgroundColor: "#fee2e2",
-            color: "#b91c1c",
-            padding: "0.8rem",
-            borderRadius: "6px",
-            marginBottom: "1.5rem",
-          }}
-        >
-          {error}
-        </div>
-      )}
-
-      {!analysisResult ? (
-        <section
-          style={{
-            backgroundColor: "#f8fafc",
-            padding: "1.5rem",
-            borderRadius: "8px",
-            border: "1px solid #e2e8f0",
-          }}
-        >
-          <h2 style={{ marginTop: 0, fontSize: "1.3rem", color: "#0f172a" }}>
-            Paso 1: ¿Qué estás construyendo?
-          </h2>
-          <p
-            style={{
-              color: "#64748b",
-              fontSize: "0.9rem",
-              marginBottom: "1.5rem",
-            }}
-          >
-            Describe tu iniciativa o reto arquitectónico. Pathfinder extraerá
-            tus competencias actuales y determinará qué conocimientos necesitas
-            profundizar.
-          </p>
-          <ContextForm onSubmit={handleContextSubmit} isLoading={isLoading} />
-        </section>
-      ) : (
-        <section>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "1.5rem",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: "1.4rem", color: "#0f172a" }}>
-              Tu Diagnóstico de Aprendizaje
-            </h2>
-            <button
-              type="button"
-              onClick={handleReset}
+          {error && (
+            <div
               style={{
-                padding: "0.4rem 0.8rem",
-                backgroundColor: "#fff",
-                border: "1px solid #cbd5e1",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "0.85rem",
+                backgroundColor: "#fee2e2",
+                color: "#b91c1c",
+                padding: "0.8rem",
+                borderRadius: "6px",
+                marginBottom: "1.5rem",
               }}
             >
-              ← Modificar Contexto
-            </button>
-          </div>
-
-          <KnowledgeProfileView
-            profile={analysisResult.knowledgeProfile}
-            context={analysisResult.projectContext}
-          />
-
-          <KnowledgeGapsList gaps={analysisResult.knowledgeGaps} />
-
-          {!learningPath && (
-            <div style={{ marginTop: "2rem", textAlign: "right" }}>
-              <button
-                type="button"
-                disabled={isBuildingPath}
-                style={{
-                  padding: "0.8rem 1.6rem",
-                  backgroundColor: isBuildingPath ? "#94a3b8" : "#0284c7",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "6px",
-                  fontWeight: "bold",
-                  fontSize: "1rem",
-                  cursor: isBuildingPath ? "default" : "pointer",
-                }}
-                onClick={handleBuildLearningPath}
-              >
-                {isBuildingPath
-                  ? "Construyendo…"
-                  : "Construir Learning Path Recomendado →"}
-              </button>
+              {error}
             </div>
           )}
 
-          {learningPath && (
-            <LearningPathView
-              learningPath={learningPath}
-              recommendations={recommendations}
-              gaps={currentGaps}
-              userId="local-user"
-              onReflectionSubmit={handleReflectionSubmit}
-            />
+          {!analysisResult ? (
+            <section
+              style={{
+                backgroundColor: "#f8fafc",
+                padding: "1.5rem",
+                borderRadius: "8px",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <h2
+                style={{ marginTop: 0, fontSize: "1.3rem", color: "#0f172a" }}
+              >
+                Paso 1: ¿Qué estás construyendo?
+              </h2>
+              <p
+                style={{
+                  color: "#64748b",
+                  fontSize: "0.9rem",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                Describe tu iniciativa o reto arquitectónico. Pathfinder
+                extraerá tus competencias actuales y determinará qué
+                conocimientos necesitas profundizar.
+              </p>
+              <ContextForm
+                onSubmit={handleContextSubmit}
+                isLoading={isLoading}
+              />
+            </section>
+          ) : (
+            <section>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                <h2 style={{ margin: 0, fontSize: "1.4rem", color: "#0f172a" }}>
+                  Tu Diagnóstico de Aprendizaje
+                </h2>
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  style={{
+                    padding: "0.4rem 0.8rem",
+                    backgroundColor: "#fff",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  ← Modificar Contexto
+                </button>
+              </div>
+
+              <KnowledgeProfileView
+                profile={analysisResult.knowledgeProfile}
+                context={analysisResult.projectContext}
+              />
+
+              <KnowledgeGapsList gaps={analysisResult.knowledgeGaps} />
+
+              {!learningPath && (
+                <div style={{ marginTop: "2rem", textAlign: "right" }}>
+                  <button
+                    type="button"
+                    disabled={isBuildingPath}
+                    style={{
+                      padding: "0.8rem 1.6rem",
+                      backgroundColor: isBuildingPath ? "#94a3b8" : "#0284c7",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                      fontSize: "1rem",
+                      cursor: isBuildingPath ? "default" : "pointer",
+                    }}
+                    onClick={handleBuildLearningPath}
+                  >
+                    {isBuildingPath
+                      ? "Construyendo…"
+                      : "Construir Learning Path Recomendado →"}
+                  </button>
+                </div>
+              )}
+
+              {learningPath && (
+                <LearningPathView
+                  learningPath={learningPath}
+                  recommendations={recommendations}
+                  gaps={currentGaps}
+                  userId="local-user"
+                  onReflectionSubmit={handleReflectionSubmit}
+                />
+              )}
+            </section>
           )}
-        </section>
-      )}
         </>
       )}
     </div>
