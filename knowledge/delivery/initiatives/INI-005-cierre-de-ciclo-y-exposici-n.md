@@ -2,7 +2,7 @@
 type: initiative
 id: INI-005
 title: Cierre de ciclo y exposición
-status: planned
+status: completed
 knowledge_level: K2
 domains:
   - product
@@ -37,6 +37,7 @@ candidates:
     materialized_as: WI-027
 horizon: later
 priority: low
+completed_at: '2026-10-07'
 ---
 
 # Cierre de ciclo y exposición
@@ -105,10 +106,27 @@ desplegado.
 
 ## Open Questions
 
-- [open] ¿El Learning Report entra en el MVP del hackathon o queda como extensión post-evento?
+- [resolved] **Learning Report en el MVP:** sí, se considera parte del MVP (decisión de la
+  usuaria, 2026-10-07). Materializado en WI-026.
 - [resolved] **Sitio público:** landing dentro de `apps/client` (no `apps/site` separado),
   porque Netlify ya despliega `apps/client`.
 
 ## Learning
 
-_Captured on completion: what was delivered, what stayed out of scope, outcome reached._
+_Completada 2026-10-07._
+
+- **Entregado:**
+  - **WI-026 — Learning Report (Journey 6):** `buildLearningReport` contrasta gaps iniciales
+    vs. actuales (cubiertos/parciales/pendientes) y propone ruta posterior; vista
+    `LearningReportView` integrada en el flujo del cliente. Local-first/heurístico.
+  - **WI-027 — Landing pública:** vista `LandingView` en ruta `/about` dentro de `apps/client`,
+    reusando el routing existente y la demo `/availability` en modo fixture (sin login).
+- **Fuera de alcance (confirmado):** observabilidad/costo de IA se trasladó a INI-006; no se
+  montó hosting nuevo (Netlify de INI-007 ya publica `apps/client`); `apps/site` quedó como
+  placeholder descartado.
+- **Resultado:** se cierra la narrativa de producto de principio a fin (contexto → diagnóstico
+  → ruta → reflexión → reporte post-evento) y el proyecto tiene cara pública, reutilizando la
+  infraestructura ya desplegada. `tsc -b` y `pnpm -r test` en verde.
+- **Aprendizaje de proceso:** reencuadrar el alcance al revisar lo ya implementado en otras
+  iniciativas (INI-007) evitó duplicar hosting y permitió apoyarse en `/availability` y en el
+  deploy existente, reduciendo el trabajo a contenido + routing.
