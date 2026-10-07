@@ -7,10 +7,14 @@
     "language": "Spanish"
   },
   "stack": {
+    "language": "typescript",
+    "packageManager": "pnpm",
     "sourceDirectories": [],
     "migrationDirectories": [],
     "contractFiles": [],
-    "infrastructureFiles": []
+    "infrastructureFiles": [
+      ".github/workflows/"
+    ]
   },
   "knowledge": {
     "hasScan": true,
@@ -26,7 +30,7 @@
     "hasSkills": true
   },
   "workItems": {
-    "total": 14,
+    "total": 25,
     "inProgress": 0,
     "done": 0,
     "cancelled": 0,
@@ -35,13 +39,14 @@
       "ready": 0,
       "in-progress": 0,
       "blocked": 0,
-      "completed": 14,
+      "completed": 25,
       "archived": 0
     },
     "byType": {
       "chore": 3,
-      "feature": 10,
-      "spike": 1
+      "feature": 19,
+      "spike": 1,
+      "bugfix": 2
     },
     "initiatives": [
       {
@@ -85,6 +90,28 @@
           "in-progress": 0,
           "blocked": 0,
           "completed": 3,
+          "archived": 0
+        }
+      },
+      {
+        "name": "INI-006",
+        "states": {
+          "draft": 0,
+          "ready": 0,
+          "in-progress": 0,
+          "blocked": 0,
+          "completed": 1,
+          "archived": 0
+        }
+      },
+      {
+        "name": "INI-007",
+        "states": {
+          "draft": 0,
+          "ready": 0,
+          "in-progress": 0,
+          "blocked": 0,
+          "completed": 10,
           "archived": 0
         }
       },
@@ -365,12 +392,221 @@
           "id": "WI-CANDIDATE-003",
           "inferred": true
         }
+      },
+      {
+        "id": "WI-015",
+        "title": "Modelo normalizado de disponibilidad de sesiones y fixtures",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K2",
+        "hasOwnership": true,
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-016",
+        "title": "Motor de proyección y filtrado para Availability Heatmap",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K2",
+        "hasOwnership": true,
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-017",
+        "title": "UI local-first del Session Availability Heatmap",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K2",
+        "hasOwnership": true,
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-018",
+        "title": "Integración del login con AWS Builder ID en apps/client",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K3",
+        "hasOwnership": true,
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-019",
+        "title": "Integración live de disponibilidad con AWS Events",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K3",
+        "hasOwnership": true,
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-005",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-020",
+        "title": "Integración de agenda personal y favoritos",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K3",
+        "hasOwnership": true,
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-006",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-021",
+        "title": "Reserva y cancelación de sesiones desde Pathfinder",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K3",
+        "hasOwnership": true,
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-007",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-022",
+        "title": "Launcher local y distribución de la experiencia autenticada",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K2",
+        "hasOwnership": true,
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-008",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-023",
+        "title": "Heat map visual de disponibilidad de sesiones",
+        "type": "bugfix",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K2",
+        "hasOwnership": true,
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-017",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-024",
+        "title": "Visibilidad de agenda y confirmación de reservas",
+        "type": "bugfix",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-007",
+        "knowledgeLevel": "K2",
+        "hasOwnership": true,
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-021",
+          "inferred": true
+        }
+      },
+      {
+        "id": "WI-025",
+        "title": "Integración del SDK de Bedrock y activación de analyzer/reranker reales",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-006",
+        "knowledgeLevel": "K3",
+        "hasOwnership": true,
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true
+        }
       }
     ]
   },
   "ownership": {
-    "workItemsTotal": 14,
-    "workItemsWithOwnership": 14,
+    "workItemsTotal": 25,
+    "workItemsWithOwnership": 25,
     "workItemsMissingOwnership": 0
   },
   "domains": [
@@ -403,6 +639,14 @@
         {
           "id": "WI-011",
           "title": "UI de captura de contexto y visualización de Knowledge Profile / Gaps"
+        },
+        {
+          "id": "WI-015",
+          "title": "Modelo normalizado de disponibilidad de sesiones y fixtures"
+        },
+        {
+          "id": "WI-025",
+          "title": "Integración del SDK de Bedrock y activación de analyzer/reranker reales"
         }
       ]
     },
@@ -424,6 +668,10 @@
         {
           "id": "WI-013",
           "title": "Construcción y visualización del Learning Path (con reconciliación de agenda)"
+        },
+        {
+          "id": "WI-016",
+          "title": "Motor de proyección y filtrado para Availability Heatmap"
         }
       ]
     },
@@ -445,6 +693,23 @@
         {
           "id": "WI-014",
           "title": "Reflexión post-sesión y adaptación del journey (re-ranking)"
+        },
+        {
+          "id": "WI-017",
+          "title": "UI local-first del Session Availability Heatmap"
+        }
+      ]
+    },
+    {
+      "reason": "same source candidate (WI-CANDIDATE-004)",
+      "items": [
+        {
+          "id": "WI-010",
+          "title": "Runtime agentic (Strands + AgentCore): topología reducida y tools"
+        },
+        {
+          "id": "WI-018",
+          "title": "Integración del login con AWS Builder ID en apps/client"
         }
       ]
     }
@@ -524,6 +789,7 @@
         "INI-004-experiencia-learning-path-y-reflexi-n.md",
         "INI-005-cierre-de-ciclo-y-exposici-n.md",
         "INI-006-habilitaci-n-de-ia-real-en-aws-bedrock-agentcore-m.md",
+        "INI-007-live-event-experience-disponibilidad-agenda-y-rese.md",
         "WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
         "WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md",
         "WI-003-modelo-de-dominio-base-en-packages-domain.md",
@@ -538,6 +804,17 @@
         "WI-012-reconciliar-verificaci-n-de-delivery-y-tests-ausen.md",
         "WI-013-construcci-n-y-visualizaci-n-del-learning-path-con.md",
         "WI-014-reflexi-n-post-sesi-n-y-adaptaci-n-del-journey-re-.md",
+        "WI-015-modelo-normalizado-de-disponibilidad-de-sesiones-y.md",
+        "WI-016-motor-de-proyecci-n-y-filtrado-para-availability-h.md",
+        "WI-017-ui-local-first-del-session-availability-heatmap.md",
+        "WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md",
+        "WI-019-integraci-n-live-de-disponibilidad-con-aws-events.md",
+        "WI-020-integraci-n-de-agenda-personal-y-favoritos.md",
+        "WI-021-reserva-y-cancelaci-n-de-sesiones-desde-pathfinder.md",
+        "WI-022-launcher-local-y-distribuci-n-de-la-experiencia-au.md",
+        "WI-023-heat-map-visual-de-disponibilidad-de-sesiones.md",
+        "WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md",
+        "WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md",
         "roadmap.md"
       ]
     }
@@ -546,10 +823,10 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 14,
+    "materialized_work_items": 25,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 14,
+    "materialized": 25,
     "remaining": 0
   },
   "missingKnowledge": [],
@@ -972,14 +1249,24 @@
     "tests": [
       {
         "type": "tests",
-        "label": "No test directory detected",
+        "label": "Vitest",
         "confidence": "high",
-        "evidence": [],
-        "recommended_review": "Confirm how this project is validated before production changes."
+        "evidence": [
+          "package.json"
+        ]
       }
     ],
     "security": [],
-    "infrastructure": [],
+    "infrastructure": [
+      {
+        "type": "infrastructure",
+        "label": "GitHub Actions",
+        "confidence": "high",
+        "evidence": [
+          ".github/workflows/"
+        ]
+      }
+    ],
     "external_integrations": [],
     "environment": []
   },
@@ -1003,10 +1290,10 @@
   },
   "isModuleRepo": false,
   "deliverySummary": {
-    "completedWorkItems": 14,
+    "completedWorkItems": 25,
     "archivedWorkItems": 0,
     "activeWorkItems": 0,
-    "implementationCompleted": 12,
+    "implementationCompleted": 16,
     "releaseBlocked": 0,
     "releaseReady": 0
   },
@@ -1253,6 +1540,189 @@
           "status": "completed"
         }
       }
+    },
+    {
+      "id": "WI-015",
+      "lifecycle": "completed",
+      "implementationStatus": "completed",
+      "validationStatus": "passed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "core": {
+          "role": "core",
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "id": "WI-016",
+      "lifecycle": "completed",
+      "implementationStatus": "completed",
+      "validationStatus": "passed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "reinvent-pathfinder": {
+          "role": "core",
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "id": "WI-017",
+      "lifecycle": "completed",
+      "implementationStatus": "completed",
+      "validationStatus": "passed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "reinvent-pathfinder": {
+          "role": "core",
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "id": "WI-018",
+      "lifecycle": "completed",
+      "implementationStatus": "completed",
+      "validationStatus": "passed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "reinvent-pathfinder": {
+          "role": "core",
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "id": "WI-019",
+      "lifecycle": "completed",
+      "implementationStatus": "in-progress",
+      "validationStatus": "in-progress",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "core": {
+          "role": "core",
+          "status": "in-progress"
+        }
+      }
+    },
+    {
+      "id": "WI-020",
+      "lifecycle": "completed",
+      "implementationStatus": "in-progress",
+      "validationStatus": "in-progress",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "core": {
+          "role": "core",
+          "status": "in-progress"
+        }
+      }
+    },
+    {
+      "id": "WI-021",
+      "lifecycle": "completed",
+      "implementationStatus": "in-progress",
+      "validationStatus": "in-progress",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "core": {
+          "role": "core",
+          "status": "in-progress"
+        }
+      }
+    },
+    {
+      "id": "WI-022",
+      "lifecycle": "completed",
+      "implementationStatus": "in-progress",
+      "validationStatus": "in-progress",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {
+        "core": {
+          "role": "core",
+          "status": "in-progress"
+        }
+      }
+    },
+    {
+      "id": "WI-023",
+      "lifecycle": "completed",
+      "implementationStatus": "not-assessed",
+      "validationStatus": "not-assessed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {}
+    },
+    {
+      "id": "WI-024",
+      "lifecycle": "completed",
+      "implementationStatus": "not-assessed",
+      "validationStatus": "not-assessed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {}
+    },
+    {
+      "id": "WI-025",
+      "lifecycle": "completed",
+      "implementationStatus": "not-assessed",
+      "validationStatus": "not-assessed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {}
     }
   ],
   "mapped_modules": [
