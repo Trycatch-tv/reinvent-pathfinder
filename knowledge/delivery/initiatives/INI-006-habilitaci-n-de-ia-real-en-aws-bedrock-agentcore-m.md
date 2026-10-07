@@ -23,6 +23,7 @@ candidates:
       Open question (decide el responsable de IA): qué modelo Bedrock inicial
       (calidad/latencia/costo), y cómo se inyectan credenciales/region. Hoy no
       hay @aws-sdk en el repo; el código Bedrock* hace fallback a heurístico.
+    materialized_as: WI-025
   - id: WI-CANDIDATE-002
     title: >-
       Ingesta real a Amazon Bedrock Managed Knowledge Bases (embeddings +

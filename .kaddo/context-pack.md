@@ -20,37 +20,43 @@
 
 ## Current Phase
 
-Phase: Maintenance
+Phase: Active Delivery
 
 Reason:
 
 - Roadmap available
-- 24 materialized work item(s)
-- Ownership coverage 100%
+- 25 materialized work item(s)
+- draft: 1
+- Ownership coverage 96%
 
-Recommended next: roadmap-agent
+Recommended next: work-item-agent
 
-Next step: Use the roadmap-agent to plan the next initiative.
+Next step: Refine the existing draft Work Item with the work-item-agent.
 
 ## Delivery State
 
-- Phase: Maintenance
-- Draft Work Items: 0
+- Phase: Active Delivery
+- Draft Work Items: 1
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 24/24
+- Ownership coverage: 24/25
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use the roadmap-agent to plan the next initiative.
-  - id: plan-next
-  - reason: No active Work Items and no remaining roadmap candidates.
-  - agent: roadmap-agent
+- Refine the existing draft Work Item with the work-item-agent.
+  - id: refine-work-item
+  - reason: There is 1 draft Work Item. Refine before defining roadmap candidates.
+  - agent: work-item-agent
+  - skill: work-item-refinement
+
+Also (secondary):
+
+- Run `kaddo owners suggest` for Work Items without code ownership.
 
 ## Project Route
 
-Route: new · Progress: 10/12
+Route: new · Progress: 9/12
 
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
@@ -105,6 +111,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-022-launcher-local-y-distribuci-n-de-la-experiencia-au.md
 - ✓ WI-023-heat-map-visual-de-disponibilidad-de-sesiones.md
 - ✓ WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md
+- ✓ WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -128,14 +135,20 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 24
+- Materialized Work Items: 25
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
 
 ## Active Work Items
 
-No active work items found.
+- WI-025 [feature] [K3] (draft) — Integración del SDK de Bedrock y activación de analyzer/reranker reales
+
+## Delivery Mix
+
+Active Work Items by type:
+
+- Features: 1
 
 ## Artifacts and Ownership
 
@@ -233,15 +246,17 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Maintenance** phase:
+Recommended next for the **Active Delivery** phase:
 
-1. roadmap-agent
+1. work-item-agent
 
 Next step:
 
-- Use the roadmap-agent to plan the next initiative.
+- Refine the existing draft Work Item with the work-item-agent.
 
 ## Instructions for the LLM
 
-- No active work.
-- Use the roadmap-agent to plan the next initiative.
+- Refine draft Work Items to ready.
+- Use the work-item-agent.
+- Do not implement unless the user explicitly asks.
+- Ownership is incomplete — propose `code:` globs (run `kaddo owners suggest`).

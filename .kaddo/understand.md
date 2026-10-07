@@ -12,18 +12,19 @@
 
 ## Current Phase
 
-- Phase: Maintenance
-- Recommended agent: roadmap-agent
-- Next step: Use the roadmap-agent to plan the next initiative.
-- Reason: No active Work Items and no remaining roadmap candidates.
+- Phase: Active Delivery
+- Recommended agent: work-item-agent
+- Recommended skill: work-item-refinement
+- Next step: Refine the existing draft Work Item with the work-item-agent.
+- Reason: There is 1 draft Work Item. Refine before defining roadmap candidates.
 
 ## Delivery State
 
-- Draft Work Items: 0
+- Draft Work Items: 1
 - Ready Work Items: 0
 - In-progress Work Items: 0
 - Blocked Work Items: 0
-- Ownership coverage: 24/24
+- Ownership coverage: 24/25
 - Remaining Work Item candidates: 0
 - Technical decision candidates: 0
 - Accepted ADRs: 0
@@ -31,20 +32,30 @@
 
 ## Project Route
 
-Route: new · Progress: 10/12
+Route: new · Progress: 9/12
 
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
 
 ## Recommended Agent Flow
 
-1. roadmap-agent
+1. work-item-agent
+2. `kaddo owners suggest`
 
 ## Primary Recommendation
 
-- id: plan-next
-- agent: roadmap-agent
-- reason: No active Work Items and no remaining roadmap candidates.
+- id: refine-work-item
+- agent: work-item-agent
+- skill: work-item-refinement
+- reason: There is 1 draft Work Item. Refine before defining roadmap candidates.
+
+## Secondary Recommendations
+
+1. Run `kaddo owners suggest` for Work Items without code ownership.
+
+## Active Work Items
+
+- WI-025 [feature] draft — Integración del SDK de Bedrock y activación de analyzer/reranker reales
 
 ## Context Pack
 
@@ -54,26 +65,31 @@ Use `.kaddo/context-pack.md` as the primary input.
 
 Use:
 
-- `knowledge/agents/delivery/roadmap-agent.md`
+- `knowledge/agents/delivery/work-item-agent.md`
+- `knowledge/skills/work-item-refinement/skill.md`
 - `.kaddo/context-pack.md`
 
 ## Expected Outputs
 
-_See the primary recommendation above._
+The LLM should produce:
+
+- Refined Work Item content.
 
 ## Copy/Paste Instructions
 
 Paste the following into your LLM chat:
 
-1. `knowledge/agents/delivery/roadmap-agent.md`
-2. `.kaddo/context-pack.md`
+1. `knowledge/agents/delivery/work-item-agent.md`
+2. `knowledge/skills/work-item-refinement/skill.md`
+3. `.kaddo/context-pack.md`
 
-Ask the LLM to follow the roadmap-agent instructions.
+Ask the LLM to follow the work-item-agent instructions.
 
 ## Next Steps
 
-1. Use the roadmap-agent to plan the next initiative.
-2. Re-run `kaddo explain`.
+1. Refine the existing draft Work Item with the work-item-agent.
+2. Run `kaddo owners suggest` for Work Items without code ownership.
+3. Re-run `kaddo explain`.
 
 ## Metadata Health
 

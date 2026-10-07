@@ -1,0 +1,11 @@
+[build]
+  command = "pnpm --filter @pathfinder/client... run build"
+  publish = "apps/client/dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
