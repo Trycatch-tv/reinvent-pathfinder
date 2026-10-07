@@ -25,7 +25,7 @@ Phase: Maintenance
 Reason:
 
 - Roadmap available
-- 25 materialized work item(s)
+- 27 materialized work item(s)
 - Ownership coverage 100%
 
 Recommended next: roadmap-agent
@@ -38,7 +38,7 @@ Next step: Use the roadmap-agent to plan the next initiative.
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 25/25
+- Ownership coverage: 27/27
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -106,6 +106,8 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-023-heat-map-visual-de-disponibilidad-de-sesiones.md
 - ✓ WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md
 - ✓ WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md
+- ✓ WI-026-learning-report-y-ruta-post-evento.md
+- ✓ WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -123,16 +125,16 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 
 ## Current Knowledge
 
-No project knowledge summary found yet.
+> What is true about this product right now.
 
 ## Roadmap Status
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 25
+- Materialized Work Items: 27
 - Remaining Work Item candidates: 0
 
-No roadmap baseline found.
+> What we intend to build and why.
 
 ## Active Work Items
 
@@ -165,6 +167,8 @@ No active work items found.
 - WI-023 [bugfix] owns: apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
 - WI-024 [bugfix] owns: apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
 - WI-025 [feature] owns: ai/knowledge/package.json, ai/knowledge/src/context-analyzer.ts, ai/knowledge/src/context-analyzer.test.ts, ai/knowledge/src/recommendations/session-reranker.ts, ai/knowledge/src/recommendations/recommendations.test.ts
+- WI-026 [feature] owns: ai/knowledge/**, apps/client/**
+- WI-027 [feature] owns: apps/client/**
 
 ## Mapped Modules
 
@@ -223,8 +227,7 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Missing Context
 
-- No project knowledge summary found yet.
-- No roadmap baseline found.
+_None — all expected context is present._
 
 
 ### Metadata Health

@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-07T02:46:17.641Z",
+  "generatedAt": "2026-10-07T04:55:27.082Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -25,8 +25,8 @@
     ]
   },
   "knowledge": {
-    "summary": "",
-    "roadmapSummary": "",
+    "summary": "> What is true about this product right now.",
+    "roadmapSummary": "> What we intend to build and why.",
     "inventoryAvailable": true,
     "workItems": [],
     "activeWorkItems": [],
@@ -620,6 +620,54 @@
         "source": {
           "type": "unknown",
           "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-026",
+        "type": "feature",
+        "title": "Learning Report y ruta post-evento",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-027",
+        "type": "feature",
+        "title": "Landing/demo pública dentro de apps/client para Builder Center",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
           "inferred": true,
           "reason": "Invalid source value: \"initiative\"."
         },
@@ -1231,6 +1279,54 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-026",
+        "type": "feature",
+        "title": "Learning Report y ruta post-evento",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-027",
+        "type": "feature",
+        "title": "Landing/demo pública dentro de apps/client para Builder Center",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -1524,6 +1620,25 @@
           "ai/knowledge/src/recommendations/session-reranker.ts",
           "ai/knowledge/src/recommendations/recommendations.test.ts"
         ]
+      },
+      {
+        "id": "WI-026",
+        "type": "feature",
+        "title": "Learning Report y ruta post-evento",
+        "summary": "",
+        "codeGlobs": [
+          "ai/knowledge/**",
+          "apps/client/**"
+        ]
+      },
+      {
+        "id": "WI-027",
+        "type": "feature",
+        "title": "Landing/demo pública dentro de apps/client para Builder Center",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/**"
+        ]
       }
     ]
   },
@@ -1588,6 +1703,8 @@
         "WI-023-heat-map-visual-de-disponibilidad-de-sesiones.md",
         "WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md",
         "WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md",
+        "WI-026-learning-report-y-ruta-post-evento.md",
+        "WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md",
         "roadmap.md"
       ]
     }
@@ -1624,17 +1741,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 25,
+    "materialized_work_items": 27,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 25,
+    "materialized": 27,
     "remaining": 0
   },
   "phase": {
     "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "25 materialized work item(s)",
+      "27 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
@@ -1663,8 +1780,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 25,
-    "ownership_coverage": "25/25",
+    "total_work_items": 27,
+    "ownership_coverage": "27/27",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1718,26 +1835,26 @@
     "agents": {
       "total": 20,
       "installed": 20,
-      "outdated": 20,
+      "outdated": 0,
       "unknown_version": 0,
       "modified": 0
     },
     "skills": {
       "total": 10,
       "installed": 10,
-      "outdated": 10,
+      "outdated": 0,
       "unknown_version": 0,
       "modified": 0
     }
   },
   "workItemSummary": {
-    "total": 25,
+    "total": 27,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 25,
+    "completed": 27,
     "archived": 0,
     "summary": "completed-only"
   },
@@ -1959,10 +2076,7 @@
   },
   "affectedModuleContexts": {},
   "isModuleRepo": false,
-  "missing": [
-    "No project knowledge summary found yet.",
-    "No roadmap baseline found."
-  ],
+  "missing": [],
   "handoff": {
     "recommendedAgents": [
       "roadmap-agent"

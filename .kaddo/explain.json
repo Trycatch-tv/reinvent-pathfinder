@@ -917,19 +917,19 @@
       "label": "This project uses the standard new-project Kaddo flow."
     },
     "nextStepRecommendation": {
-      "id": "plan-next",
-      "phase": "Maintenance",
-      "label": "Use the roadmap-agent to plan the next initiative.",
-      "agent": "roadmap-agent",
-      "reason": "No active Work Items and no remaining roadmap candidates."
+      "id": "questions",
+      "phase": "Knowledge Refinement",
+      "label": "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.",
+      "command": "kaddo questions",
+      "reason": "2 blocking open question(s) remain."
     }
   },
   "nextStepRecommendation": {
-    "id": "plan-next",
-    "phase": "Maintenance",
-    "label": "Use the roadmap-agent to plan the next initiative.",
-    "agent": "roadmap-agent",
-    "reason": "No active Work Items and no remaining roadmap candidates."
+    "id": "questions",
+    "phase": "Knowledge Refinement",
+    "label": "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.",
+    "command": "kaddo questions",
+    "reason": "2 blocking open question(s) remain."
   },
   "techDecisions": {
     "status": "none",
@@ -958,230 +958,230 @@
     "agents": {
       "total": 20,
       "up_to_date": 0,
-      "outdated": 20,
+      "outdated": 0,
       "missing": 0,
       "unknown_version": 0,
-      "modified": 0,
+      "modified": 20,
       "items": [
         {
           "name": "capability-agent",
           "path": "knowledge/agents/product/capability-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "architecture-agent",
           "path": "knowledge/agents/tech/architecture-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "roadmap-agent",
           "path": "knowledge/agents/delivery/roadmap-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "legacy-agent",
           "path": "knowledge/agents/utilities/legacy-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "adr-agent",
           "path": "knowledge/agents/tech/adr-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "work-item-agent",
           "path": "knowledge/agents/delivery/work-item-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "git-strategy-agent",
           "path": "knowledge/agents/delivery/git-strategy-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "security-agent",
           "path": "knowledge/agents/tech/security-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "standards-agent",
           "path": "knowledge/agents/tech/standards-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "stack-agent",
           "path": "knowledge/agents/tech/stack-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "module-design-agent",
           "path": "knowledge/agents/tech/module-design-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "module-context-agent",
           "path": "knowledge/agents/tech/module-context-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "business-agent",
           "path": "knowledge/agents/business/business-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "bootstrap-agent",
           "path": "knowledge/agents/product/bootstrap-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "codebase-agent",
           "path": "knowledge/agents/tech/codebase-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "implementation-agent",
           "path": "knowledge/agents/delivery/implementation-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "backlog-agent",
           "path": "knowledge/agents/delivery/backlog-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "ownership-agent",
           "path": "knowledge/agents/delivery/ownership-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "capsule-agent",
           "path": "knowledge/agents/tech/capsule-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "graph-agent",
           "path": "knowledge/agents/tech/graph-agent.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         }
       ]
     },
     "skills": {
       "total": 10,
       "up_to_date": 0,
-      "outdated": 10,
+      "outdated": 0,
       "missing": 0,
       "unknown_version": 0,
-      "modified": 0,
+      "modified": 10,
       "items": [
         {
           "name": "adr-writing",
           "path": "knowledge/skills/adr-writing/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "work-item-refinement",
           "path": "knowledge/skills/work-item-refinement/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "ownership-suggestion",
           "path": "knowledge/skills/ownership-suggestion/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "graph-metadata-review",
           "path": "knowledge/skills/graph-metadata-review/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "capsule-writing",
           "path": "knowledge/skills/capsule-writing/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "learning-capture",
           "path": "knowledge/skills/learning-capture/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "implementation-planning",
           "path": "knowledge/skills/implementation-planning/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "module-context-refinement",
           "path": "knowledge/skills/module-context-refinement/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "evidence-verification",
           "path": "knowledge/skills/evidence-verification/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         },
         {
           "name": "legacy-risk-assessment",
           "path": "knowledge/skills/legacy-risk-assessment/skill.md",
           "available": "3.114.0",
-          "installed": "3.111.0",
-          "state": "outdated"
+          "installed": "3.115.0",
+          "state": "modified"
         }
       ]
     }

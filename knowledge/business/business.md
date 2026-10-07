@@ -1,13 +1,21 @@
 ---
 type: business
-project_state: new
+project_state: ai-assisted
 generated_by: kaddo-bootstrap
 template_version: 1
+refined_by: business-agent
 ---
 
 > Idioma del proyecto: **español**. Escribe este conocimiento en español. Mantén en inglés el código, los nombres de archivo, los comandos y las claves de configuración.
 
 # Business Context
+
+> **Estado (refinado por business-agent):** el ciclo de valor del producto (Journeys 1-6) ya está
+> implementado end-to-end en modo **local-first / heurístico** y expuesto públicamente (deploy de
+> Netlify que publica `apps/client`). Lo que sigue siendo aspiracional —la capa de IA real sobre
+> Amazon Bedrock/Strands/AgentCore y el backend serverless desplegado— se marca como tal: vive en la
+> iniciativa **INI-006** y aún no está implementado. Las restricciones de negocio (privacidad de
+> tokens, costo-consciencia de IA, open source) siguen vigentes.
 
 ## Problem
 
@@ -63,6 +71,19 @@ El usuario principal no necesita conocer de antemano qué sesiones debe tomar. D
 7. **Usar el proyecto como caso real de Knowledge-Driven Development.** Aplicar Kaddo durante el ciclo de desarrollo para mantener alineados contexto, decisiones, roadmap, capacidades, Vertical Slices, Work Items y código.
 8. **Entregar una solución competitiva para el re:Invent Event Catalog API Hackathon.** El hackathon funciona como escenario de validación y exposición, pero no debe condicionar el producto a una demo desechable.
 
+### Estado de los objetivos (logrado vs. pendiente)
+
+- **Logrado:** el ciclo de valor completo (contexto → Knowledge Gaps → recomendaciones explicables →
+  Learning Path → reflexión → adaptación → Learning Report) funciona local-first; la integración live
+  con AWS Events (catálogo, disponibilidad, agenda, favoritos, reservas) y la autenticación Builder ID
+  (OAuth 2.0 + PKCE, tokens solo en memoria) están implementadas; existe cara pública (landing `/about`
+  + demo `/availability` sin login) desplegada en Netlify; el proyecto es open source con trazabilidad
+  Kaddo (iniciativas y Work Items).
+- **Pendiente / aspiracional:** la validación de "uso práctico de IA sobre datos reales" (objetivo 5)
+  se cumple hoy con lógica **heurística/determinística**, no con modelos de Bedrock; la IA real
+  (recuperación semántica + ranking con Bedrock, runtime agentic) está planificada en **INI-006**.
+  El despliegue del backend serverless (`services/api`) tampoco está activo todavía.
+
 ## Constraints
 
 ### Restricciones del evento y del API
@@ -103,3 +124,31 @@ El usuario principal no necesita conocer de antemano qué sesiones debe tomar. D
 - El proyecto se desarrollará open source y en público.
 - Las contribuciones deben mantener trazabilidad entre capacidades, componentes, Vertical Slices, Work Items y cambios de código.
 - Las decisiones arquitectónicas relevantes deben quedar documentadas y actualizar el conocimiento de Kaddo cuando corresponda.
+
+## Business rules
+
+Enunciados verificables (independientes de implementación):
+
+- Un visitante **sin autenticar** puede leer la landing y navegar la demo de disponibilidad en modo
+  fixture; nunca se le exponen operaciones que requieran sesión. _(verificable en la vista pública)_
+- Las operaciones protegidas de AWS Events (agenda, favoritos, reservas) solo se habilitan si el
+  usuario tiene sesión Builder ID activa. _(verificable: sin token, no hay escritura)_
+- Los access/refresh tokens de AWS Events **no se persisten** ni se envían al backend de Pathfinder;
+  residen solo en memoria del cliente. _(verificable por inspección del flujo de auth)_
+- AWS Events API es la fuente de verdad: ante conflicto, el estado mostrado se reconcilia releyendo
+  la agenda, sin estado optimista. _(verificable: mutación → relectura → render)_
+- La disponibilidad se representa con señales cualitativas explícitas de AWS Events; **no se infiere**
+  capacidad numérica. _(verificable en el heat map)_
+- Toda recomendación debe ser explicable: indica por qué es relevante y qué Knowledge Gap cubre.
+  _(verificable: cada recomendación trae explicación)_
+- Las decisiones de IA deben ser costo-conscientes: primero filtro determinístico, luego ranking.
+  _(regla de diseño; hoy el ranking es heurístico, no Bedrock)_
+
+## Open questions
+
+- [open] **IA real vs. heurística.** Cuándo y cómo activar la validación del objetivo de negocio de
+  "uso práctico de IA" con modelos de Bedrock (INI-006), más allá de la heurística actual.
+- [open] **Monetización/sostenibilidad.** No definida; el proyecto es open source y orientado al
+  hackathon y la comunidad. _(supuesto: fuera de alcance por ahora)_
+- [open] **Multi-evento.** Si el valor de negocio se extiende más allá de re:Invent a otros eventos
+  AWS en una versión futura.

@@ -401,9 +401,6 @@ Progress: 10/12
 - Active Work Items: 0
 - Implementation completed: 17
 
-## Suggested Next Steps
-1. Use the roadmap-agent to plan the next initiative.
-
 ## Project Readiness
 - overall: not-applicable
 
@@ -428,10 +425,8 @@ Discovery:
 
 ## Installed Assets
 - CLI version: 3.114.0
-- Agents: 20 installed (20 outdated)
-- Skills: 10 installed (10 outdated)
-
-Suggested: run `kaddo agents status` and `kaddo skills status`.
+- Agents: 20 installed (20 modified)
+- Skills: 10 installed (10 modified)
 
 ## Metadata Health
 - `knowledge/delivery/roadmap.md`: Missing `generated_by` in frontmatter.

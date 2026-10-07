@@ -1,502 +1,279 @@
 ---
 type: codebase
-project_state: new
+project_state: ai-assisted
 generated_by: kaddo-bootstrap
 template_version: 1
+refined_by: codebase-agent
 ---
 
 > Idioma del proyecto: **español**. Escribe este conocimiento en español. Mantén en inglés el código, los nombres de archivo, los comandos y las claves de configuración.
 
 # Codebase Map
 
+> **Estado (refinado por codebase-agent):** el proyecto ya NO es un esqueleto. Existe un monorepo
+> `pnpm` con 11 paquetes TypeScript, project references de `tsc`, suite de tests Vitest por paquete
+> y un cliente React desplegado en Netlify (`charlasreinvent.netlify.app`, publica `apps/client`).
+> Esta sección describe la estructura **real existente**; lo que sigue siendo intención (bloque IA
+> real sobre Bedrock, backend serverless desplegado) se marca explícitamente como planificado.
+
 ## Repository structure
 
-El proyecto está en estado `new`: todavía no existe una estructura de producción consolidada. La siguiente estructura representa la **intención arquitectónica inicial** y debe evolucionar únicamente cuando aparezcan límites reales en el código.
+Estructura real verificada en el repositorio:
 
 ```text
 reinvent-pathfinder/
 │
 ├── apps/
-│   ├── client/                    # React + Vite + TypeScript
-│   │                              # Experiencia local-first del asistente
-│   └── site/                      # Sitio/demo público para Builder Center
+│   ├── client/                    # React + Vite + TypeScript (DESPLEGADO en Netlify)
+│   │   └── src/
+│   │       ├── App.tsx            # Routing local-first: /, /availability, /about, /callback
+│   │       ├── components/        # LandingView, AvailabilityHeatmap, LearningPathView,
+│   │       │                      # LearningReportView, ReflectionForm, KnowledgeProfileView,
+│   │       │                      # KnowledgeGapsList, ContextForm, BuilderIdLogin
+│   │       ├── auth/              # builder-id-transaction.ts + PKCE (Web Crypto API)
+│   │       ├── fixtures/         # availability-heatmap.ts (demo sin login)
+│   │       └── client.test.ts    # Tests SSR (renderToString)
+│   └── site/                      # Placeholder DESCARTADO: la landing vive en apps/client (/about)
 │
 ├── services/
-│   └── api/                       # API serverless tradicional
-│       ├── src/
-│       │   ├── handlers/
-│       │   ├── application/
-│       │   └── adapters/
-│       └── serverless.yml
+│   └── api/                       # API serverless (implementada con tests; despliegue real pendiente)
+│       └── src/
 │
 ├── ai/
-│   ├── agents/                    # Agentes Strands
+│   ├── knowledge/                 # Motor de conocimiento HEURÍSTICO / local-first (implementado)
+│   │   └── src/
+│   │       ├── context-analyzer.ts        # HeuristicContextAnalyzer
+│   │       ├── recommendations/           # candidate-filter.ts, session-reranker.ts
+│   │       │                              # (HeuristicSessionReranker)
+│   │       ├── kb/                         # knowledge-base-client.ts, session-document-transformer.ts
+│   │       └── index.ts                    # buildLearningPath, adaptLearningPathFromReflection,
+│   │                                       # buildLearningReport
+│   ├── agents/                    # journey-recommendation-agent.ts, knowledge-agent.ts (spike)
 │   ├── tools/                     # Tools expuestas a los agentes
-│   ├── knowledge/                 # Ingesta / acceso a Managed KB
 │   └── contracts/                 # Schemas de entradas/salidas agentic
 │
 ├── packages/
-│   ├── domain/                    # Journey, KnowledgeProfile, Gaps, Recommendations
-│   ├── events-client/             # Adapter TypeScript para AWS Events REST API
-│   ├── data/                      # Repositories / contratos DynamoDB
+│   ├── domain/                    # ProjectContext, KnowledgeProfile, KnowledgeGap,
+│   │                              # SessionCandidate, SessionRecommendation, LearningPath,
+│   │                              # Reflection, ScheduleConflict + lógica de proyección
+│   ├── events-client/             # Adapter de AWS Events REST API (AwsEventsClient)
+│   ├── data/                      # Repositories / contratos DynamoDB (sin tests aún)
 │   ├── contracts/                 # DTOs y schemas compartidos
-│   └── shared/                    # Solo utilidades realmente compartidas
+│   └── shared/                    # Utilidades compartidas
 │
-├── infra/
-│   ├── serverless/                # Infra de aplicación tradicional
-│   └── agentic/                   # IaC / deployment del bloque AI-AgentCore
-│
-├── docs/
-│   ├── architecture/
-│   ├── adr/
-│   └── technical-brief.md
-│
+├── .github/workflows/ci.yml       # CI (GitHub Actions)
+├── .kaddo/                        # Knowledge base generada por Kaddo (no editar a mano)
 ├── knowledge/                     # Knowledge base de Kaddo
-├── .kaddo/
-│
-├── .github/
-│   ├── workflows/
-│   ├── ISSUE_TEMPLATE/
-│   └── PULL_REQUEST_TEMPLATE.md
-│
-├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
-├── SECURITY.md
-├── LICENSE
-├── package.json
-└── pnpm-workspace.yaml
+├── netlify.toml                   # Deploy de apps/client
+├── .node-version                  # Node objetivo (24)
+├── eslint.config.mjs
+├── vitest.config.ts
+├── tsconfig.base.json             # Config base compartida
+├── tsconfig.json                  # Project references del monorepo
+├── pnpm-workspace.yaml
+├── README.md
+└── package.json
 ```
+
+> No existen todavía `infra/`, `docs/` ni plantillas de `.github/ISSUE_TEMPLATE`; eran intención
+> del bootstrap. Se crearán solo cuando aparezca necesidad real.
 
 ### Límites principales
 
-#### `apps/client`
+#### `apps/client` — implementado y desplegado
 
-Cliente local-first encargado de:
+Cliente local-first (React + Vite + TypeScript). Responsabilidades reales:
 
-- `Project Context UI`;
-- OAuth 2.0 + PKCE para AWS Events;
-- manejo en memoria de tokens;
-- consumo directo de AWS Events cuando corresponda;
-- visualización del `Knowledge Profile`;
-- `Learning Path`;
-- agenda;
-- reflexión post-sesión;
-- coordinación del journey del usuario.
+- Routing propio basado en estado (`route`/`navigate`/`popstate`) con rutas `/` (captura de
+  contexto + diagnóstico), `/availability` (heat map de disponibilidad, demo sin login),
+  `/about` (landing pública) y `/callback` (OAuth).
+- Captura de contexto (`ContextForm`) y visualización de `KnowledgeProfile`/`KnowledgeGaps`.
+- Construcción y visualización del `Learning Path` (`LearningPathView`) y reflexión post-sesión
+  (`ReflectionForm`).
+- `Learning Report` de cierre de ciclo (`LearningReportView`).
+- Heat map de disponibilidad (`AvailabilityHeatmap`) en modo fixture o live.
+- Login AWS Builder ID (`BuilderIdLogin`) con OAuth 2.0 + PKCE; tokens solo en memoria.
+- Toda la lógica de recomendación/aprendizaje se ejecuta local-first contra `@pathfinder/ai-knowledge`.
 
-Tecnología base:
+Evidencia: `apps/client/src/App.tsx`, `apps/client/src/components/**`,
+`apps/client/src/auth/builder-id-transaction.ts`, `apps/client/src/client.test.ts`.
+
+#### `packages/events-client` — implementado
+
+Adapter TypeScript de AWS Events REST API (`AwsEventsClient`). Encapsula:
+
+- `ListSessions` con paginación por `nextToken` hasta agotarla.
+- Normalización de sesiones (`normalizeAwsSession`) y de disponibilidad (`seatAvailability`,
+  sin inferir capacidad; preserva niveles oficiales 100–500).
+- `GetSchedule` (agenda personal), favoritos, reservas y cancelaciones.
+- Normalización de errores (`AwsEventsError` y variantes 401/403/404/429) y manejo de throttling.
+- Fixtures de desarrollo: `SAMPLE_RAW_SESSIONS`, `SAMPLE_USER_SCHEDULE`.
+
+AWS Events API es la fuente de verdad del evento. Evidencia:
+`packages/events-client/src/client/aws-events-client.ts`,
+`packages/events-client/src/normalizer/**`, `packages/events-client/src/types/**`,
+`packages/events-client/src/events-client.test.ts`.
+
+#### `packages/domain` — implementado
+
+Dominio independiente de AWS. Tipos y lógica de proyección/filtrado para disponibilidad,
+Knowledge Gaps, recomendaciones y Learning Path. Evidencia: `packages/domain/src/types/**`,
+`packages/domain/src/logic/**`, `packages/domain/src/domain.test.ts`.
+
+#### `ai/knowledge` — implementado (HEURÍSTICO / local-first)
+
+Motor de conocimiento y recomendaciones **sin IA externa**: analizador de contexto y reranker
+heurísticos, construcción de Learning Path, adaptación por reflexión y Learning Report.
+
+Flujo de datos real (local-first, sin red salvo integración live de AWS Events):
 
 ```text
-React
-Vite
-TypeScript
+ProjectContext (ContextForm)
+        ↓
+HeuristicContextAnalyzer ──► KnowledgeProfile + KnowledgeGaps
+        ↓
+candidate-filter (determinístico)
+        ↓
+HeuristicSessionReranker ──► SessionRecommendation[] (explicables)
+        ↓
+buildLearningPath ──► LearningPath (concilia con agenda)
+        ↓
+adaptLearningPathFromReflection ◄── Reflection (recalcula gaps/recos/ruta)
+        ↓
+buildLearningReport ──► LearningReport (cierre de ciclo)
 ```
 
-#### `services/api`
+- `HeuristicContextAnalyzer` (`context-analyzer.ts`): deriva `KnowledgeProfile` y `KnowledgeGaps`.
+- `candidate-filter.ts` + `HeuristicSessionReranker` (`recommendations/session-reranker.ts`):
+  filtro determinístico + reordenamiento explicable.
+- `index.ts`: `buildLearningPath`, `adaptLearningPathFromReflection`, `buildLearningReport`.
+- `kb/`: cliente y transformador de documentos de sesión (preparación para KB semántica).
 
-Backend serverless tradicional.
+Evidencia: `ai/knowledge/src/**`, `ai/knowledge/src/context-analyzer.test.ts`,
+`ai/knowledge/src/recommendations/recommendations.test.ts`,
+`ai/knowledge/src/kb/knowledge-base.test.ts`.
 
-Responsabilidades esperadas:
+> **Importante:** este bloque NO usa Amazon Bedrock, Strands ni AgentCore. La habilitación de IA
+> real está planificada en la iniciativa **INI-006** y aún no está implementada.
 
-- exponer endpoints propios de Pathfinder;
-- validación de requests;
-- acceso a DynamoDB;
-- integración de servicios no agentic;
-- coordinación con el bloque de IA cuando corresponda;
-- métricas técnicas y manejo de errores.
-
-Infraestructura:
-
-```text
-API Gateway
-AWS Lambda
-Amazon DynamoDB
-IAM
-CloudWatch
-```
-
-IaC:
+Pipeline semántico **planificado** (INI-006, aún no implementado); hoy su equivalente lo cubre la
+heurística anterior:
 
 ```text
-Serverless Framework
-```
-
-#### `ai`
-
-Bloque de inteligencia y agentes.
-
-Tecnología base:
-
-```text
-Strands Agents SDK
-Amazon Bedrock AgentCore Runtime
-Amazon Bedrock
+AWS Events API (fuente de verdad del catálogo)
+        ↓
+Catalog Ingestion → Normalized session documents   [preparado en ai/knowledge/src/kb/]
+        ↓
 Amazon Bedrock Managed Knowledge Bases
+        ↓
+Semantic retrieval (por Knowledge Gaps)
+        ↓
+Re-ranking explicable con Bedrock → Agent / Recommendation Tool
 ```
 
-Responsabilidades esperadas:
+#### `ai/agents`, `ai/tools`, `ai/contracts` — spike / base
 
-- interpretar el contexto del proyecto;
-- generar/actualizar `Knowledge Profile`;
-- identificar `Knowledge Gaps`;
-- recuperar conocimiento semántico de sesiones;
-- realizar ranking semántico;
-- explicar recomendaciones;
-- construir/adaptar el Learning Path.
+Contratos y esqueleto de agentes (`journey-recommendation-agent.ts`, `knowledge-agent.ts`) y tools,
+provenientes del spike WI-010. Sin runtime Bedrock/AgentCore activo. Evidencia: `ai/agents/src/**`,
+`ai/tools/src/**`, `ai/contracts/src/**`.
 
-El MVP no debe crear un agente independiente por cada función. La topología objetivo será pequeña, idealmente entre uno y tres agentes, con tools explícitas.
+#### `services/api` — implementado (sin despliegue serverless activo)
 
-#### `packages/events-client`
+Backend con tests, pensado para los endpoints de Pathfinder. El despliegue serverless real y la
+integración Bedrock no están activos todavía. Evidencia: `services/api/src/**`.
 
-Adapter TypeScript de AWS Events REST API.
+#### `packages/contracts`, `packages/shared` — implementados
 
-Debe encapsular:
+DTOs/schemas compartidos y utilidades. Evidencia: `packages/contracts/src/**`,
+`packages/shared/src/**`.
 
-- catalog;
-- pagination;
-- session normalization;
-- `GetSchedule`;
-- favorites;
-- reservations;
-- personal time;
-- error normalization;
-- retry/throttling behavior.
+#### `packages/data` — base, sin tests
 
-AWS Events API es la fuente de verdad para información del evento y agenda.
-
-#### `packages/domain`
-
-Dominio independiente de AWS cuando sea razonable.
-
-Conceptos principales:
-
-```text
-AttendeeJourney
-ProjectContext
-KnowledgeProfile
-KnowledgeGap
-SessionCandidate
-SessionRecommendation
-LearningPath
-Reflection
-ScheduleConflict
-```
-
-#### `packages/data`
-
-Abstracciones de persistencia operacional.
-
-Backend principal:
-
-```text
-Amazon DynamoDB
-```
-
-Datos potenciales:
-
-- journey;
-- knowledge profiles;
-- knowledge gaps;
-- reflections;
-- recommendations;
-- estado de ingestión;
-- cache operacional del catálogo si se decide centralizarlo.
-
-DynamoDB no reemplaza la `Managed Knowledge Base`.
-
-#### `ai/knowledge`
-
-Responsable de la representación semántica de conocimiento del catálogo.
-
-Flujo esperado:
-
-```text
-AWS Events API
-      ↓
-Catalog Ingestion
-      ↓
-Normalized session documents
-      ↓
-Amazon Bedrock Managed Knowledge Bases
-      ↓
-Semantic retrieval
-      ↓
-Agent / Recommendation Tool
-```
-
-La `Managed Knowledge Base` es una representación optimizada para recuperación semántica; AWS Events API sigue siendo la fuente de verdad del catálogo.
+Contratos/repositorios de persistencia DynamoDB. Aún sin suite de tests (el script usa
+`--passWithNoTests`). Evidencia: `packages/data/src/**`.
 
 ## Entry points
 
-Los entry points definitivos se crearán durante el bootstrap técnico. La intención inicial es:
-
-### Client
-
-```text
-apps/client/src/main.tsx
-```
-
-Responsable de iniciar la experiencia local-first.
-
-### Pathfinder API
-
-Handlers bajo:
-
-```text
-services/api/src/handlers/
-```
-
-Endpoints iniciales esperados:
-
-```text
-GET  /health
-
-POST /v1/context/analyze
-POST /v1/recommendations/rank
-POST /v1/journey/adapt
-```
-
-Los contratos exactos se definirán mediante schemas versionados antes de considerarlos estables.
-
-### Agentic runtime
-
-Entry point esperado bajo:
-
-```text
-ai/agents/
-```
-
-La topología exacta sigue abierta. Las responsabilidades mínimas deben cubrir:
-
-```text
-analyzeProjectContext()
-retrieveSessionKnowledge()
-findKnowledgeGaps()
-rankSessions()
-buildLearningPath()
-getSchedule()
-manageFavorites()
-reserveSession()
-adaptJourney()
-```
-
-Estas responsabilidades pueden agruparse en máximo tres agentes para el MVP, en lugar de crear un agente por operación.
-
-### Infrastructure
-
-Aplicación tradicional:
-
-```text
-services/api/serverless.yml
-```
-
-o estructura equivalente bajo:
-
-```text
-infra/serverless/
-```
-
-Bloque agentic:
-
-```text
-infra/agentic/
-```
-
-El mecanismo final puede combinar `agentcore deploy` con IaC específico para recursos complementarios.
+- **Client:** `apps/client/src/main.tsx` monta `App.tsx` (routing local-first ya operativo).
+- **Callback OAuth:** ruta `/callback` manejada dentro de `App.tsx` + `apps/client/src/auth/`.
+- **Pathfinder API:** handlers bajo `services/api/src/` (implementados; contratos aún no estables).
+- **Agentic runtime:** `ai/agents/src/` (spike; sin runtime desplegado).
 
 ## How to run
 
-Aún no existen comandos de producción definitivos.
-
-La experiencia objetivo de desarrollo es:
+Experiencia de desarrollo real (local-first, sin AWS):
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-y debe permitir levantar localmente las partes que no requieren infraestructura real.
+El cliente arranca en el puerto de desarrollo de Vite. La demo pública (`/availability`) y la
+landing (`/about`) funcionan **sin login** en modo fixture. El flujo autenticado con AWS Builder ID
+resuelve su callback en `/callback`.
 
-### Desarrollo local sin AWS
+### Variables de entorno
 
-Un contribuidor normal debe poder trabajar con:
+- `VITE_AWS_EVENT_ID` — habilita el cliente live de AWS Events (`AwsEventsClient`) para un
+  `eventId` concreto. Sin esta variable, el cliente opera solo en modo fixture local. Documentada
+  en el `README.md`; se configura vía `.env` (ignorado por git) y hay un `.env.example` de muestra.
+- `VITE_AUTH_REDIRECT_URI` — opcional; sobreescribe el `redirectUri` del callback de Builder ID.
 
-- fixtures;
-- mocks;
-- contratos;
-- UI;
-- dominio;
-- tests;
-
-sin necesidad de desplegar recursos AWS ni ejecutar `serverless login`.
-
-### Desarrollo con infraestructura AWS
-
-Para trabajo sobre el backend serverless:
-
-```text
-Serverless Framework authentication
-+
-AWS credentials / SSO
-```
-
-El deployment esperado será equivalente a:
+### Verificación
 
 ```bash
-serverless deploy --stage dev
+tsc -b          # build de project references del monorepo
+pnpm -r test    # suite Vitest de todos los paquetes
 ```
 
-### Desarrollo del bloque agentic
+### Desarrollo con AWS / bloque agentic
 
-Se definirá un flujo reproducible para:
-
-```text
-Strands Agents
-AgentCore local/dev
-AgentCore deployment
-Managed Knowledge Base
-Bedrock models
-```
-
-Los comandos concretos se documentarán cuando el primer Vertical Slice agentic sea implementado.
-
-### AWS Events authentication
-
-La experiencia autenticada debe ejecutarse desde un callback local compatible con OAuth 2.0 + PKCE.
-
-Los access/refresh tokens no deben almacenarse de forma persistente ni enviarse al backend de Pathfinder.
+Pendiente: el despliegue serverless (`services/api`) y el bloque IA real (INI-006, Bedrock/Strands/
+AgentCore) se documentarán cuando se implementen. Hoy no se requieren credenciales AWS para
+desarrollar la experiencia local-first.
 
 ## How to test
 
-La estrategia inicial tendrá varias capas.
+- **Framework:** Vitest por paquete. El cliente usa render SSR (`renderToString`) en
+  `apps/client/src/client.test.ts`.
+- **Cobertura actual (verificada por paquete):** `ai/knowledge` ~76, `packages/events-client` ~102,
+  `packages/domain` ~28, `apps/client` 24, `packages/contracts` ~18, `services/api` ~18,
+  `ai/tools` ~8, `ai/agents` ~4, `packages/shared` ~4. `packages/data` sin tests
+  (`--passWithNoTests`).
+- **Casos de resiliencia cubiertos en events-client:** paginación, `401`/`403`/`404`/`429`,
+  campos opcionales ausentes, partial success en favoritos/reservas, reconciliación tras fallo.
+- **CI:** `.github/workflows/ci.yml` (GitHub Actions) ejecuta la verificación en PRs.
+- **Pendiente:** E2E con Playwright (propuesto, aún no implementado).
 
-### Unit tests
+## Conventions
 
-Para:
+- **Lenguaje:** TypeScript estricto en todos los paquetes; project references de `tsc` (`tsc -b`).
+- **Estilo del cliente:** componentes React presentacionales con estilos inline; vistas que reciben
+  datos y callbacks por props (patrón de `LearningReportView`/`LandingView`), fáciles de testear por
+  SSR sin stubs de red/auth.
+- **Formato:** comillas dobles sin punto y coma; ESLint (`eslint.config.mjs`). Nota operativa: el
+  reformateador reordena imports alfabéticamente; validar imports con `tsc -b` tras editar.
+- **Nombres de paquetes:** namespace `@pathfinder/*` (p. ej. `@pathfinder/domain`,
+  `@pathfinder/events-client`, `@pathfinder/ai-knowledge`, `@pathfinder/contracts`).
+- **Local-first primero:** la lógica de valor corre en el cliente contra paquetes locales; AWS Events
+  solo se consulta con `VITE_AWS_EVENT_ID` + sesión Builder ID.
+- **Git:** ver la estrategia de Git del proyecto (no se repite aquí).
 
-- dominio;
-- scoring determinístico;
-- Knowledge Gap transitions;
-- session normalization;
-- request validation;
-- mappers;
-- repositories.
+## Minimum criteria to start development
 
-Herramienta propuesta:
-
-```text
-Vitest
-```
-
-### Integration tests
-
-Para:
-
-- AWS Events adapter con fixtures/mocks;
-- DynamoDB repositories;
-- handlers Lambda;
-- Bedrock adapters;
-- tools de Strands;
-- contratos entre API y agentes.
-
-Cuando sea útil se usarán:
-
-```text
-MSW
-local mocks
-AWS test resources
-```
-
-### E2E
-
-Para journeys críticos:
-
-```text
-Project Context
-→ Knowledge Profile
-→ Knowledge Gaps
-→ Recommendations
-→ Learning Path
-```
-
-y posteriormente:
-
-```text
-Reflection
-→ Knowledge changes
-→ Recommendation adaptation
-```
-
-Herramienta propuesta:
-
-```text
-Playwright
-```
-
-### Casos de resiliencia obligatorios
-
-Se deben cubrir al menos:
-
-- AWS Events pagination;
-- `401`;
-- `403`;
-- `409`;
-- `429` + retry;
-- campos opcionales ausentes;
-- partial success en favorites/reservations;
-- fallos de Bedrock;
-- respuestas AI inválidas;
-- fallos de DynamoDB;
-- ausencia de resultados relevantes.
-
-### CI
-
-En Pull Requests se espera ejecutar:
-
-```text
-install
-lint
-typecheck
-unit tests
-integration tests
-build
-infrastructure validation
-```
-
-El deployment debe ocurrir desde pipeline y no depender de credenciales permanentes almacenadas localmente.
+- Node según `.node-version` (24) y `pnpm`.
+- `pnpm install` + `pnpm dev` levantan el cliente sin AWS.
+- `tsc -b` y `pnpm -r test` en verde antes de considerar un cambio terminado.
+- No se requieren credenciales AWS ni `serverless login` para la experiencia local-first.
 
 ## Open questions
 
-- [resolved] **Topología de agentes.** Se define una topología de exactamente 2 agentes para el MVP.
-  - note: Se dividen las tareas en 2 agentes especializados (Knowledge Agent y Journey/Recommendation Agent) para evitar sobrecomplejidad sin concentrar todo en un único agente.
-- [resolved] **Agrupación propuesta de agentes.** Agrupación en 2 agentes: un agente enfocado en el conocimiento y catálogo (`Knowledge Agent`), y un segundo agente enfocado en la experiencia, recomendaciones y jornada del asistente (`Journey & Recommendation Agent`).
-  - note: Decisión alineada con la topología de 2 agentes para el MVP.
-- [resolved] **IaC del bloque agentic.** Confirmado: `Amazon Bedrock AgentCore` se desplegará mediante `agentcore deploy` para el bloque agentic, mientras que el bloque tradicional continuará con Serverless Framework.
-  - note: Separación limpia entre el ciclo de vida del agente y la infraestructura serverless convencional.
-- [assumed] **Límite entre Lambda y AgentCore.** Definir qué operaciones pertenecen a `services/api` y cuáles se ejecutan directamente dentro del agent runtime.
-  - note: `services/api` (Lambda) gestiona endpoints CRUD determinísticos y agregaciones rápidas; AgentCore ejecuta la orquestación semántica, el razonamiento de recomendaciones y las tools de Bedrock.
-- [assumed] **Autenticación del backend de Pathfinder.** Definir cómo proteger endpoints con costo de Bedrock sin reutilizar indebidamente el access token de AWS Events.
-  - note: En el MVP local los tokens de AWS Builder ID residen en memoria del cliente; los endpoints de Pathfinder se protegen con headers de sesión local / API key sin propagar credenciales externas.
-- [assumed] **Modelo de identidad.** Definir cómo correlacionar un journey persistido en DynamoDB con un usuario sin aumentar innecesariamente el alcance de autenticación.
-  - note: Se utiliza un UUID de perfil anónimo / identificador de dispositivo local para correlacionar el journey en DynamoDB, manteniendo la privacidad del asistente.
-- [assumed] **Modelo DynamoDB.** Definir partition/sort keys y si se utilizará single-table design o tablas separadas.
-  - note: Single-table design (`PK` = entity type + id, `SK` = sub-resource o timestamp) para journeys, reflexiones y perfiles de conocimiento.
-- [assumed] **Persistencia del catálogo.** Definir qué parte del catálogo vive únicamente en cache local, qué parte se almacena en DynamoDB y qué parte solo se representa en Managed Knowledge Bases.
-  - note: El catálogo crudo se cachea localmente para velocidad; las sesiones indexadas semánticamente se representan en Bedrock Knowledge Bases; DynamoDB almacena únicamente el estado y personalización del usuario.
-- [assumed] **Ingesta de Managed Knowledge Bases.** Definir formato de documentos, metadata, frecuencia de sincronización y mecanismo de actualización desde AWS Events API.
-  - note: Ingesta batch en JSON estructurado por sesión (con metadata de track, nivel, formato y venue) exportado a S3 como data source de Bedrock Knowledge Base.
-- [assumed] **Candidate Filtering vs semantic retrieval.** Definir en qué orden y con qué señales se combinan filtros determinísticos, KB retrieval y ranking de Bedrock.
-  - note: 1º Filtro determinístico (horario, conflictos de agenda, venue); 2º Retrieval semántico en Bedrock KB basado en Knowledge Gaps; 3º Re-ranking explicable final con Bedrock.
-- [assumed] **Modelo Bedrock.** Seleccionar el modelo inicial con base en calidad, latencia y costo; mantenerlo configurable.
-  - note: Modelo base Claude 3.5 Sonnet / Haiku en Bedrock con identificador parametrizable mediante variables de entorno.
-- [resolved] **Distribución local.** Confirmado: ejecución local mediante `pnpm dev` en el monorepo para el MVP.
-  - note: Desarrollo local estándar y rápido sin empaquetado de distribución adicional durante el hackathon.
-- [assumed] **Public site.** Definir si `apps/site` será una aplicación separada o una vista pública dentro del mismo frontend.
-  - note: Para el MVP se inicia como ruta/vista pública accesible dentro del mismo frontend (`apps/desktop` o web SPA) para maximizar reutilización de componentes.
-- [assumed] **Retención de datos.** Definir cuánto tiempo se conservarán journeys, profiles, reflections y recommendations.
-  - note: TTL de 30 días en DynamoDB para datos temporales de la conferencia.
-- [assumed] **Observabilidad de producto.** Definir eventos permitidos sin registrar información privada del proyecto del usuario.
-  - note: Métricas anonimizadas en CloudWatch (latencia de Bedrock, número de sesiones recomendadas, conteo de reflexiones) sin almacenar descripciones de proyectos privados.
-- [assumed] **Optimización logística.** Validar si los datos de venue disponibles permiten calcular una señal útil de desplazamiento.
-  - note: Considerar tiempo de traslado entre venues como penalización en el filtro determinístico cuando la información de sala/hotel esté disponible.
-- [resolved] **Learning Report.** Confirmado: se mantiene dentro del alcance del MVP del hackathon.
-  - note: Esencial para cerrar el ciclo completo de valor del participante: antes (contexto/gaps), durante (reflexión/re-ranking) y después (síntesis de aprendizaje y reporte de valor post-evento).
+Preguntas realmente abiertas (las resueltas durante la entrega ya no se listan):
+
+- [open] **Despliegue de `services/api`.** Falta activar el despliegue serverless real y definir su
+  pipeline; hoy existe código y tests pero no despliegue.
+- [open] **Bloque IA real (INI-006).** Topología final de agentes, IaC (`agentcore deploy` vs. otro),
+  modelo Bedrock y límite Lambda ↔ AgentCore. Pertenece a INI-006, aún no implementado.
+- [open] **Persistencia DynamoDB.** `packages/data` tiene base pero sin modelo single-table definido
+  ni tests; definir keys y retención cuando se active persistencia central.
+- [open] **E2E.** Introducir Playwright para los journeys críticos.
