@@ -21,6 +21,7 @@ candidates:
     notes: >-
       Open question: definir si entra en el MVP del hackathon o queda como
       extensión.
+    materialized_as: WI-026
   - id: WI-CANDIDATE-002
     title: Landing/demo pública dentro de apps/client para Builder Center
     type: feature
