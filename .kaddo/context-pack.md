@@ -20,37 +20,46 @@
 
 ## Current Phase
 
-Phase: Maintenance
+Phase: Active Delivery
 
 Reason:
 
 - Roadmap available
-- 22 materialized work item(s)
+- 24 materialized work item(s)
+- ready: 1, in-progress: 1
 - Ownership coverage 100%
 
-Recommended next: roadmap-agent
+Recommended next: implementation-agent
 
-Next step: Use the roadmap-agent to plan the next initiative.
+Next step: Use implementation-agent to implement WI-024.
 
 ## Delivery State
 
-- Phase: Maintenance
+- Phase: Active Delivery
 - Draft Work Items: 0
-- Ready Work Items: 0
-- In-progress Work Items: 0
-- Ownership coverage: 22/22
+- Ready Work Items: 1
+- In-progress Work Items: 1
+- Ownership coverage: 24/24
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use the roadmap-agent to plan the next initiative.
-  - id: plan-next
-  - reason: No active Work Items and no remaining roadmap candidates.
-  - agent: roadmap-agent
+- Use implementation-agent to implement WI-024.
+  - id: implement-work-item
+  - reason: WI-024 is ready for implementation.
+  - agent: implementation-agent
+  - skill: implementation-planning
+
+Also (secondary):
+
+- Validate affected modules for multirepo Work Items before implementation.
 
 ## Project Route
 
 Route: new · Progress: 10/12
+
+Current:
+- Run guard
 
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
@@ -103,6 +112,8 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-020-integraci-n-de-agenda-personal-y-favoritos.md
 - ✓ WI-021-reserva-y-cancelaci-n-de-sesiones-desde-pathfinder.md
 - ✓ WI-022-launcher-local-y-distribuci-n-de-la-experiencia-au.md
+- ✓ WI-023-heat-map-visual-de-disponibilidad-de-sesiones.md
+- ✓ WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -126,14 +137,21 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 22
+- Materialized Work Items: 24
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
 
 ## Active Work Items
 
-No active work items found.
+- WI-023 [bugfix] [K2] (in-progress) — Heat map visual de disponibilidad de sesiones · domains: experience, aws-events
+- WI-024 [bugfix] [K2] (ready) — Visibilidad de agenda y confirmación de reservas · domains: experience, aws-events
+
+## Delivery Mix
+
+Active Work Items by type:
+
+- Bugfixs: 2
 
 ## Artifacts and Ownership
 
@@ -159,6 +177,8 @@ No active work items found.
 - WI-020 [feature] owns: packages/events-client/src/types/user-schedule.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
 - WI-021 [feature] owns: packages/events-client/src/types/user-schedule.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
 - WI-022 [feature] owns: package.json, apps/client/package.json, apps/client/vite.config.ts, apps/client/src/App.tsx, README.md
+- WI-023 [bugfix] owns: apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
+- WI-024 [bugfix] owns: apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
 
 ## Mapped Modules
 
@@ -229,15 +249,16 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Maintenance** phase:
+Recommended next for the **Active Delivery** phase:
 
-1. roadmap-agent
+1. implementation-agent
 
 Next step:
 
-- Use the roadmap-agent to plan the next initiative.
+- Use implementation-agent to implement WI-024.
 
 ## Instructions for the LLM
 
-- No active work.
-- Use the roadmap-agent to plan the next initiative.
+- Use the implementation-agent.
+- Suggest a branch name only.
+- Do not run git commands.

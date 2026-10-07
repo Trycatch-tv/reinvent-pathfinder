@@ -97,6 +97,19 @@ export function describeReservationFailures(failed: readonly { readonly code?: s
   return `AWS Events rechazó ${failed.length} reserva(s); se mostró la agenda confirmada.`
 }
 
+export function describeReservationReconciliation(input: {
+  readonly wasReserved: boolean
+  readonly sessionId: string
+  readonly reservedSessionIds: readonly string[]
+  readonly failed: readonly { readonly code?: string }[]
+}): string {
+  const reservationConfirmed = input.reservedSessionIds.includes(input.sessionId)
+  if (!input.wasReserved && reservationConfirmed) return "Reserva confirmada por AWS Events."
+  if (input.wasReserved && !reservationConfirmed) return "Cancelación de reserva confirmada por AWS Events."
+  if (input.failed.length) return describeReservationFailures(input.failed)
+  return input.wasReserved ? "AWS Events no confirmó la cancelación de la reserva." : "AWS Events no confirmó la reserva."
+}
+
 export const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] =
     useState<AnalyzeContextResponse | null>(null)
@@ -296,7 +309,7 @@ export const App: React.FC = () => {
         : await liveEventsClient.reserveSession(sessionId)
       const reconciled = await liveEventsClient.getPersonalSchedule()
       setScheduleSnapshot(reconciled)
-      setScheduleMessage(result.failed.length ? describeReservationFailures(result.failed) : "Agenda reconciliada con AWS Events.")
+      setScheduleMessage(describeReservationReconciliation({ wasReserved: isReserved, sessionId, reservedSessionIds: reconciled.reservedSessionIds, failed: result.failed }))
     } catch (err: unknown) {
       try {
         setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())

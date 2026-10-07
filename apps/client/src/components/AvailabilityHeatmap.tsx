@@ -9,6 +9,15 @@ import {
 import type { UserScheduleResult } from '@pathfinder/events-client'
 import React, { useMemo, useState } from 'react'
 
+const availabilityVisuals = {
+  available: { label: 'Disponible', background: '#dcfce7', border: '#15803d', color: '#14532d' },
+  limited: { label: 'Disponibilidad limitada', background: '#fef9c3', border: '#ca8a04', color: '#713f12' },
+  full: { label: 'Completa', background: '#fee2e2', border: '#b91c1c', color: '#7f1d1d' },
+  'walk-up': { label: 'Solo walk-up', background: '#ffedd5', border: '#c2410c', color: '#7c2d12' },
+  unavailable: { label: 'No disponible', background: '#e2e8f0', border: '#64748b', color: '#334155' },
+  unknown: { label: 'Disponibilidad desconocida', background: '#f1f5f9', border: '#94a3b8', color: '#475569' },
+} as const
+
 export interface AvailabilityHeatmapProps {
   readonly sessions: readonly SessionCandidate[]
   readonly availability: readonly SessionAvailability[]
@@ -39,16 +48,19 @@ export function createAvailabilityProjection(
 }
 
 function statusLabel(status: AvailabilityProjectedSession['availability']['status']): string {
-  const labels = {
-    available: 'Disponible',
-    limited: 'Disponibilidad limitada',
-    full: 'Completa',
-    'walk-up': 'Solo walk-up',
-    unavailable: 'No disponible',
-    unknown: 'Disponibilidad desconocida',
-  } as const
+  return availabilityVisuals[status].label
+}
 
-  return labels[status]
+function AvailabilityLegend() {
+  return (
+    <section aria-label="Leyenda de disponibilidad" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', margin: '0.75rem 0' }}>
+      {Object.entries(availabilityVisuals).map(([status, visual]) => (
+        <span key={status} data-availability-status={status} style={{ background: visual.background, border: `1px solid ${visual.border}`, borderRadius: '999px', color: visual.color, fontSize: '0.85rem', padding: '0.2rem 0.5rem' }}>
+          {visual.label}
+        </span>
+      ))}
+    </section>
+  )
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {
@@ -126,6 +138,15 @@ export function AvailabilityHeatmap({
   const rowKeys = uniqueSorted(projection.groups.map((group) => `${group.day}\u0000${group.startTime}`))
   const favoriteIds = new Set(schedule?.favoriteSessionIds ?? [])
   const reservedIds = new Set(schedule?.reservedSessionIds ?? [])
+  const scheduleEntries = sessions.flatMap((session) => {
+    const isReserved = reservedIds.has(session.id)
+    const isFavorite = favoriteIds.has(session.id)
+    return isReserved || isFavorite ? [{ session, isReserved, isFavorite }] : []
+  })
+  const knownScheduleIds = new Set(scheduleEntries.map(({ session }) => session.id))
+  const unresolvedScheduleCount = schedule
+    ? [...new Set([...schedule.reservedSessionIds, ...schedule.favoriteSessionIds])].filter((id) => !knownScheduleIds.has(id)).length
+    : 0
 
   const updateFilter = <Key extends keyof AvailabilityProjectionFilters>(key: Key, value: AvailabilityProjectionFilters[Key]) => {
     setFilters((current) => ({ ...current, [key]: value }))
@@ -153,6 +174,11 @@ export function AvailabilityHeatmap({
 
       {schedule && <section aria-label="Resumen de agenda" style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0.75rem', margin: '1rem 0' }}>
         <strong>Mi agenda</strong>: {schedule.reservedSessionIds.length} reserva(s), {schedule.favoriteSessionIds.length} favorito(s), {schedule.personalTime.length} bloque(s) personal(es). <span>Sincronizada el {new Date(schedule.lastSyncedAt).toLocaleString()}.</span>
+        <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Sesiones confirmadas</h3>
+        {scheduleEntries.length ? <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
+          {scheduleEntries.map(({ session, isReserved, isFavorite }) => <li key={session.id}><button type="button" onClick={() => setSelectedSessionId(session.id)}>{`${session.code} — ${session.title}`}</button> {isReserved ? '· Reservada' : ''}{isFavorite ? '· Favorita' : ''}</li>)}
+        </ul> : <p style={{ marginBottom: 0 }}>No hay sesiones de tu agenda presentes en el catálogo cargado.</p>}
+        {unresolvedScheduleCount > 0 && <p role="status" style={{ marginBottom: 0 }}>{`${unresolvedScheduleCount} sesión(es) de tu agenda aún no aparecen en el catálogo cargado.`}</p>}
       </section>}
 
       <fieldset style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '1rem', margin: '1rem 0' }}>
@@ -168,6 +194,7 @@ export function AvailabilityHeatmap({
       </fieldset>
 
       <p aria-live="polite">{projectedSessions.length} sesión(es) visibles. Las sesiones sin señal confirmada muestran “Disponibilidad desconocida”.</p>
+      <AvailabilityLegend />
       <div style={{ overflowX: 'auto' }}>
         <table>
           <caption>Matriz de disponibilidad por horario y venue</caption>
@@ -181,7 +208,8 @@ export function AvailabilityHeatmap({
                   const isFavorite = favoriteIds.has(item.session.id)
                   const isReserved = reservedIds.has(item.session.id)
                   const agendaLabel = `${isReserved ? ' · Reservada' : ''}${isFavorite ? ' · Favorita' : ''}`
-                  return <button key={item.session.id} type="button" onClick={() => setSelectedSessionId(item.session.id)} aria-label={`${item.session.title}: ${statusLabel(item.availability.status)}${agendaLabel}`} style={{ display: 'block', marginBottom: '0.35rem' }}>{item.session.code} — {statusLabel(item.availability.status)}{isReserved ? ' · Reservada' : ''}{isFavorite ? ' · Favorita' : ''}</button>
+                  const visual = availabilityVisuals[item.availability.status]
+                  return <button key={item.session.id} type="button" onClick={() => setSelectedSessionId(item.session.id)} aria-label={`${item.session.title}: ${statusLabel(item.availability.status)}${agendaLabel}`} data-availability-status={item.availability.status} style={{ background: visual.background, border: `1px solid ${visual.border}`, borderRadius: '4px', color: visual.color, display: 'block', fontWeight: 600, marginBottom: '0.35rem', minWidth: '8rem', padding: '0.35rem 0.5rem', textAlign: 'center' }}>{item.session.code} — {statusLabel(item.availability.status)}{isReserved ? ' · Reservada' : ''}{isFavorite ? ' · Favorita' : ''}</button>
                 }) ?? '—'}</td>
               })}</tr>
             })}

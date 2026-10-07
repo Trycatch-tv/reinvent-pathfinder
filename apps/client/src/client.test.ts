@@ -10,7 +10,7 @@ import type {
 import React from "react"
 import { renderToString } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
-import { App, describeLiveAvailabilityError, describeLiveReservationError, describeReservationFailures, eventsApiBaseUrl, selectAvailabilitySnapshot } from "./App.js"
+import { App, describeLiveAvailabilityError, describeLiveReservationError, describeReservationFailures, describeReservationReconciliation, eventsApiBaseUrl, selectAvailabilitySnapshot } from "./App.js"
 import { AwsEventsForbiddenError, AwsEventsThrottlingError, AwsEventsUnauthorizedError } from "@pathfinder/events-client"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
@@ -173,8 +173,15 @@ describe("apps/client UI components", () => {
     expect(html).toContain("Palazzo Ballroom E")
     expect(html).toContain("Modo fixture local")
     expect(html).toContain("Mi agenda")
+    expect(html).toContain("Sesiones confirmadas")
+    expect(html).toContain("AIM301 — Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore")
     expect(html).toContain("Quitar de favoritos")
     expect(html).toContain("Cancelar reserva")
+    expect(html).toContain('aria-label="Leyenda de disponibilidad"')
+    expect(html).toContain('data-availability-status="available"')
+    expect(html).toContain('data-availability-status="limited"')
+    expect(html).toContain('data-availability-status="full"')
+    expect(html).toContain('data-availability-status="unknown"')
   })
 
   it("does not offer reservations for a session without available capacity", () => {
@@ -199,6 +206,26 @@ describe("apps/client UI components", () => {
     expect(describeReservationFailures([{ code: "SessionFull" }])).toContain("llena")
     expect(describeReservationFailures([{ code: "ScheduleConflict" }])).toContain("conflicto")
     expect(describeReservationFailures([{ code: "AlreadyReserved" }])).toContain("ya estaba reservada")
+    expect(describeReservationReconciliation({ wasReserved: false, sessionId: "session-1", reservedSessionIds: ["session-1"], failed: [] })).toContain("Reserva confirmada")
+    expect(describeReservationReconciliation({ wasReserved: false, sessionId: "session-1", reservedSessionIds: [], failed: [] })).toContain("no confirmó la reserva")
+  })
+
+  it("reports schedule IDs that are not part of the loaded catalog", () => {
+    const html = renderToString(
+      React.createElement(AvailabilityHeatmap, {
+        sessions: heatmapSessions,
+        availability: SAMPLE_HEATMAP_AVAILABILITY,
+        schedule: {
+          reservedSessionIds: ["sess-aim-301", "not-in-catalog"],
+          favoriteSessionIds: [],
+          personalTime: [],
+          lastSyncedAt: "2026-10-06T00:00:00.000Z",
+          items: [],
+        },
+      }),
+    )
+
+    expect(html).toContain("1 sesión(es) de tu agenda aún no aparecen en el catálogo cargado.")
   })
 
   it("uses Vite's same-origin AWS Events proxy during development", () => {

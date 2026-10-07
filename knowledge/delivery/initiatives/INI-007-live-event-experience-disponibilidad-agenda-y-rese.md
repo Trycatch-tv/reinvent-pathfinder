@@ -82,6 +82,18 @@ candidates:
     suggested_knowledge_level: K2
     expected_value: Ejecución local compatible con el callback OAuth de AWS Events.
     materialized_as: WI-022
+  - id: WI-CANDIDATE-009
+    title: Heat map visual de disponibilidad de sesiones
+    type: bugfix
+    suggested_knowledge_level: K2
+    expected_value: Señal visual accesible por estado de disponibilidad, sin inferir cupos numéricos.
+    materialized_as: WI-023
+  - id: WI-CANDIDATE-010
+    title: Visibilidad de agenda y confirmación de reservas
+    type: bugfix
+    suggested_knowledge_level: K2
+    expected_value: Agenda confirmada visible y confirmación de reserva basada en GetSchedule.
+    materialized_as: WI-024
 horizon: now
 priority: high
 ---
