@@ -29,6 +29,18 @@ export interface FavoriteMutationResult {
   readonly failed: readonly FavoriteFailure[];
 }
 
+/** Reservation failures are per-session and may include a conflicting session ID. */
+export interface ReservationFailure {
+  readonly sessionId: string;
+  readonly code?: string;
+  readonly conflictSessionId?: string;
+}
+
+export interface ReservationMutationResult {
+  readonly successfulSessionIds: readonly string[];
+  readonly failed: readonly ReservationFailure[];
+}
+
 export interface RawAwsPersonalTime {
   readonly personalTimeId: string;
   readonly startDateTime: string;
@@ -65,6 +77,17 @@ export interface RawAwsFavoriteMutationResponse {
   readonly result: {
     readonly successful: readonly string[];
     readonly failed: readonly { readonly sessionId: string; readonly code?: string }[];
+  };
+}
+
+export interface RawAwsReservationMutationResponse {
+  readonly result: {
+    readonly successful?: readonly string[];
+    readonly failed?: readonly {
+      readonly sessionId: string;
+      readonly code?: string;
+      readonly conflictSessionId?: string;
+    }[];
   };
 }
 

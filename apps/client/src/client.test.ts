@@ -10,7 +10,7 @@ import type {
 import React from "react"
 import { renderToString } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
-import { App, describeLiveAvailabilityError, eventsApiBaseUrl, selectAvailabilitySnapshot } from "./App.js"
+import { App, describeLiveAvailabilityError, describeLiveReservationError, describeReservationFailures, eventsApiBaseUrl, selectAvailabilitySnapshot } from "./App.js"
 import { AwsEventsForbiddenError, AwsEventsThrottlingError, AwsEventsUnauthorizedError } from "@pathfinder/events-client"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
@@ -163,6 +163,7 @@ describe("apps/client UI components", () => {
           items: [],
         },
         onToggleFavorite: () => {},
+        onToggleReservation: () => {},
       }),
     )
 
@@ -173,12 +174,31 @@ describe("apps/client UI components", () => {
     expect(html).toContain("Modo fixture local")
     expect(html).toContain("Mi agenda")
     expect(html).toContain("Quitar de favoritos")
+    expect(html).toContain("Cancelar reserva")
+  })
+
+  it("does not offer reservations for a session without available capacity", () => {
+    const html = renderToString(
+      React.createElement(AvailabilityHeatmap, {
+        sessions: heatmapSessions,
+        availability: SAMPLE_HEATMAP_AVAILABILITY,
+        initialSelectedSessionId: "sess-sec-305",
+        onToggleReservation: () => {},
+      }),
+    )
+
+    expect(html).toContain("Reservas aún no disponibles para esta sesión.")
+    expect(html).not.toContain("Reservar sesión")
   })
 
   it("explains live availability failures without exposing provider details", () => {
     expect(describeLiveAvailabilityError(new AwsEventsUnauthorizedError("token=secret"))).toContain("Inicia sesión")
     expect(describeLiveAvailabilityError(new AwsEventsForbiddenError())).toContain("registro")
     expect(describeLiveAvailabilityError(new AwsEventsThrottlingError())).toContain("limitando")
+    expect(describeLiveReservationError(new (class extends Error { statusCode = 404 })())).toContain("reserva")
+    expect(describeReservationFailures([{ code: "SessionFull" }])).toContain("llena")
+    expect(describeReservationFailures([{ code: "ScheduleConflict" }])).toContain("conflicto")
+    expect(describeReservationFailures([{ code: "AlreadyReserved" }])).toContain("ya estaba reservada")
   })
 
   it("uses Vite's same-origin AWS Events proxy during development", () => {

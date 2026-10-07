@@ -16,7 +16,7 @@ import { normalizeAwsSession } from '../normalizer/normalize-session.js';
 import { normalizeAwsAvailability } from '../normalizer/normalize-availability.js';
 import { SAMPLE_RAW_SESSIONS } from '../fixtures/sample-sessions.js';
 import { SAMPLE_USER_SCHEDULE } from '../fixtures/sample-user-schedule.js';
-import type { FavoriteMutationResult, RawAwsFavoriteMutationResponse, RawAwsScheduleResponse, UserScheduleItem, UserScheduleResult } from '../types/user-schedule.js';
+import type { FavoriteMutationResult, RawAwsFavoriteMutationResponse, RawAwsReservationMutationResponse, RawAwsScheduleResponse, ReservationMutationResult, UserScheduleItem, UserScheduleResult } from '../types/user-schedule.js';
 
 import type { TokenStore } from '../auth/token-store.js';
 
@@ -59,6 +59,7 @@ export class AwsEventsClient {
   private readonly mockSessions: readonly RawAwsSession[];
   private mockSchedule: UserScheduleResult;
   private mockFavoriteIds: Set<string>;
+  private mockReservedIds: Set<string>;
 
   constructor(options: AwsEventsClientOptions = {}) {
     this.baseUrl = options.baseUrl ?? 'https://api.awsevents.com/v1';
@@ -78,6 +79,7 @@ export class AwsEventsClient {
       items: SAMPLE_USER_SCHEDULE,
     };
     this.mockFavoriteIds = new Set(this.mockSchedule.favoriteSessionIds);
+    this.mockReservedIds = new Set(this.mockSchedule.reservedSessionIds);
   }
 
   /**
@@ -429,6 +431,47 @@ export class AwsEventsClient {
 
     const url = this.eventId ? this.eventUrl(`/favorites/${encodeURIComponent(sessionId)}`) : `${this.baseUrl}/user/favorites/${encodeURIComponent(sessionId)}`;
     await this.requestWithRetry<unknown>(url, 'DELETE', undefined, false);
+  }
+
+  /** Reserves one session and reports the provider result for that session. */
+  public async reserveSession(sessionId: string): Promise<ReservationMutationResult> {
+    if (this.mockMode) {
+      this.mockReservedIds.add(sessionId);
+      this.mockSchedule = { ...this.mockSchedule, reservedSessionIds: Array.from(this.mockReservedIds), items: this.mockSchedule.items };
+      return { successfulSessionIds: [sessionId], failed: [] };
+    }
+
+    const token = this.tokenStore?.getAccessToken();
+    if (!token) {
+      throw new AwsEventsUnauthorizedError('Cannot reserve a session without an active access token.');
+    }
+
+    const response = await this.requestWithRetry<RawAwsReservationMutationResponse>(
+      this.eventUrl('/reservations'),
+      'POST',
+      { sessionIds: [sessionId] },
+      false,
+    );
+    return {
+      successfulSessionIds: response.result.successful ?? [],
+      failed: response.result.failed ?? [],
+    };
+  }
+
+  /** Cancels one reservation. A 404 means the confirmed reservation is already absent. */
+  public async cancelReservation(sessionId: string): Promise<void> {
+    if (this.mockMode) {
+      this.mockReservedIds.delete(sessionId);
+      this.mockSchedule = { ...this.mockSchedule, reservedSessionIds: Array.from(this.mockReservedIds), items: this.mockSchedule.items };
+      return;
+    }
+
+    const token = this.tokenStore?.getAccessToken();
+    if (!token) {
+      throw new AwsEventsUnauthorizedError('Cannot cancel a reservation without an active access token.');
+    }
+
+    await this.requestWithRetry<unknown>(this.eventUrl(`/reservations/${encodeURIComponent(sessionId)}`), 'DELETE', undefined, false);
   }
 
   private eventUrl(path: string): string {

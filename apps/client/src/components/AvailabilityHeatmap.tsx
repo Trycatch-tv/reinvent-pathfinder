@@ -26,6 +26,8 @@ export interface AvailabilityHeatmapProps {
   readonly onRefreshSchedule?: () => void
   readonly onToggleFavorite?: (sessionId: string, isFavorite: boolean) => void
   readonly favoriteMutationSessionId?: string | null
+  readonly onToggleReservation?: (sessionId: string, isReserved: boolean) => void
+  readonly reservationMutationSessionId?: string | null
 }
 
 export function createAvailabilityProjection(
@@ -53,12 +55,15 @@ function uniqueSorted(values: readonly string[]): readonly string[] {
   return [...new Set(values)].sort()
 }
 
-function AvailabilityDetail({ selected, isFavorite, isReserved, onToggleFavorite, isMutatingFavorite }: {
+function AvailabilityDetail({ selected, isFavorite, isReserved, onToggleFavorite, isMutatingFavorite, onToggleReservation, isMutatingReservation, reservationUnavailableMessage }: {
   readonly selected: AvailabilityProjectedSession
   readonly isFavorite: boolean
   readonly isReserved: boolean
   readonly onToggleFavorite?: () => void
   readonly isMutatingFavorite: boolean
+  readonly onToggleReservation?: () => void
+  readonly isMutatingReservation: boolean
+  readonly reservationUnavailableMessage?: string
 }) {
   const { session, availability } = selected
 
@@ -80,6 +85,8 @@ function AvailabilityDetail({ selected, isFavorite, isReserved, onToggleFavorite
         {availability.lastUpdatedAt && <><dt>Actualizado</dt><dd>{availability.lastUpdatedAt}</dd></>}
       </dl>
       {onToggleFavorite && <button type="button" onClick={onToggleFavorite} disabled={isMutatingFavorite}>{isMutatingFavorite ? 'Actualizando favorito…' : isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}</button>}
+      {onToggleReservation && <button type="button" onClick={onToggleReservation} disabled={isMutatingReservation}>{isMutatingReservation ? 'Actualizando reserva…' : isReserved ? 'Cancelar reserva' : 'Reservar sesión'}</button>}
+      {reservationUnavailableMessage && <p role="status">{reservationUnavailableMessage}</p>}
     </aside>
   )
 }
@@ -101,6 +108,8 @@ export function AvailabilityHeatmap({
   onRefreshSchedule,
   onToggleFavorite,
   favoriteMutationSessionId = null,
+  onToggleReservation,
+  reservationMutationSessionId = null,
 }: AvailabilityHeatmapProps) {
   const days = uniqueSorted(sessions.flatMap((session) => session.schedule ? [session.schedule.day] : []))
   const venues = uniqueSorted(sessions.flatMap((session) => session.location ? [session.location.venue] : []))
@@ -179,7 +188,11 @@ export function AvailabilityHeatmap({
           </tbody>
         </table>
       </div>
-      {selected ? <AvailabilityDetail selected={selected} isFavorite={favoriteIds.has(selected.session.id)} isReserved={reservedIds.has(selected.session.id)} onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(selected.session.id, favoriteIds.has(selected.session.id)) : undefined} isMutatingFavorite={favoriteMutationSessionId === selected.session.id} /> : <p>No hay sesiones que coincidan con los filtros.</p>}
+      {selected ? (() => {
+        const isReserved = reservedIds.has(selected.session.id)
+        const canReserve = selected.availability.isReservable === true && (selected.availability.status === 'available' || selected.availability.status === 'limited')
+        return <AvailabilityDetail selected={selected} isFavorite={favoriteIds.has(selected.session.id)} isReserved={isReserved} onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(selected.session.id, favoriteIds.has(selected.session.id)) : undefined} isMutatingFavorite={favoriteMutationSessionId === selected.session.id} onToggleReservation={onToggleReservation && (isReserved || canReserve) ? () => onToggleReservation(selected.session.id, isReserved) : undefined} isMutatingReservation={reservationMutationSessionId === selected.session.id} reservationUnavailableMessage={!isReserved && onToggleReservation && !canReserve ? 'Reservas aún no disponibles para esta sesión.' : undefined} />
+      })() : <p>No hay sesiones que coincidan con los filtros.</p>}
     </section>
   )
 }

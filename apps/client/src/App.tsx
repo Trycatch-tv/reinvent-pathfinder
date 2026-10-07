@@ -82,6 +82,21 @@ export function describeLiveScheduleError(error: unknown): string {
   return describeLiveAvailabilityError(error).replace("la disponibilidad", "tu agenda")
 }
 
+export function describeLiveReservationError(error: unknown): string {
+  if (error instanceof AwsEventsNotFoundError || (error instanceof AwsEventsError && error.statusCode === 404)) {
+    return "Esa reserva ya no existe en AWS Events; actualiza tu agenda para reconciliarla."
+  }
+  return describeLiveAvailabilityError(error).replace("la disponibilidad", "tu reserva")
+}
+
+export function describeReservationFailures(failed: readonly { readonly code?: string }[]): string {
+  const codes = failed.map((failure) => failure.code?.toLowerCase() ?? "")
+  if (codes.some((code) => code.includes("full"))) return "La sesión está llena; se mostró la agenda confirmada."
+  if (codes.some((code) => code.includes("conflict"))) return "La sesión entra en conflicto con tu agenda; se mostró la agenda confirmada."
+  if (codes.some((code) => code.includes("already") || code.includes("reserved"))) return "La sesión ya estaba reservada; se mostró la agenda confirmada."
+  return `AWS Events rechazó ${failed.length} reserva(s); se mostró la agenda confirmada.`
+}
+
 export const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] =
     useState<AnalyzeContextResponse | null>(null)
@@ -101,6 +116,7 @@ export const App: React.FC = () => {
   const [scheduleMessage, setScheduleMessage] = useState<string | null>(null)
   const [isRefreshingSchedule, setIsRefreshingSchedule] = useState(false)
   const [favoriteMutationSessionId, setFavoriteMutationSessionId] = useState<string | null>(null)
+  const [reservationMutationSessionId, setReservationMutationSessionId] = useState<string | null>(null)
   const [route, setRoute] = useState(() => typeof window === "undefined" ? "/" : window.location.pathname)
   const isAvailabilityRoute = route === "/availability"
   const isCallbackRoute = route === "/callback"
@@ -270,6 +286,29 @@ export const App: React.FC = () => {
     }
   }
 
+  const handleToggleReservation = async (sessionId: string, isReserved: boolean) => {
+    if (!liveEventsClient || !scheduleSnapshot || !canLoadSchedule) return
+    setReservationMutationSessionId(sessionId)
+    setScheduleMessage(null)
+    try {
+      const result = isReserved
+        ? (await liveEventsClient.cancelReservation(sessionId), { successfulSessionIds: [sessionId], failed: [] })
+        : await liveEventsClient.reserveSession(sessionId)
+      const reconciled = await liveEventsClient.getPersonalSchedule()
+      setScheduleSnapshot(reconciled)
+      setScheduleMessage(result.failed.length ? describeReservationFailures(result.failed) : "Agenda reconciliada con AWS Events.")
+    } catch (err: unknown) {
+      try {
+        setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
+      } catch {
+        // Preserve the last confirmed schedule when reconciliation also fails.
+      }
+      setScheduleMessage(describeLiveReservationError(err))
+    } finally {
+      setReservationMutationSessionId(null)
+    }
+  }
+
   return (
     <div
       style={{
@@ -317,6 +356,8 @@ export const App: React.FC = () => {
           onRefreshSchedule={handleScheduleRefresh}
           onToggleFavorite={handleToggleFavorite}
           favoriteMutationSessionId={favoriteMutationSessionId}
+          onToggleReservation={handleToggleReservation}
+          reservationMutationSessionId={reservationMutationSessionId}
         />
       ) : isCallbackRoute ? (
         <BuilderIdLogin client={authClient} authenticated={isAuthenticated} onAuthenticated={() => { setIsAuthenticated(true); setRoute("/") }} onLogout={() => setIsAuthenticated(false)} />

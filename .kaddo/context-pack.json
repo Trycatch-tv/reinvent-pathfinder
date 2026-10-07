@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-06T23:40:33.324Z",
+  "generatedAt": "2026-10-07T00:51:45.052Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -509,6 +509,54 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-021",
+        "type": "feature",
+        "title": "Reserva y cancelación de sesiones desde Pathfinder",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-007",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-022",
+        "type": "feature",
+        "title": "Launcher local y distribución de la experiencia autenticada",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-008",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -991,6 +1039,54 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-021",
+        "type": "feature",
+        "title": "Reserva y cancelación de sesiones desde Pathfinder",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "aws-events",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-007",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-022",
+        "type": "feature",
+        "title": "Launcher local y distribución de la experiencia autenticada",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "experience",
+          "aws-events"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-008",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "artifacts": [
@@ -1223,6 +1319,33 @@
           "apps/client/src/components/AvailabilityHeatmap.tsx",
           "apps/client/src/client.test.ts"
         ]
+      },
+      {
+        "id": "WI-021",
+        "type": "feature",
+        "title": "Reserva y cancelación de sesiones desde Pathfinder",
+        "summary": "Pathfinder permite consultar disponibilidad y agenda, pero no reservar ni cancelar sesiones desde la experiencia autenticada con estado confirmado por AWS Events.",
+        "codeGlobs": [
+          "packages/events-client/src/types/user-schedule.ts",
+          "packages/events-client/src/client/aws-events-client.ts",
+          "packages/events-client/src/events-client.test.ts",
+          "apps/client/src/App.tsx",
+          "apps/client/src/components/AvailabilityHeatmap.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-022",
+        "type": "feature",
+        "title": "Launcher local y distribución de la experiencia autenticada",
+        "summary": "",
+        "codeGlobs": [
+          "package.json",
+          "apps/client/package.json",
+          "apps/client/vite.config.ts",
+          "apps/client/src/App.tsx",
+          "README.md"
+        ]
       }
     ]
   },
@@ -1282,6 +1405,8 @@
         "WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md",
         "WI-019-integraci-n-live-de-disponibilidad-con-aws-events.md",
         "WI-020-integraci-n-de-agenda-personal-y-favoritos.md",
+        "WI-021-reserva-y-cancelaci-n-de-sesiones-desde-pathfinder.md",
+        "WI-022-launcher-local-y-distribuci-n-de-la-experiencia-au.md",
         "roadmap.md"
       ]
     }
@@ -1318,17 +1443,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 20,
+    "materialized_work_items": 22,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 20,
+    "materialized": 22,
     "remaining": 0
   },
   "phase": {
     "phase": "Maintenance",
     "reasons": [
       "Roadmap available",
-      "20 materialized work item(s)",
+      "22 materialized work item(s)",
       "Ownership coverage 100%"
     ],
     "recommendedAgents": [
@@ -1357,8 +1482,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 20,
-    "ownership_coverage": "20/20",
+    "total_work_items": 22,
+    "ownership_coverage": "22/22",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1425,13 +1550,13 @@
     }
   },
   "workItemSummary": {
-    "total": 20,
+    "total": 22,
     "active": 0,
     "draft": 0,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 20,
+    "completed": 22,
     "archived": 0,
     "summary": "completed-only"
   },

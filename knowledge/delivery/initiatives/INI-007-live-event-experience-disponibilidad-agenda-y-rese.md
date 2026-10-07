@@ -75,11 +75,13 @@ candidates:
     expected_value: >-
       Reservas y cancelaciones con partial success y reconciliación posterior
       con GetSchedule.
+    materialized_as: WI-021
   - id: WI-CANDIDATE-008
     title: Launcher local y distribución de la experiencia autenticada
     type: feature
     suggested_knowledge_level: K2
     expected_value: Ejecución local compatible con el callback OAuth de AWS Events.
+    materialized_as: WI-022
 horizon: now
 priority: high
 ---
@@ -196,9 +198,8 @@ ningún Work Item en esta iniciativa.
   o no mapeados se representan como `unknown`; no se infiere capacidad ni disponibilidad.
   - note: Esto permite completar el primer slice con fixtures y protege a la UI contra cambios
     del proveedor. El mapping definitivo se verificará durante WI-CANDIDATE-005.
-- [deferred] Confirmar rutas y semántica del contrato OpenAPI para `ReserveSessions` y
-  `CancelReservation`.
-  - note: Solo bloquea WI-CANDIDATE-007; no bloquea el modelo, las fixtures ni el heatmap.
+- [resolved] `ReserveSessions` usa `POST /v1/events/{eventId}/reservations` con 1–10 IDs distintos y resultados por sesión; `CancelReservation` usa `DELETE /v1/events/{eventId}/reservations/{sessionId}` y devuelve `404` cuando no existe reserva.
+  - note: Confirmado contra la documentación oficial de AWS Events; `GetSchedule` seguirá siendo la reconciliación obligatoria.
 - [resolved] El primer release de la experiencia autenticada se ejecuta con `pnpm dev`.
   - note: Alineado con la decisión de distribución local del MVP en
     `knowledge/tech/codebase.md`. `npx reinvent-pathfinder` queda como extensión posterior.

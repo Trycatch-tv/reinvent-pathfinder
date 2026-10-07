@@ -25,7 +25,7 @@ Phase: Maintenance
 Reason:
 
 - Roadmap available
-- 20 materialized work item(s)
+- 22 materialized work item(s)
 - Ownership coverage 100%
 
 Recommended next: roadmap-agent
@@ -38,7 +38,7 @@ Next step: Use the roadmap-agent to plan the next initiative.
 - Draft Work Items: 0
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 20/20
+- Ownership coverage: 22/22
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -101,6 +101,8 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-018-integraci-n-del-login-con-aws-builder-id-en-apps-c.md
 - ✓ WI-019-integraci-n-live-de-disponibilidad-con-aws-events.md
 - ✓ WI-020-integraci-n-de-agenda-personal-y-favoritos.md
+- ✓ WI-021-reserva-y-cancelaci-n-de-sesiones-desde-pathfinder.md
+- ✓ WI-022-launcher-local-y-distribuci-n-de-la-experiencia-au.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -124,7 +126,7 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 20
+- Materialized Work Items: 22
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
@@ -155,6 +157,8 @@ No active work items found.
 - WI-018 [feature] owns: apps/client/src/App.tsx, apps/client/src/components/BuilderIdLogin.tsx, apps/client/src/auth/builder-id-transaction.ts, apps/client/src/client.test.ts
 - WI-019 [feature] owns: packages/events-client/src/types/raw-aws-events.ts, packages/events-client/src/normalizer/normalize-session.ts, packages/events-client/src/normalizer/normalize-availability.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts, apps/client/src/vite-env.d.ts, apps/client/vite.config.ts, packages/domain/src/types/session-candidate.ts, packages/domain/src/domain.test.ts
 - WI-020 [feature] owns: packages/events-client/src/types/user-schedule.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
+- WI-021 [feature] owns: packages/events-client/src/types/user-schedule.ts, packages/events-client/src/client/aws-events-client.ts, packages/events-client/src/events-client.test.ts, apps/client/src/App.tsx, apps/client/src/components/AvailabilityHeatmap.tsx, apps/client/src/client.test.ts
+- WI-022 [feature] owns: package.json, apps/client/package.json, apps/client/vite.config.ts, apps/client/src/App.tsx, README.md
 
 ## Mapped Modules
 

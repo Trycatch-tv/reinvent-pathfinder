@@ -222,6 +222,29 @@ describe('AWS Events Client & Normalizer', () => {
       await expect(client.removeFavorite('favorite-1')).rejects.toThrow(AwsEventsNotFoundError);
       expect(mockFetch).toHaveBeenCalledOnce();
     });
+
+    it('reports partial reservation results and does not treat a 200 as global success', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+        result: { successful: ['session-1'], failed: [{ sessionId: 'session-2', code: 'SessionFull' }] },
+      }), { status: 200 }));
+      vi.stubGlobal('fetch', mockFetch);
+      const client = new AwsEventsClient({ baseUrl: 'https://events.example/v1', eventId: 'evt-1', tokenStore: { getAccessToken: () => 'token' } as never });
+
+      const result = await client.reserveSession('session-1');
+
+      expect(mockFetch.mock.calls[0]?.[0]).toBe('https://events.example/v1/events/evt-1/reservations');
+      expect(mockFetch.mock.calls[0]?.[1]).toMatchObject({ method: 'POST', body: JSON.stringify({ sessionIds: ['session-1'] }) });
+      expect(result).toEqual({ successfulSessionIds: ['session-1'], failed: [{ sessionId: 'session-2', code: 'SessionFull' }] });
+    });
+
+    it('does not retry a missing reservation cancellation', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(new Response('Not Found', { status: 404 }));
+      vi.stubGlobal('fetch', mockFetch);
+      const client = new AwsEventsClient({ baseUrl: 'https://events.example/v1', eventId: 'evt-1', tokenStore: { getAccessToken: () => 'token' } as never, maxRetries: 3 });
+
+      await expect(client.cancelReservation('session-1')).rejects.toThrow(AwsEventsNotFoundError);
+      expect(mockFetch).toHaveBeenCalledOnce();
+    });
   });
 
   describe('AwsEventsClient Resilience & HTTP Retries', () => {
