@@ -34,6 +34,7 @@ candidates:
       Decisión (2026-10-07): landing dentro de apps/client (no apps/site
       separado), porque Netlify ya despliega apps/client. apps/site queda como
       placeholder.
+    materialized_as: WI-027
 horizon: later
 priority: low
 ---

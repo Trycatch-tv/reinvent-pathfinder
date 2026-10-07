@@ -37,6 +37,7 @@ import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
+import { LandingView } from "./components/LandingView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
@@ -209,6 +210,7 @@ export const App: React.FC = () => {
   )
   const isAvailabilityRoute = route === "/availability"
   const isCallbackRoute = route === "/callback"
+  const isAboutRoute = route === "/about"
   const availabilityView = selectAvailabilitySnapshot(liveSnapshot)
 
   useEffect(() => {
@@ -217,7 +219,7 @@ export const App: React.FC = () => {
     return () => window.removeEventListener("popstate", onPopState)
   }, [])
 
-  const navigate = (path: "/" | "/availability") => {
+  const navigate = (path: "/" | "/availability" | "/about") => {
     if (typeof window !== "undefined" && window.location.pathname !== path) {
       window.history.pushState({}, "", path)
     }
@@ -471,8 +473,19 @@ export const App: React.FC = () => {
           AI companion que transforma el catálogo de AWS re:Invent en una ruta
           de aprendizaje adaptativa.
         </p>
-        {!isAvailabilityRoute && (
-          <p style={{ marginBottom: 0 }}>
+        <p style={{ marginBottom: 0, display: "flex", gap: "1rem" }}>
+          {!isAboutRoute && (
+            <a
+              href="/about"
+              onClick={(event) => {
+                event.preventDefault()
+                navigate("/about")
+              }}
+            >
+              Qué es Pathfinder
+            </a>
+          )}
+          {!isAvailabilityRoute && (
             <a
               href="/availability"
               onClick={(event) => {
@@ -482,8 +495,8 @@ export const App: React.FC = () => {
             >
               Ver disponibilidad de sesiones
             </a>
-          </p>
-        )}
+          )}
+        </p>
         {!isCallbackRoute && (
           <BuilderIdLogin
             client={authClient}
@@ -497,7 +510,12 @@ export const App: React.FC = () => {
         )}
       </header>
 
-      {isAvailabilityRoute ? (
+      {isAboutRoute ? (
+        <LandingView
+          onNavigateDemo={() => navigate("/availability")}
+          onNavigateHome={() => navigate("/")}
+        />
+      ) : isAvailabilityRoute ? (
         <AvailabilityHeatmap
           sessions={availabilityView.sessions}
           availability={availabilityView.availability}

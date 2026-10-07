@@ -44,6 +44,7 @@ import {
 import { ContextForm } from "./components/ContextForm.js"
 import { KnowledgeGapsList } from "./components/KnowledgeGapsList.js"
 import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
+import { LandingView } from "./components/LandingView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
 import { ReflectionForm } from "./components/ReflectionForm.js"
@@ -600,5 +601,41 @@ describe("apps/client UI components", () => {
     expect(html).toContain("Pendientes:")
     expect(html).toContain("Ruta de aprendizaje posterior")
     expect(html).toContain("DynamoDB single-table")
+  })
+
+  it("LandingView explains the product, how to run it locally and links to demo/repo", () => {
+    const html = renderToString(
+      React.createElement(LandingView, {
+        onNavigateDemo: () => {},
+        onNavigateHome: () => {},
+      }),
+    )
+
+    expect(html).toContain("Qué es re:Invent Pathfinder")
+    expect(html).toContain("El ciclo de valor")
+    expect(html).toContain("Cómo lanzar la experiencia local")
+    expect(html).toContain("pnpm install")
+    expect(html).toContain("pnpm dev")
+    expect(html).toContain("https://github.com/Trycatch-tv/reinvent-pathfinder")
+    expect(html).toContain("AWS Builder Center")
+    expect(html).toContain("Ver demo de disponibilidad")
+  })
+
+  it("renders the public about landing route from App without requiring login", () => {
+    vi.stubGlobal("window", { location: { pathname: "/about" } })
+    try {
+      const html = renderToString(React.createElement(App))
+      expect(html).toContain("Qué es re:Invent Pathfinder")
+      expect(html).toContain("Ver demo de disponibilidad")
+      expect(html).not.toContain("Paso 1: ¿Qué estás construyendo?")
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it("links to the about landing from the header on the home route", () => {
+    const html = renderToString(React.createElement(App))
+    expect(html).toContain('href="/about"')
+    expect(html).toContain("Qué es Pathfinder")
   })
 })

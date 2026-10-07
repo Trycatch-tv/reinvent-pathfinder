@@ -30,7 +30,7 @@
     "hasSkills": true
   },
   "workItems": {
-    "total": 26,
+    "total": 27,
     "inProgress": 0,
     "done": 0,
     "cancelled": 0,
@@ -39,12 +39,12 @@
       "ready": 0,
       "in-progress": 0,
       "blocked": 0,
-      "completed": 26,
+      "completed": 27,
       "archived": 0
     },
     "byType": {
       "chore": 3,
-      "feature": 20,
+      "feature": 21,
       "spike": 1,
       "bugfix": 2
     },
@@ -100,7 +100,7 @@
           "ready": 0,
           "in-progress": 0,
           "blocked": 0,
-          "completed": 1,
+          "completed": 2,
           "archived": 0
         }
       },
@@ -631,12 +631,31 @@
           "id": "WI-CANDIDATE-001",
           "inferred": true
         }
+      },
+      {
+        "id": "WI-027",
+        "title": "Landing/demo pública dentro de apps/client para Builder Center",
+        "type": "feature",
+        "status": "completed",
+        "lifecycle": "completed",
+        "initiative": "INI-005",
+        "knowledgeLevel": "K2",
+        "hasOwnership": true,
+        "domains": [
+          "product",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true
+        }
       }
     ]
   },
   "ownership": {
-    "workItemsTotal": 26,
-    "workItemsWithOwnership": 26,
+    "workItemsTotal": 27,
+    "workItemsWithOwnership": 27,
     "workItemsMissingOwnership": 0
   },
   "domains": [
@@ -706,6 +725,10 @@
         {
           "id": "WI-016",
           "title": "Motor de proyección y filtrado para Availability Heatmap"
+        },
+        {
+          "id": "WI-027",
+          "title": "Landing/demo pública dentro de apps/client para Builder Center"
         }
       ]
     },
@@ -850,6 +873,7 @@
         "WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md",
         "WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md",
         "WI-026-learning-report-y-ruta-post-evento.md",
+        "WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md",
         "roadmap.md"
       ]
     }
@@ -858,10 +882,10 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 26,
+    "materialized_work_items": 27,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 26,
+    "materialized": 27,
     "remaining": 0
   },
   "missingKnowledge": [],
@@ -1325,7 +1349,7 @@
   },
   "isModuleRepo": false,
   "deliverySummary": {
-    "completedWorkItems": 26,
+    "completedWorkItems": 27,
     "archivedWorkItems": 0,
     "activeWorkItems": 0,
     "implementationCompleted": 17,
@@ -1776,6 +1800,19 @@
           "status": "completed"
         }
       }
+    },
+    {
+      "id": "WI-027",
+      "lifecycle": "completed",
+      "implementationStatus": "not-assessed",
+      "validationStatus": "not-assessed",
+      "releaseStatus": "not-assessed",
+      "affectedModules": [
+        "reinvent-pathfinder"
+      ],
+      "releaseGates": [],
+      "completionExceptions": [],
+      "repoEvidence": {}
     }
   ],
   "mapped_modules": [
