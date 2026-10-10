@@ -13,8 +13,10 @@
 ## Current Phase
 
 - Phase: Active Delivery
-- Next step: Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
-- Reason: 2 blocking open question(s) remain.
+- Recommended agent: work-item-agent
+- Recommended skill: work-item-refinement
+- Next step: Refine the existing draft Work Item with the work-item-agent.
+- Reason: There is 1 draft Work Item. Refine before defining roadmap candidates.
 
 ## Delivery State
 
@@ -22,7 +24,7 @@
 - Ready Work Items: 0
 - In-progress Work Items: 0
 - Blocked Work Items: 0
-- Ownership coverage: 27/28
+- Ownership coverage: 28/29
 - Remaining Work Item candidates: 0
 - Technical decision candidates: 0
 - Accepted ADRs: 0
@@ -37,11 +39,19 @@ Warnings:
 
 ## Recommended Agent Flow
 
+1. work-item-agent
+2. `kaddo owners suggest`
+
 ## Primary Recommendation
 
-- id: questions
-- command: `kaddo questions`
-- reason: 2 blocking open question(s) remain.
+- id: refine-work-item
+- agent: work-item-agent
+- skill: work-item-refinement
+- reason: There is 1 draft Work Item. Refine before defining roadmap candidates.
+
+## Secondary Recommendations
+
+1. Run `kaddo owners suggest` for Work Items without code ownership.
 
 ## Active Work Items
 
@@ -54,20 +64,33 @@ Use `.kaddo/context-pack.md` as the primary input.
 
 ## Agent Prompts
 
+Use:
+
+- `knowledge/agents/delivery/work-item-agent.md`
+- `knowledge/skills/work-item-refinement/skill.md`
 - `.kaddo/context-pack.md`
 
 ## Expected Outputs
 
-_See the primary recommendation above._
+The LLM should produce:
+
+- Refined Work Item content.
 
 ## Copy/Paste Instructions
 
-Paste `.kaddo/context-pack.md` into your LLM chat.
+Paste the following into your LLM chat:
+
+1. `knowledge/agents/delivery/work-item-agent.md`
+2. `knowledge/skills/work-item-refinement/skill.md`
+3. `.kaddo/context-pack.md`
+
+Ask the LLM to follow the work-item-agent instructions.
 
 ## Next Steps
 
-1. Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
-2. Re-run `kaddo explain`.
+1. Refine the existing draft Work Item with the work-item-agent.
+2. Run `kaddo owners suggest` for Work Items without code ownership.
+3. Re-run `kaddo explain`.
 
 ## Metadata Health
 

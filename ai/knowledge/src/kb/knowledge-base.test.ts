@@ -5,6 +5,7 @@ import {
   BedrockAgentRuntimeKnowledgeBaseClient,
 } from '../index.js';
 import type { SessionCandidate, KnowledgeGap } from '@pathfinder/domain';
+import type { BedrockAgentRuntimeClient } from '@aws-sdk/client-bedrock-agent-runtime';
 
 describe('Bedrock Managed Knowledge Base Ingestion & Semantic Retrieval', () => {
   const sampleSessions: readonly SessionCandidate[] = [
@@ -155,6 +156,129 @@ describe('Bedrock Managed Knowledge Base Ingestion & Semantic Retrieval', () => 
 
       expect(result.items.length).toBeGreaterThan(0);
       expect(result.items[0]?.session.code).toBe('SEC305');
+    });
+
+    it('executes RetrieveCommand via BedrockAgentRuntimeClient and maps retrieval results with scores', async () => {
+      const mockClient = {
+        send: async () => ({
+          retrievalResults: [
+            {
+              content: {
+                text: 'Session Code: AIM301\nTitle: Building Autonomous Multi-Agent Systems with Amazon Bedrock AgentCore\nFormat: breakout\nLevel: 300\nTopics: Generative AI, Agentic Workflows\n\nDescription:\nLearn how to architect, test, and deploy resilient AI agents using Amazon Bedrock AgentCore runtime and Strands SDK.',
+              },
+              score: 0.94,
+              metadata: {
+                sessionId: 'sess-aim-301',
+                code: 'AIM301',
+                level: 300,
+                format: 'breakout',
+                topics: ['Generative AI', 'Agentic Workflows'],
+              },
+            },
+            {
+              content: {
+                text: 'Session Code: DAT304\nTitle: Advanced DynamoDB Design Patterns\nLevel: 300\nTopics: DynamoDB\n\nDescription: Single table patterns.',
+              },
+              score: 0.81,
+              metadata: {
+                sessionId: 'sess-dat-304',
+                code: 'DAT304',
+                level: 300,
+                format: 'breakout',
+                topics: ['DynamoDB'],
+              },
+            },
+          ],
+        }),
+      };
+
+      const client = new BedrockAgentRuntimeKnowledgeBaseClient({
+        knowledgeBaseId: 'kb-test-12345',
+        region: 'us-east-1',
+        client: mockClient as unknown as BedrockAgentRuntimeClient,
+        fallbackSessions: sampleSessions,
+      });
+
+      expect(client.knowledgeBaseId).toBe('kb-test-12345');
+      expect(client.region).toBe('us-east-1');
+
+      const result = await client.retrieve({
+        text: 'Autonomous agents on Bedrock',
+        maxResults: 2,
+      });
+
+      expect(result.items).toHaveLength(2);
+      expect(result.totalRetrieved).toBe(2);
+      expect(result.items[0]?.session.code).toBe('AIM301');
+      expect(result.items[0]?.score).toBe(0.94);
+      expect(result.items[0]?.excerpt).toContain('Building Autonomous Multi-Agent Systems');
+      expect(result.items[1]?.session.code).toBe('DAT304');
+      expect(result.items[1]?.score).toBe(0.81);
+    });
+
+    it('retrieves results for a KnowledgeGap using Bedrock Knowledge Base', async () => {
+      const mockClient = {
+        send: async () => ({
+          retrievalResults: [
+            {
+              content: {
+                text: 'Title: Advanced DynamoDB Design Patterns\nDescription: Deep dive into modeling.',
+              },
+              score: 0.92,
+              metadata: {
+                sessionId: 'sess-dat-304',
+                code: 'DAT304',
+                level: 300,
+                format: 'breakout',
+                topics: ['Amazon DynamoDB'],
+              },
+            },
+          ],
+        }),
+      };
+
+      const client = new BedrockAgentRuntimeKnowledgeBaseClient({
+        knowledgeBaseId: 'kb-test-12345',
+        client: mockClient as unknown as BedrockAgentRuntimeClient,
+        fallbackSessions: sampleSessions,
+      });
+
+      const gap: KnowledgeGap = {
+        id: 'gap-dynamo',
+        topic: 'DynamoDB Single-Table Design',
+        description: 'Advanced NoSQL composite keys.',
+        targetProficiency: 'professional',
+        severity: 'critical',
+        status: 'open',
+        rationale: 'Project requires low-latency persistence.',
+        addressedBySessionIds: [],
+      };
+
+      const result = await client.retrieveForGap(gap);
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0]?.session.code).toBe('DAT304');
+      expect(result.items[0]?.score).toBe(0.92);
+    });
+
+    it('gracefully degrades to in-memory fallback when BedrockAgentRuntimeClient throws an exception', async () => {
+      const failingClient = {
+        send: async () => {
+          throw new Error('AccessDeniedException: User is not authorized to perform: bedrock:Retrieve');
+        },
+      };
+
+      const client = new BedrockAgentRuntimeKnowledgeBaseClient({
+        knowledgeBaseId: 'kb-test-unauthorized',
+        client: failingClient as unknown as BedrockAgentRuntimeClient,
+        fallbackSessions: sampleSessions,
+      });
+
+      const result = await client.retrieve({
+        text: 'Multi-agent workflows with Bedrock AgentCore',
+      });
+
+      expect(result.items.length).toBeGreaterThan(0);
+      expect(result.items[0]?.session.code).toBe('AIM301');
     });
   });
 });

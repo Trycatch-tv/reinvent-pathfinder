@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-10T23:32:22.234Z",
+  "generatedAt": "2026-10-10T23:45:01.339Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -708,6 +708,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-028",
+        "type": "feature",
+        "title": "Ingesta real a Amazon Bedrock Managed Knowledge Bases (embeddings + Retrieve)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -1360,6 +1384,30 @@
         ]
       },
       {
+        "id": "WI-028",
+        "type": "feature",
+        "title": "Ingesta real a Amazon Bedrock Managed Knowledge Bases (embeddings + Retrieve)",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
         "id": "WI-026",
         "type": "feature",
         "title": "Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery",
@@ -1684,6 +1732,19 @@
         "codeGlobs": [
           "apps/client/**"
         ]
+      },
+      {
+        "id": "WI-028",
+        "type": "feature",
+        "title": "Ingesta real a Amazon Bedrock Managed Knowledge Bases (embeddings + Retrieve)",
+        "summary": "",
+        "codeGlobs": [
+          "ai/knowledge/package.json",
+          "ai/knowledge/src/kb/knowledge-base-client.ts",
+          "ai/knowledge/src/kb/session-document-transformer.ts",
+          "ai/knowledge/src/kb/types.ts",
+          "ai/knowledge/src/kb/knowledge-base.test.ts"
+        ]
       }
     ]
   },
@@ -1751,6 +1812,7 @@
         "WI-026-learning-report-y-ruta-post-evento.md",
         "WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md",
         "WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md",
+        "WI-028-ingesta-real-a-amazon-bedrock-managed-knowledge-ba.md",
         "roadmap.md"
       ]
     }
@@ -1787,25 +1849,24 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 28,
+    "materialized_work_items": 29,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 28,
+    "materialized": 29,
     "remaining": 0
   },
   "phase": {
     "phase": "Active Delivery",
     "reasons": [
       "Roadmap available",
-      "28 materialized work item(s)",
+      "29 materialized work item(s)",
       "draft: 1",
-      "Ownership coverage 96%"
+      "Ownership coverage 97%"
     ],
     "recommendedAgents": [
-      "work-item-agent",
-      "kaddo owners suggest"
+      "work-item-agent"
     ],
-    "nextStep": "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.",
+    "nextStep": "Refine the existing draft Work Item with the work-item-agent.",
     "llmInstructions": [
       "Refine draft Work Items to ready.",
       "Use the work-item-agent.",
@@ -1814,14 +1875,23 @@
     ]
   },
   "nextStepRecommendation": {
-    "id": "questions",
-    "phase": "Knowledge Refinement",
-    "label": "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.",
-    "command": "kaddo questions",
-    "reason": "2 blocking open question(s) remain."
+    "id": "refine-work-item",
+    "phase": "Active Delivery",
+    "label": "Refine the existing draft Work Item with the work-item-agent.",
+    "agent": "work-item-agent",
+    "skill": "work-item-refinement",
+    "reason": "There is 1 draft Work Item. Refine before defining roadmap candidates.",
+    "secondary": [
+      {
+        "id": "suggest-ownership",
+        "label": "Run `kaddo owners suggest` for Work Items without code ownership.",
+        "command": "kaddo owners suggest",
+        "reason": "Ownership coverage is 28/29."
+      }
+    ]
   },
   "deliveryState": {
-    "phase": "Knowledge Refinement",
+    "phase": "Active Delivery",
     "draft_work_items": 1,
     "refined_draft_work_items": 0,
     "refined_draft_ids": [],
@@ -1830,8 +1900,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 28,
-    "ownership_coverage": "27/28",
+    "total_work_items": 29,
+    "ownership_coverage": "28/29",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1898,13 +1968,13 @@
     }
   },
   "workItemSummary": {
-    "total": 28,
+    "total": 29,
     "active": 1,
     "draft": 1,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 27,
+    "completed": 28,
     "archived": 0,
     "summary": "draft-only"
   },
@@ -2064,7 +2134,7 @@
         "id": "suggest-ownership",
         "label": "Suggest ownership",
         "status": "next",
-        "reason": "Ownership coverage is 27/28.",
+        "reason": "Ownership coverage is 28/29.",
         "command": "kaddo owners suggest"
       },
       {
@@ -2137,11 +2207,10 @@
   ],
   "handoff": {
     "recommendedAgents": [
-      "work-item-agent",
-      "kaddo owners suggest"
+      "work-item-agent"
     ],
     "nextSteps": [
-      "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions."
+      "Refine the existing draft Work Item with the work-item-agent."
     ],
     "instructions": [
       "Refine draft Work Items to ready.",

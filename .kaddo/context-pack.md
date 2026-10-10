@@ -26,29 +26,34 @@ Phase: Active Delivery
 Reason:
 
 - Roadmap available
-- 28 materialized work item(s)
+- 29 materialized work item(s)
 - draft: 1
-- Ownership coverage 96%
+- Ownership coverage 97%
 
-Recommended next: work-item-agent, kaddo owners suggest
+Recommended next: work-item-agent
 
-Next step: Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
+Next step: Refine the existing draft Work Item with the work-item-agent.
 
 ## Delivery State
 
-- Phase: Knowledge Refinement
+- Phase: Active Delivery
 - Draft Work Items: 1
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 27/28
+- Ownership coverage: 28/29
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
-  - id: questions
-  - reason: 2 blocking open question(s) remain.
-  - command: `kaddo questions`
+- Refine the existing draft Work Item with the work-item-agent.
+  - id: refine-work-item
+  - reason: There is 1 draft Work Item. Refine before defining roadmap candidates.
+  - agent: work-item-agent
+  - skill: work-item-refinement
+
+Also (secondary):
+
+- Run `kaddo owners suggest` for Work Items without code ownership.
 
 ## Project Route
 
@@ -111,6 +116,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-026-learning-report-y-ruta-post-evento.md
 - ✓ WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md
 - ✓ WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md
+- ✓ WI-028-ingesta-real-a-amazon-bedrock-managed-knowledge-ba.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -134,7 +140,7 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 28
+- Materialized Work Items: 29
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
@@ -179,6 +185,7 @@ Active Work Items by type:
 - WI-025 [feature] owns: ai/knowledge/package.json, ai/knowledge/src/context-analyzer.ts, ai/knowledge/src/context-analyzer.test.ts, ai/knowledge/src/recommendations/session-reranker.ts, ai/knowledge/src/recommendations/recommendations.test.ts
 - WI-026 [feature] owns: ai/knowledge/**, apps/client/**
 - WI-027 [feature] owns: apps/client/**
+- WI-028 [feature] owns: ai/knowledge/package.json, ai/knowledge/src/kb/knowledge-base-client.ts, ai/knowledge/src/kb/session-document-transformer.ts, ai/knowledge/src/kb/types.ts, ai/knowledge/src/kb/knowledge-base.test.ts
 
 ## Mapped Modules
 
@@ -253,11 +260,10 @@ Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (
 Recommended next for the **Active Delivery** phase:
 
 1. work-item-agent
-2. kaddo owners suggest
 
 Next step:
 
-- Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
+- Refine the existing draft Work Item with the work-item-agent.
 
 ## Instructions for the LLM
 

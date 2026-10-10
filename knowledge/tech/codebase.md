@@ -302,10 +302,12 @@ desarrollar la experiencia local-first.
 
 Preguntas realmente abiertas (las resueltas durante la entrega ya no se listan):
 
-- [open] **Despliegue de `services/api`.** Falta activar el despliegue serverless real y definir su
+- [deferred] **Despliegue de `services/api`.** Falta activar el despliegue serverless real y definir su
   pipeline; hoy existe código y tests pero no despliegue.
+  - note: Aplazado para el pipeline de infraestructura cloud posterior al bloque de inferencia.
 - [open] **Bloque IA real (INI-006).** Topología final de agentes, IaC (`agentcore deploy` vs. otro),
   modelo Bedrock y límite Lambda ↔ AgentCore. Pertenece a INI-006, aún no implementado.
-- [open] **Persistencia DynamoDB.** `packages/data` tiene base pero sin modelo single-table definido
+- [deferred] **Persistencia DynamoDB.** `packages/data` tiene base pero sin modelo single-table definido
   ni tests; definir keys y retención cuando se active persistencia central.
+  - note: Aplazado; el cliente opera en arquitectura local-first con storage del navegador en MVP.
 - [open] **E2E.** Introducir Playwright para los journeys críticos.

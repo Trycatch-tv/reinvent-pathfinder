@@ -39,6 +39,7 @@ candidates:
       embeddings y frecuencia de sincronización desde AWS Events API. Hoy existe
       InMemoryKnowledgeBaseRetriever (offline) y SessionDocumentTransformer;
       falta la KB real + Retrieve API.
+    materialized_as: WI-028
   - id: WI-CANDIDATE-003
     title: Despliegue del runtime agentic en Amazon Bedrock AgentCore
     type: feature

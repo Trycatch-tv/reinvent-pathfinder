@@ -113,9 +113,16 @@ export class InMemoryKnowledgeBaseRetriever implements KnowledgeBaseRetriever {
   }
 }
 
+import {
+  BedrockAgentRuntimeClient,
+  RetrieveCommand,
+  type RetrieveCommandInput,
+} from '@aws-sdk/client-bedrock-agent-runtime';
+
 export interface BedrockKnowledgeBaseClientOptions {
   readonly knowledgeBaseId?: string;
   readonly region?: string;
+  readonly client?: BedrockAgentRuntimeClient;
   readonly fallbackSessions?: readonly SessionCandidate[];
 }
 
@@ -125,32 +132,140 @@ export interface BedrockKnowledgeBaseClientOptions {
  * or falls back seamlessly to InMemoryKnowledgeBaseRetriever.
  */
 export class BedrockAgentRuntimeKnowledgeBaseClient implements KnowledgeBaseRetriever {
-  private readonly knowledgeBaseId?: string;
+  public readonly knowledgeBaseId?: string;
+  public readonly region: string;
+  private readonly client?: BedrockAgentRuntimeClient;
+  private readonly fallbackSessions: readonly SessionCandidate[];
   private readonly fallbackRetriever: InMemoryKnowledgeBaseRetriever;
 
   constructor(options: BedrockKnowledgeBaseClientOptions = {}) {
     this.knowledgeBaseId = options.knowledgeBaseId ?? process.env.KNOWLEDGE_BASE_ID;
-    this.fallbackRetriever = new InMemoryKnowledgeBaseRetriever(options.fallbackSessions ?? []);
+    this.region = options.region ?? process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-1';
+    this.fallbackSessions = options.fallbackSessions ?? [];
+    this.fallbackRetriever = new InMemoryKnowledgeBaseRetriever(this.fallbackSessions);
+
+    if (options.client) {
+      this.client = options.client;
+    } else if (this.knowledgeBaseId) {
+      this.client = new BedrockAgentRuntimeClient({ region: this.region });
+    }
   }
 
   public async retrieve(query: KnowledgeRetrievalQuery): Promise<KnowledgeRetrievalResult> {
-    if (!this.knowledgeBaseId) {
+    if (!this.knowledgeBaseId || !this.client) {
       return this.fallbackRetriever.retrieve(query);
     }
 
     try {
-      // In live cloud mode with AWS SDK, BedrockAgentRuntimeClient.send(new RetrieveCommand(...))
-      // For now, fallback cleanly until live infrastructure is deployed
-      return await this.fallbackRetriever.retrieve(query);
+      const maxResults = query.maxResults ?? 5;
+      const minScore = query.minScore ?? 0.1;
+
+      const input: RetrieveCommandInput = {
+        knowledgeBaseId: this.knowledgeBaseId,
+        retrievalQuery: {
+          text: query.text,
+        },
+        retrievalConfiguration: {
+          vectorSearchConfiguration: {
+            numberOfResults: maxResults,
+          },
+        },
+      };
+
+      const response = await this.client.send(new RetrieveCommand(input));
+      const retrievalResults = response.retrievalResults ?? [];
+
+      if (retrievalResults.length === 0) {
+        return {
+          items: [],
+          totalRetrieved: 0,
+          query: query.text,
+        };
+      }
+
+      const items: KnowledgeRetrievalItem[] = [];
+
+      for (let idx = 0; idx < retrievalResults.length; idx++) {
+        const result = retrievalResults[idx];
+        if (!result) continue;
+
+        const rawScore = result.score ?? 0.8;
+        const normalizedScore = Math.min(1, Math.round(rawScore * 100) / 100);
+        if (normalizedScore < minScore) continue;
+
+        const metadata = (result.metadata ?? {}) as Record<string, unknown>;
+        const metaSessionId = typeof metadata['sessionId'] === 'string' ? metadata['sessionId'] : undefined;
+        const metaCode = typeof metadata['code'] === 'string' ? metadata['code'] : undefined;
+        const metaLevel = typeof metadata['level'] === 'number' ? metadata['level'] : undefined;
+        const metaFormat = typeof metadata['format'] === 'string' ? metadata['format'] : undefined;
+        const metaTopics = Array.isArray(metadata['topics'])
+          ? (metadata['topics'] as string[])
+          : undefined;
+
+        // Apply metadata filters if present
+        if (query.filter?.level && metaLevel !== undefined && metaLevel !== query.filter.level) {
+          continue;
+        }
+        if (query.filter?.format && metaFormat !== undefined && metaFormat !== query.filter.format) {
+          continue;
+        }
+        if (query.filter?.topic && metaTopics) {
+          const targetTopic = query.filter.topic.toLowerCase();
+          const hasTopic = metaTopics.some((t) => t.toLowerCase().includes(targetTopic));
+          if (!hasTopic) continue;
+        }
+
+        const content = result.content?.text ?? '';
+        const matchedCandidate = this.fallbackSessions.find(
+          (s) => (metaSessionId && s.id === metaSessionId) || (metaCode && s.code === metaCode)
+        );
+
+        const session: SessionCandidate = matchedCandidate ?? {
+          id: metaSessionId ?? `kb-doc-${idx + 1}`,
+          code: metaCode ?? `SESS-${idx + 1}`,
+          title: this.extractTitleFromContent(content) || 're:Invent Session',
+          description: content,
+          level: (metaLevel as 100 | 200 | 300 | 400) ?? 200,
+          format: (metaFormat as SessionCandidate['format']) ?? 'breakout',
+          topics: metaTopics ?? ['AWS', 'Cloud'],
+        };
+
+        const excerpt = content.length > 160 ? `${content.slice(0, 160)}...` : content;
+        const matchedTopics = session.topics.slice(0, 2);
+
+        items.push({
+          session,
+          score: normalizedScore,
+          matchedTopics: matchedTopics.length > 0 ? matchedTopics : ['Cloud'],
+          excerpt: excerpt || session.description,
+        });
+      }
+
+      return {
+        items,
+        totalRetrieved: items.length,
+        query: query.text,
+      };
     } catch {
       return this.fallbackRetriever.retrieve(query);
     }
   }
 
   public async retrieveForGap(gap: KnowledgeGap, maxResults = 5): Promise<KnowledgeRetrievalResult> {
+    const queryText = `${gap.topic} ${gap.description} ${gap.rationale}`;
     return this.retrieve({
-      text: `${gap.topic} ${gap.description}`,
+      text: queryText,
       maxResults,
     });
+  }
+
+  private extractTitleFromContent(content: string): string | undefined {
+    const lines = content.split('\n');
+    for (const line of lines) {
+      if (line.startsWith('Title:')) {
+        return line.replace('Title:', '').trim();
+      }
+    }
+    return lines[0]?.trim();
   }
 }
