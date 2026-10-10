@@ -1,7 +1,7 @@
 ---
 type: agent
 name: implementation-agent
-version: 3.115.0
+version: 3.121.2
 group: delivery
 ---
 # Implementation Agent
@@ -157,6 +157,7 @@ Apply these reusable skills when relevant (install with `kaddo add skills`; read
 - **implementation-planning** — Implementation Planning Skill.
 - **evidence-verification** — Evidence Verification Skill.
 - **legacy-risk-assessment** — Legacy Risk Assessment Skill.
+- **poc-report-writing** — POC Final Report Writing Skill.
 
 ## Agent Trace
 

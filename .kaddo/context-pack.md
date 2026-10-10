@@ -14,43 +14,45 @@
 
 - Name: pathfinder
 - State: new
+- Mode: standard
 - Team size: small
 - Structure: monorepo
 - Language: Spanish
 
 ## Current Phase
 
-Phase: Maintenance
+Phase: Active Delivery
 
 Reason:
 
 - Roadmap available
-- 27 materialized work item(s)
-- Ownership coverage 100%
+- 28 materialized work item(s)
+- draft: 1
+- Ownership coverage 96%
 
-Recommended next: roadmap-agent
+Recommended next: work-item-agent, kaddo owners suggest
 
-Next step: Use the roadmap-agent to plan the next initiative.
+Next step: Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
 
 ## Delivery State
 
-- Phase: Maintenance
-- Draft Work Items: 0
+- Phase: Knowledge Refinement
+- Draft Work Items: 1
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 27/27
+- Ownership coverage: 27/28
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
 
-- Use the roadmap-agent to plan the next initiative.
-  - id: plan-next
-  - reason: No active Work Items and no remaining roadmap candidates.
-  - agent: roadmap-agent
+- Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
+  - id: questions
+  - reason: 2 blocking open question(s) remain.
+  - command: `kaddo questions`
 
 ## Project Route
 
-Route: new · Progress: 10/12
+Route: new · Progress: 9/12
 
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
@@ -107,6 +109,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md
 - ✓ WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md
 - ✓ WI-026-learning-report-y-ruta-post-evento.md
+- ✓ WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md
 - ✓ WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md
 - ✓ roadmap.md
 
@@ -125,20 +128,27 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 
 ## Current Knowledge
 
-> What is true about this product right now.
+No project knowledge summary found yet.
 
 ## Roadmap Status
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 27
+- Materialized Work Items: 28
 - Remaining Work Item candidates: 0
 
-> What we intend to build and why.
+No roadmap baseline found.
 
 ## Active Work Items
 
-No active work items found.
+- WI-026 [feature] (draft) — Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery
+  - Source: chat
+
+## Delivery Mix
+
+Active Work Items by type:
+
+- Features: 1
 
 ## Artifacts and Ownership
 
@@ -221,13 +231,15 @@ Available reusable skills (agents apply these; content is not inlined):
 - legacy-risk-assessment
 - module-context-refinement
 - ownership-suggestion
+- poc-report-writing
 - work-item-refinement
 
 Read full skill definitions in `knowledge/skills/` or via the Kaddo MCP server (`kaddo://skills`).
 
 ## Missing Context
 
-_None — all expected context is present._
+- No project knowledge summary found yet.
+- No roadmap baseline found.
 
 
 ### Metadata Health
@@ -238,15 +250,18 @@ _None — all expected context is present._
 
 ## Recommended Agent Handoff
 
-Recommended next for the **Maintenance** phase:
+Recommended next for the **Active Delivery** phase:
 
-1. roadmap-agent
+1. work-item-agent
+2. kaddo owners suggest
 
 Next step:
 
-- Use the roadmap-agent to plan the next initiative.
+- Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
 
 ## Instructions for the LLM
 
-- No active work.
-- Use the roadmap-agent to plan the next initiative.
+- Refine draft Work Items to ready.
+- Use the work-item-agent.
+- Do not implement unless the user explicitly asks.
+- Ownership is incomplete — propose `code:` globs (run `kaddo owners suggest`).

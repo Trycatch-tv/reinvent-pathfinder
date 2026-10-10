@@ -1,7 +1,7 @@
 ---
 type: agent
 name: backlog-agent
-version: 3.115.0
+version: 3.121.2
 group: delivery
 ---
 # Backlog Agent

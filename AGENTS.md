@@ -110,6 +110,7 @@ task — do not load every skill by default.
 - `legacy-risk-assessment`
 - `module-context-refinement`
 - `ownership-suggestion`
+- `poc-report-writing`
 - `work-item-refinement`
 
 ## Command fallback

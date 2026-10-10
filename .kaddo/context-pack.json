@@ -1,9 +1,10 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-07T04:55:27.082Z",
+  "generatedAt": "2026-10-10T23:32:22.234Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
+    "mode": "standard",
     "teamSize": "small",
     "structure": "monorepo",
     "language": "Spanish"
@@ -25,11 +26,41 @@
     ]
   },
   "knowledge": {
-    "summary": "> What is true about this product right now.",
-    "roadmapSummary": "> What we intend to build and why.",
+    "summary": "",
+    "roadmapSummary": "",
     "inventoryAvailable": true,
-    "workItems": [],
-    "activeWorkItems": [],
+    "workItems": [
+      {
+        "id": "WI-026",
+        "type": "feature",
+        "title": "Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery",
+        "status": "draft",
+        "lifecycle": "draft",
+        "knowledgeLevel": "",
+        "domains": [],
+        "source": {
+          "type": "chat",
+          "imported_at": "2026-10-09",
+          "inferred": false
+        }
+      }
+    ],
+    "activeWorkItems": [
+      {
+        "id": "WI-026",
+        "type": "feature",
+        "title": "Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery",
+        "status": "draft",
+        "lifecycle": "draft",
+        "knowledgeLevel": "",
+        "domains": [],
+        "source": {
+          "type": "chat",
+          "imported_at": "2026-10-09",
+          "inferred": false
+        }
+      }
+    ],
     "completedWorkItems": [
       {
         "id": "WI-001",
@@ -1327,6 +1358,20 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-026",
+        "type": "feature",
+        "title": "Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery",
+        "status": "draft",
+        "lifecycle": "draft",
+        "knowledgeLevel": "",
+        "domains": [],
+        "source": {
+          "type": "chat",
+          "imported_at": "2026-10-09",
+          "inferred": false
+        }
       }
     ],
     "artifacts": [
@@ -1704,6 +1749,7 @@
         "WI-024-visibilidad-de-agenda-y-confirmaci-n-de-reservas.md",
         "WI-025-integraci-n-del-sdk-de-bedrock-y-activaci-n-de-ana.md",
         "WI-026-learning-report-y-ruta-post-evento.md",
+        "WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md",
         "WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md",
         "roadmap.md"
       ]
@@ -1741,38 +1787,42 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 27,
+    "materialized_work_items": 28,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 27,
+    "materialized": 28,
     "remaining": 0
   },
   "phase": {
-    "phase": "Maintenance",
+    "phase": "Active Delivery",
     "reasons": [
       "Roadmap available",
-      "27 materialized work item(s)",
-      "Ownership coverage 100%"
+      "28 materialized work item(s)",
+      "draft: 1",
+      "Ownership coverage 96%"
     ],
     "recommendedAgents": [
-      "roadmap-agent"
+      "work-item-agent",
+      "kaddo owners suggest"
     ],
-    "nextStep": "Use the roadmap-agent to plan the next initiative.",
+    "nextStep": "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.",
     "llmInstructions": [
-      "No active work.",
-      "Use the roadmap-agent to plan the next initiative."
+      "Refine draft Work Items to ready.",
+      "Use the work-item-agent.",
+      "Do not implement unless the user explicitly asks.",
+      "Ownership is incomplete — propose `code:` globs (run `kaddo owners suggest`)."
     ]
   },
   "nextStepRecommendation": {
-    "id": "plan-next",
-    "phase": "Maintenance",
-    "label": "Use the roadmap-agent to plan the next initiative.",
-    "agent": "roadmap-agent",
-    "reason": "No active Work Items and no remaining roadmap candidates."
+    "id": "questions",
+    "phase": "Knowledge Refinement",
+    "label": "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.",
+    "command": "kaddo questions",
+    "reason": "2 blocking open question(s) remain."
   },
   "deliveryState": {
-    "phase": "Maintenance",
-    "draft_work_items": 0,
+    "phase": "Knowledge Refinement",
+    "draft_work_items": 1,
     "refined_draft_work_items": 0,
     "refined_draft_ids": [],
     "ready_work_items": 0,
@@ -1780,8 +1830,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 27,
-    "ownership_coverage": "27/27",
+    "total_work_items": 28,
+    "ownership_coverage": "27/28",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -1831,7 +1881,7 @@
     }
   },
   "installedAssets": {
-    "version": "3.115.0",
+    "version": "3.121.2",
     "agents": {
       "total": 20,
       "installed": 20,
@@ -1840,25 +1890,27 @@
       "modified": 0
     },
     "skills": {
-      "total": 10,
-      "installed": 10,
+      "total": 11,
+      "installed": 11,
       "outdated": 0,
       "unknown_version": 0,
       "modified": 0
     }
   },
   "workItemSummary": {
-    "total": 27,
-    "active": 0,
-    "draft": 0,
+    "total": 28,
+    "active": 1,
+    "draft": 1,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
     "completed": 27,
     "archived": 0,
-    "summary": "completed-only"
+    "summary": "draft-only"
   },
-  "deliveryMix": {},
+  "deliveryMix": {
+    "feature": 1
+  },
   "external": [],
   "graph": {
     "generatedAt": "2026-10-03T06:00:22.556Z",
@@ -1901,6 +1953,7 @@
     "legacy-risk-assessment",
     "module-context-refinement",
     "ownership-suggestion",
+    "poc-report-writing",
     "work-item-refinement"
   ],
   "scanSignals": {
@@ -1940,9 +1993,9 @@
   "projectRoute": {
     "type": "new",
     "currentStep": "create-work-source",
-    "completed": 10,
+    "completed": 9,
     "total": 12,
-    "progressPercent": 83,
+    "progressPercent": 75,
     "steps": [
       {
         "id": "enable-kaddo",
@@ -2010,7 +2063,9 @@
       {
         "id": "suggest-ownership",
         "label": "Suggest ownership",
-        "status": "done"
+        "status": "next",
+        "reason": "Ownership coverage is 27/28.",
+        "command": "kaddo owners suggest"
       },
       {
         "id": "prepare-implementation",
@@ -2076,17 +2131,23 @@
   },
   "affectedModuleContexts": {},
   "isModuleRepo": false,
-  "missing": [],
+  "missing": [
+    "No project knowledge summary found yet.",
+    "No roadmap baseline found."
+  ],
   "handoff": {
     "recommendedAgents": [
-      "roadmap-agent"
+      "work-item-agent",
+      "kaddo owners suggest"
     ],
     "nextSteps": [
-      "Use the roadmap-agent to plan the next initiative."
+      "Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions."
     ],
     "instructions": [
-      "No active work.",
-      "Use the roadmap-agent to plan the next initiative."
+      "Refine draft Work Items to ready.",
+      "Use the work-item-agent.",
+      "Do not implement unless the user explicitly asks.",
+      "Ownership is incomplete — propose `code:` globs (run `kaddo owners suggest`)."
     ],
     "operatingRules": [
       "**Never run `git commit`, `git push` or `git merge` without explicit human confirmation.**",

@@ -1,7 +1,7 @@
 ---
 type: agent
 name: capsule-agent
-version: 3.115.0
+version: 3.121.2
 group: tech
 ---
 # Capsule Agent

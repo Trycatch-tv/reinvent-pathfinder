@@ -12,18 +12,17 @@
 
 ## Current Phase
 
-- Phase: Maintenance
-- Recommended agent: roadmap-agent
-- Next step: Use the roadmap-agent to plan the next initiative.
-- Reason: No active Work Items and no remaining roadmap candidates.
+- Phase: Active Delivery
+- Next step: Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
+- Reason: 2 blocking open question(s) remain.
 
 ## Delivery State
 
-- Draft Work Items: 0
+- Draft Work Items: 1
 - Ready Work Items: 0
 - In-progress Work Items: 0
 - Blocked Work Items: 0
-- Ownership coverage: 27/27
+- Ownership coverage: 27/28
 - Remaining Work Item candidates: 0
 - Technical decision candidates: 0
 - Accepted ADRs: 0
@@ -31,20 +30,23 @@
 
 ## Project Route
 
-Route: new · Progress: 10/12
+Route: new · Progress: 9/12
 
 Warnings:
 - Create initial work source — Some Work Items have no source metadata.
 
 ## Recommended Agent Flow
 
-1. roadmap-agent
-
 ## Primary Recommendation
 
-- id: plan-next
-- agent: roadmap-agent
-- reason: No active Work Items and no remaining roadmap candidates.
+- id: questions
+- command: `kaddo questions`
+- reason: 2 blocking open question(s) remain.
+
+## Active Work Items
+
+- WI-026 [feature] draft — Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery
+  - Source: chat
 
 ## Context Pack
 
@@ -52,9 +54,6 @@ Use `.kaddo/context-pack.md` as the primary input.
 
 ## Agent Prompts
 
-Use:
-
-- `knowledge/agents/delivery/roadmap-agent.md`
 - `.kaddo/context-pack.md`
 
 ## Expected Outputs
@@ -63,16 +62,11 @@ _See the primary recommendation above._
 
 ## Copy/Paste Instructions
 
-Paste the following into your LLM chat:
-
-1. `knowledge/agents/delivery/roadmap-agent.md`
-2. `.kaddo/context-pack.md`
-
-Ask the LLM to follow the roadmap-agent instructions.
+Paste `.kaddo/context-pack.md` into your LLM chat.
 
 ## Next Steps
 
-1. Use the roadmap-agent to plan the next initiative.
+1. Run `kaddo questions` to see source locations and resolution guidance, then resolve, assume or defer the blocking open questions.
 2. Re-run `kaddo explain`.
 
 ## Metadata Health
