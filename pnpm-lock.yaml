@@ -190,6 +190,9 @@ importers:
 
   ai/agents:
     dependencies:
+      '@aws-sdk/client-bedrock-agent-runtime':
+        specifier: ^3.1149.0
+        version: 3.1149.0
       '@pathfinder/ai-contracts':
         specifier: workspace:*
         version: link:../contracts

@@ -11,11 +11,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@pathfinder/domain": "workspace:*",
-    "@pathfinder/contracts": "workspace:*",
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.1149.0",
     "@pathfinder/ai-contracts": "workspace:*",
-    "@pathfinder/ai-tools": "workspace:*",
     "@pathfinder/ai-knowledge": "workspace:*",
+    "@pathfinder/ai-tools": "workspace:*",
+    "@pathfinder/contracts": "workspace:*",
+    "@pathfinder/domain": "workspace:*",
     "@pathfinder/events-client": "workspace:*"
   }
 }

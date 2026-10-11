@@ -9,6 +9,14 @@ import {
 } from '@pathfinder/ai-tools';
 import type { SessionCandidate, KnowledgeGap } from '@pathfinder/domain';
 import type { UserScheduleItem } from '@pathfinder/events-client';
+import {
+  BedrockAgentCoreInvoker,
+  type BedrockAgentCoreConfig,
+} from './agentcore-runtime.js';
+
+export interface JourneyRecommendationAgentOptions extends BedrockAgentCoreConfig {
+  readonly bedrockAgentId?: string;
+}
 
 export class JourneyRecommendationAgent {
   public readonly agentId = 'journey-recommendation-agent';
@@ -17,15 +25,42 @@ export class JourneyRecommendationAgent {
 
   public readonly rankTool: RecommendationsRankTool;
   public readonly conflictTool: ScheduleConflictCheckTool;
+  private readonly invoker: BedrockAgentCoreInvoker;
 
-  constructor() {
+  constructor(options: JourneyRecommendationAgentOptions = {}) {
     this.rankTool = new RecommendationsRankTool();
     this.conflictTool = new ScheduleConflictCheckTool();
+    this.invoker = new BedrockAgentCoreInvoker({
+      agentId: options.agentId ?? options.bedrockAgentId ?? process.env.BEDROCK_JOURNEY_AGENT_ID,
+      agentAliasId: options.agentAliasId,
+      region: options.region,
+      client: options.client,
+    });
   }
 
   public async run(options: AgentRunOptions): Promise<AgentRunResponse> {
-    const steps: AgentRunStep[] = [];
     const now = new Date().toISOString();
+
+    // 1. If Bedrock AgentCore is configured, attempt live cloud invocation first
+    if (this.invoker.isConfigured()) {
+      try {
+        const remoteResult = await this.invoker.invoke(
+          options.prompt,
+          (options.contextVariables?.sessionId as string) ?? undefined
+        );
+        return {
+          agentId: this.agentId,
+          output: remoteResult.output,
+          steps: remoteResult.steps,
+          completedAt: now,
+          modelId: remoteResult.modelId,
+        };
+      } catch {
+        // Fallback transparently to local tool orchestration loop
+      }
+    }
+
+    const steps: AgentRunStep[] = [];
 
     const gaps = (options.contextVariables?.knowledgeGaps as KnowledgeGap[]) ?? [];
     const candidates = (options.contextVariables?.candidateSessions as SessionCandidate[]) ?? [];

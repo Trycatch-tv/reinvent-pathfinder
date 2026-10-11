@@ -8,6 +8,14 @@ import {
   KnowledgeBaseSearchTool,
 } from '@pathfinder/ai-tools';
 import type { SessionCandidate } from '@pathfinder/domain';
+import {
+  BedrockAgentCoreInvoker,
+  type BedrockAgentCoreConfig,
+} from './agentcore-runtime.js';
+
+export interface KnowledgeAgentOptions extends BedrockAgentCoreConfig {
+  readonly catalogSessions?: readonly SessionCandidate[];
+}
 
 export class KnowledgeAgent {
   public readonly agentId = 'knowledge-agent';
@@ -16,17 +24,44 @@ export class KnowledgeAgent {
 
   public readonly contextAnalysisTool: ContextAnalysisTool;
   public readonly kbSearchTool: KnowledgeBaseSearchTool;
+  private readonly invoker: BedrockAgentCoreInvoker;
 
-  constructor(options: { catalogSessions?: readonly SessionCandidate[] } = {}) {
+  constructor(options: KnowledgeAgentOptions = {}) {
     this.contextAnalysisTool = new ContextAnalysisTool();
     this.kbSearchTool = new KnowledgeBaseSearchTool(undefined, options.catalogSessions ?? []);
+    this.invoker = new BedrockAgentCoreInvoker({
+      agentId: options.agentId ?? options.bedrockAgentId ?? process.env.BEDROCK_KNOWLEDGE_AGENT_ID,
+      agentAliasId: options.agentAliasId,
+      region: options.region,
+      client: options.client,
+    });
   }
 
   public async run(options: AgentRunOptions): Promise<AgentRunResponse> {
-    const steps: AgentRunStep[] = [];
     const now = new Date().toISOString();
 
-    // 1. If project details are present in contextVariables, analyze context
+    // 1. If Bedrock AgentCore is configured, attempt live cloud invocation first
+    if (this.invoker.isConfigured()) {
+      try {
+        const remoteResult = await this.invoker.invoke(
+          options.prompt,
+          (options.contextVariables?.sessionId as string) ?? undefined
+        );
+        return {
+          agentId: this.agentId,
+          output: remoteResult.output,
+          steps: remoteResult.steps,
+          completedAt: now,
+          modelId: remoteResult.modelId,
+        };
+      } catch {
+        // Fallback transparently to local tool orchestration loop
+      }
+    }
+
+    const steps: AgentRunStep[] = [];
+
+    // 2. If project details are present in contextVariables, analyze context
     const projectName = (options.contextVariables?.projectName as string) ?? 're:Invent Project';
     const description = (options.contextVariables?.description as string) ?? options.prompt;
     const currentStack = (options.contextVariables?.currentStack as string[]) ?? [];

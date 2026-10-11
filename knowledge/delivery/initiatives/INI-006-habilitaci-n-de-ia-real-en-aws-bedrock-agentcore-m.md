@@ -51,6 +51,7 @@ candidates:
       Open question (responsable de IA): IaC del bloque agentic (agentcore
       deploy vs CDK/SAM) y límite Lambda/AgentCore. Hoy los agentes reportan
       modelId 'agentcore-runtime-offline-v1' (sin runtime real).
+    materialized_as: WI-029
   - id: WI-CANDIDATE-004
     title: Control de costos/seguridad y observabilidad de IA
     type: chore
