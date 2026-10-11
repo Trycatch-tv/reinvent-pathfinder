@@ -84,6 +84,7 @@ candidates:
     notes: >-
       Evitar llamadas duplicadas, respetar throttling y conservar refresh manual
       como acción secundaria. Sin polling agresivo.
+    materialized_as: WI-034
   - id: WI-CANDIDATE-006
     title: Consistencia del pipeline de IA y trazabilidad por etapa
     type: feature

@@ -702,5 +702,26 @@ describe("apps/client UI components", () => {
       vi.unstubAllGlobals()
     }
   })
+
+  it("renders availability view in Demo mode with populated sessions and heatmap immediately", () => {
+    vi.stubGlobal("window", {
+      location: { pathname: "/availability" },
+      localStorage: {
+        getItem: () => "demo",
+        setItem: () => {},
+        removeItem: () => {},
+      },
+    })
+    try {
+      const html = renderToString(React.createElement(App))
+      expect(html).toContain("Disponibilidad de sesiones")
+      expect(html).toContain("Building Autonomous Multi-Agent Systems")
+      expect(html).toContain("Modo Demo")
+      expect(html).toContain("Actualizar disponibilidad")
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
 })
+
 

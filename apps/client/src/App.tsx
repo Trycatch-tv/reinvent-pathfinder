@@ -33,7 +33,7 @@ import {
   type UserScheduleResult,
   normalizeAwsSession,
 } from "@pathfinder/events-client"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
 import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 import { ContextForm } from "./components/ContextForm.js"
@@ -303,16 +303,85 @@ export const App: React.FC = () => {
   const [reservationMutationSessionId, setReservationMutationSessionId] =
     useState<string | null>(null)
 
+  const isAutoLoadingRef = useRef(false)
+
+  // Autocarga en modo Demo
   useEffect(() => {
-    if (isAuthenticated && liveEventsClient && tokenStore.getAccessToken() && !scheduleSnapshot) {
-      void liveEventsClient
-        .getPersonalSchedule()
-        .then((s) => {
-          setScheduleSnapshot(s)
-        })
-        .catch(() => {})
+    if (mode === "demo") {
+      if (!scheduleSnapshot) {
+        void dataProvider.schedule
+          .getSchedule()
+          .then(setScheduleSnapshot)
+          .catch(() => {})
+      }
     }
-  }, [isAuthenticated, scheduleSnapshot])
+  }, [mode, dataProvider, scheduleSnapshot])
+
+  // Autocarga en modo Live autenticado
+  useEffect(() => {
+    if (
+      mode !== "live" ||
+      !isAuthenticated ||
+      !liveEventsClient ||
+      !tokenStore.getAccessToken()
+    ) {
+      return
+    }
+
+    if (liveSnapshot && scheduleSnapshot) return
+    if (isAutoLoadingRef.current) return
+
+    isAutoLoadingRef.current = true
+    setIsRefreshingAvailability(true)
+    setIsRefreshingSchedule(true)
+
+    let isCancelled = false
+
+    Promise.all([
+      !liveSnapshot
+        ? liveEventsClient.fetchAvailabilitySnapshot().catch((err: unknown) => {
+            if (!isCancelled) {
+              setAvailabilityMessage(describeLiveAvailabilityError(err))
+            }
+            return null
+          })
+        : Promise.resolve(liveSnapshot),
+      !scheduleSnapshot
+        ? dataProvider.schedule.getSchedule().catch((err: unknown) => {
+            if (!isCancelled) {
+              setScheduleMessage(describeLiveScheduleError(err))
+            }
+            return null
+          })
+        : Promise.resolve(scheduleSnapshot),
+    ])
+      .then(([availSnap, schedSnap]) => {
+        if (isCancelled) return
+        if (availSnap && !liveSnapshot) {
+          setLiveSnapshot(availSnap)
+          setAvailabilityMessage(
+            `Disponibilidad sincronizada automáticamente (${availSnap.sessions.length} sesiones).`,
+          )
+        }
+        if (schedSnap && !scheduleSnapshot) {
+          setScheduleSnapshot(schedSnap)
+          setScheduleMessage(
+            `Agenda sincronizada automáticamente (${schedSnap.reservedSessionIds.length} reserva(s), ${schedSnap.favoriteSessionIds.length} favorita(s)).`,
+          )
+        }
+      })
+      .finally(() => {
+        isAutoLoadingRef.current = false
+        if (!isCancelled) {
+          setIsRefreshingAvailability(false)
+          setIsRefreshingSchedule(false)
+        }
+      })
+
+    return () => {
+      isCancelled = true
+    }
+  }, [mode, isAuthenticated, liveEventsClient, dataProvider, liveSnapshot, scheduleSnapshot])
   const [route, setRoute] = useState(() =>
     typeof window === "undefined" ? "/" : window.location.pathname,
   )
@@ -497,6 +566,18 @@ export const App: React.FC = () => {
   }
 
   const handleAvailabilityRefresh = async () => {
+    if (mode === "demo") {
+      setIsRefreshingAvailability(true)
+      try {
+        const avail = await dataProvider.availability.getAvailability()
+        setAvailabilityMessage(
+          `Disponibilidad demo sincronizada (${avail.length} sesiones).`,
+        )
+      } finally {
+        setIsRefreshingAvailability(false)
+      }
+      return
+    }
     if (!liveEventsClient) {
       setAvailabilityMessage(
         "Configura VITE_AWS_EVENT_ID para consultar AWS Events.",
@@ -520,7 +601,7 @@ export const App: React.FC = () => {
       )
     } catch (err: unknown) {
       setAvailabilityMessage(
-        `${describeLiveAvailabilityError(err)}${liveSnapshot ? " Se conserva el último snapshot válido." : " Se mantiene el modo fixture local."}`,
+        `${describeLiveAvailabilityError(err)}${liveSnapshot ? " Se conserva el último snapshot válido." : " No se pudo obtener la disponibilidad en vivo."}`,
       )
     } finally {
       setIsRefreshingAvailability(false)
@@ -528,10 +609,11 @@ export const App: React.FC = () => {
   }
 
   const canLoadSchedule = Boolean(
-    liveEventsClient &&
-    isAuthenticated &&
-    tokenStore.getAccessToken() &&
-    liveSnapshot,
+    mode === "demo" ||
+      (liveEventsClient &&
+        isAuthenticated &&
+        tokenStore.getAccessToken() &&
+        liveSnapshot),
   )
 
   const handleScheduleRefresh = async () => {
