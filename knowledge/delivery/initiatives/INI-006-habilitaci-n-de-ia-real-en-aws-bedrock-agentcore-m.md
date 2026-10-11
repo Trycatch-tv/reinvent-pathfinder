@@ -2,7 +2,7 @@
 type: initiative
 id: INI-006
 title: Habilitación de IA real en AWS (Bedrock + AgentCore + Managed KB)
-status: planned
+status: completed
 knowledge_level: K2
 domains:
   - ai
@@ -64,8 +64,10 @@ candidates:
       Open question (responsable de IA): cómo proteger endpoints con costo de
       Bedrock sin reutilizar el access token de AWS Events; umbrales de alerta
       de costo. Se solapa con INI-005 (observabilidad); coordinar alcance.
+    materialized_as: WI-030
 horizon: next
 priority: high
+completed_at: '2026-10-11'
 ---
 
 # Habilitación de IA real en AWS (Bedrock + AgentCore + Managed KB)

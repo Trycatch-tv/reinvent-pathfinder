@@ -176,6 +176,8 @@ import {
   BedrockRuntimeClient,
   ConverseCommand,
 } from '@aws-sdk/client-bedrock-runtime';
+import { CostGuardrail } from './observability/cost-guardrail.js';
+import { AiMetricsTracker } from './observability/ai-metrics-tracker.js';
 
 function extractJsonBlock(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
@@ -186,6 +188,8 @@ export interface BedrockAnalyzerOptions {
   readonly modelId?: string;
   readonly region?: string;
   readonly bedrockClient?: BedrockRuntimeClient;
+  readonly guardrail?: CostGuardrail;
+  readonly tracker?: AiMetricsTracker;
 }
 
 /**
@@ -198,12 +202,16 @@ export class BedrockContextAnalyzer implements ContextAnalyzerProvider {
   public readonly region: string;
   private readonly fallbackAnalyzer: HeuristicContextAnalyzer;
   private client: BedrockRuntimeClient | null;
+  public readonly guardrail?: CostGuardrail;
+  public readonly tracker?: AiMetricsTracker;
 
   constructor(options: BedrockAnalyzerOptions = {}) {
     this.modelId = options.modelId ?? process.env.BEDROCK_MODEL_ID ?? 'anthropic.claude-3-5-sonnet-20241022-v2:0';
     this.region = options.region ?? process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-1';
     this.fallbackAnalyzer = new HeuristicContextAnalyzer();
     this.client = options.bedrockClient ?? null;
+    this.guardrail = options.guardrail;
+    this.tracker = options.tracker;
   }
 
   private getClient(): BedrockRuntimeClient | null {
@@ -220,8 +228,37 @@ export class BedrockContextAnalyzer implements ContextAnalyzerProvider {
   }
 
   public async analyze(request: AnalyzeContextRequest): Promise<AnalyzeContextResponse> {
+    const startTime = Date.now();
+
+    if (this.guardrail) {
+      const estimatedTokens = Math.ceil((request.description.length + 1200) / 4);
+      const validation = this.guardrail.validateRequest(estimatedTokens);
+      if (!validation.allowed) {
+        this.tracker?.record({
+          operation: 'context-analysis',
+          modelId: this.modelId,
+          latencyMs: Date.now() - startTime,
+          inputTokens: 0,
+          outputTokens: 0,
+          estimatedCostUsd: 0,
+          status: 'budget-exceeded',
+          errorDetails: validation.reason,
+        });
+        return this.fallbackAnalyzer.analyze(request);
+      }
+    }
+
     const client = this.getClient();
     if (!client) {
+      this.tracker?.record({
+        operation: 'context-analysis',
+        modelId: this.modelId,
+        latencyMs: Date.now() - startTime,
+        inputTokens: 0,
+        outputTokens: 0,
+        estimatedCostUsd: 0,
+        status: 'fallback',
+      });
       return this.fallbackAnalyzer.analyze(request);
     }
 
@@ -271,13 +308,45 @@ Responde ÚNICAMENTE con el bloque JSON válido.`;
       const response = await client.send(command);
       const outputText = response.output?.message?.content?.[0]?.text;
       if (!outputText) {
+        this.tracker?.record({
+          operation: 'context-analysis',
+          modelId: this.modelId,
+          latencyMs: Date.now() - startTime,
+          inputTokens: 0,
+          outputTokens: 0,
+          estimatedCostUsd: 0,
+          status: 'fallback',
+        });
         return this.fallbackAnalyzer.analyze(request);
       }
 
       const parsed = JSON.parse(extractJsonBlock(outputText));
       if (!parsed || !Array.isArray(parsed.skills) || !Array.isArray(parsed.knowledgeGaps)) {
+        this.tracker?.record({
+          operation: 'context-analysis',
+          modelId: this.modelId,
+          latencyMs: Date.now() - startTime,
+          inputTokens: 0,
+          outputTokens: 0,
+          estimatedCostUsd: 0,
+          status: 'fallback',
+        });
         return this.fallbackAnalyzer.analyze(request);
       }
+
+      const inputTokens = response.usage?.inputTokens ?? 0;
+      const outputTokens = response.usage?.outputTokens ?? 0;
+      const cost = this.guardrail?.recordUsage(this.modelId, inputTokens, outputTokens) ?? 0;
+
+      this.tracker?.record({
+        operation: 'context-analysis',
+        modelId: this.modelId,
+        latencyMs: Date.now() - startTime,
+        inputTokens,
+        outputTokens,
+        estimatedCostUsd: cost,
+        status: 'success',
+      });
 
       const now = new Date().toISOString();
       const userId = request.userId ?? 'anonymous-attendee';
@@ -339,7 +408,17 @@ Responde ÚNICAMENTE con el bloque JSON válido.`;
         analyzedAt: now,
         modelId: this.modelId,
       };
-    } catch {
+    } catch (err) {
+      this.tracker?.record({
+        operation: 'context-analysis',
+        modelId: this.modelId,
+        latencyMs: Date.now() - startTime,
+        inputTokens: 0,
+        outputTokens: 0,
+        estimatedCostUsd: 0,
+        status: 'fallback',
+        errorDetails: err instanceof Error ? err.message : String(err),
+      });
       return this.fallbackAnalyzer.analyze(request);
     }
   }

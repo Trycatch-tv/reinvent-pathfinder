@@ -214,6 +214,8 @@ import {
   BedrockRuntimeClient,
   ConverseCommand,
 } from '@aws-sdk/client-bedrock-runtime';
+import { CostGuardrail } from '../observability/cost-guardrail.js';
+import { AiMetricsTracker } from '../observability/ai-metrics-tracker.js';
 
 function extractJsonBlock(text: string): string {
   const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
@@ -225,6 +227,8 @@ export interface BedrockRerankerOptions {
   readonly region?: string;
   readonly bedrockClient?: BedrockRuntimeClient;
   readonly weights?: ScoringWeights;
+  readonly guardrail?: CostGuardrail;
+  readonly tracker?: AiMetricsTracker;
 }
 
 /**
@@ -237,6 +241,8 @@ export class BedrockSessionReranker implements SessionRerankerProvider {
   private readonly fallbackReranker: HeuristicSessionReranker;
   private readonly filter: CandidateFilter;
   private client: BedrockRuntimeClient | null;
+  public readonly guardrail?: CostGuardrail;
+  public readonly tracker?: AiMetricsTracker;
 
   constructor(options: BedrockRerankerOptions = {}) {
     this.modelId = options.modelId ?? process.env.BEDROCK_MODEL_ID ?? 'anthropic.claude-3-5-sonnet-20241022-v2:0';
@@ -244,6 +250,8 @@ export class BedrockSessionReranker implements SessionRerankerProvider {
     this.fallbackReranker = new HeuristicSessionReranker(options.weights);
     this.filter = new CandidateFilter();
     this.client = options.bedrockClient ?? null;
+    this.guardrail = options.guardrail;
+    this.tracker = options.tracker;
   }
 
   private getClient(): BedrockRuntimeClient | null {
@@ -260,6 +268,7 @@ export class BedrockSessionReranker implements SessionRerankerProvider {
   }
 
   public async rank(request: RankRecommendationsRequest): Promise<RankRecommendationsResponse> {
+    const startTime = Date.now();
     const totalCandidatesEvaluated = request.candidateSessions.length;
     const filteredSessions = this.filter.filter(request.candidateSessions, {
       targetLevels: request.targetLevels,
@@ -277,8 +286,35 @@ export class BedrockSessionReranker implements SessionRerankerProvider {
       };
     }
 
+    if (this.guardrail) {
+      const estimatedTokens = Math.ceil(filteredCandidatesCount * 120 + 500);
+      const validation = this.guardrail.validateRequest(estimatedTokens);
+      if (!validation.allowed) {
+        this.tracker?.record({
+          operation: 'session-rerank',
+          modelId: this.modelId,
+          latencyMs: Date.now() - startTime,
+          inputTokens: 0,
+          outputTokens: 0,
+          estimatedCostUsd: 0,
+          status: 'budget-exceeded',
+          errorDetails: validation.reason,
+        });
+        return this.fallbackReranker.rank(request);
+      }
+    }
+
     const client = this.getClient();
     if (!client) {
+      this.tracker?.record({
+        operation: 'session-rerank',
+        modelId: this.modelId,
+        latencyMs: Date.now() - startTime,
+        inputTokens: 0,
+        outputTokens: 0,
+        estimatedCostUsd: 0,
+        status: 'fallback',
+      });
       return this.fallbackReranker.rank(request);
     }
 
@@ -332,13 +368,45 @@ Responde ÚNICAMENTE con el bloque JSON array válido.`;
       const response = await client.send(command);
       const outputText = response.output?.message?.content?.[0]?.text;
       if (!outputText) {
+        this.tracker?.record({
+          operation: 'session-rerank',
+          modelId: this.modelId,
+          latencyMs: Date.now() - startTime,
+          inputTokens: 0,
+          outputTokens: 0,
+          estimatedCostUsd: 0,
+          status: 'fallback',
+        });
         return this.fallbackReranker.rank(request);
       }
 
       const parsed = JSON.parse(extractJsonBlock(outputText));
       if (!Array.isArray(parsed) || parsed.length === 0) {
+        this.tracker?.record({
+          operation: 'session-rerank',
+          modelId: this.modelId,
+          latencyMs: Date.now() - startTime,
+          inputTokens: 0,
+          outputTokens: 0,
+          estimatedCostUsd: 0,
+          status: 'fallback',
+        });
         return this.fallbackReranker.rank(request);
       }
+
+      const inputTokens = response.usage?.inputTokens ?? 0;
+      const outputTokens = response.usage?.outputTokens ?? 0;
+      const cost = this.guardrail?.recordUsage(this.modelId, inputTokens, outputTokens) ?? 0;
+
+      this.tracker?.record({
+        operation: 'session-rerank',
+        modelId: this.modelId,
+        latencyMs: Date.now() - startTime,
+        inputTokens,
+        outputTokens,
+        estimatedCostUsd: cost,
+        status: 'success',
+      });
 
       const sessionsById = new Map(filteredSessions.map((s) => [s.id, s]));
       const limit = request.maxRecommendations ?? 10;
@@ -388,7 +456,17 @@ Responde ÚNICAMENTE con el bloque JSON array válido.`;
         rankedAt: new Date().toISOString(),
         modelId: this.modelId,
       };
-    } catch {
+    } catch (err) {
+      this.tracker?.record({
+        operation: 'session-rerank',
+        modelId: this.modelId,
+        latencyMs: Date.now() - startTime,
+        inputTokens: 0,
+        outputTokens: 0,
+        estimatedCostUsd: 0,
+        status: 'fallback',
+        errorDetails: err instanceof Error ? err.message : String(err),
+      });
       return this.fallbackReranker.rank(request);
     }
   }

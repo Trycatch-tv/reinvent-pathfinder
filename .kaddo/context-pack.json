@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-10T23:58:18.876Z",
+  "generatedAt": "2026-10-11T00:15:45.858Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -756,6 +756,30 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-030",
+        "type": "chore",
+        "title": "Control de costos/seguridad y observabilidad de IA",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -1456,6 +1480,30 @@
         ]
       },
       {
+        "id": "WI-030",
+        "type": "chore",
+        "title": "Control de costos/seguridad y observabilidad de IA",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "tech"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "not-assessed",
+        "validationStatus": "not-assessed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
         "id": "WI-026",
         "type": "feature",
         "title": "Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery",
@@ -1806,6 +1854,20 @@
           "ai/agents/src/agentcore-runtime.ts",
           "ai/agents/src/agents.test.ts"
         ]
+      },
+      {
+        "id": "WI-030",
+        "type": "chore",
+        "title": "Control de costos/seguridad y observabilidad de IA",
+        "summary": "",
+        "codeGlobs": [
+          "ai/knowledge/src/observability/ai-metrics-tracker.ts",
+          "ai/knowledge/src/observability/cost-guardrail.ts",
+          "ai/knowledge/src/observability/observability.test.ts",
+          "ai/knowledge/src/context-analyzer.ts",
+          "ai/knowledge/src/recommendations/session-reranker.ts",
+          "ai/knowledge/src/index.ts"
+        ]
       }
     ]
   },
@@ -1875,6 +1937,7 @@
         "WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md",
         "WI-028-ingesta-real-a-amazon-bedrock-managed-knowledge-ba.md",
         "WI-029-despliegue-del-runtime-agentic-en-amazon-bedrock-a.md",
+        "WI-030-control-de-costos-seguridad-y-observabilidad-de-ia.md",
         "roadmap.md"
       ]
     }
@@ -1911,17 +1974,17 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 30,
+    "materialized_work_items": 31,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 30,
+    "materialized": 31,
     "remaining": 0
   },
   "phase": {
     "phase": "Active Delivery",
     "reasons": [
       "Roadmap available",
-      "30 materialized work item(s)",
+      "31 materialized work item(s)",
       "draft: 1",
       "Ownership coverage 97%"
     ],
@@ -1948,7 +2011,7 @@
         "id": "suggest-ownership",
         "label": "Run `kaddo owners suggest` for Work Items without code ownership.",
         "command": "kaddo owners suggest",
-        "reason": "Ownership coverage is 29/30."
+        "reason": "Ownership coverage is 30/31."
       }
     ]
   },
@@ -1962,8 +2025,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 30,
-    "ownership_coverage": "29/30",
+    "total_work_items": 31,
+    "ownership_coverage": "30/31",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -2013,7 +2076,7 @@
     }
   },
   "installedAssets": {
-    "version": "3.122.0",
+    "version": "3.123.0",
     "agents": {
       "total": 20,
       "installed": 20,
@@ -2030,13 +2093,13 @@
     }
   },
   "workItemSummary": {
-    "total": 30,
+    "total": 31,
     "active": 1,
     "draft": 1,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 29,
+    "completed": 30,
     "archived": 0,
     "summary": "draft-only"
   },
@@ -2196,7 +2259,7 @@
         "id": "suggest-ownership",
         "label": "Suggest ownership",
         "status": "next",
-        "reason": "Ownership coverage is 29/30.",
+        "reason": "Ownership coverage is 30/31.",
         "command": "kaddo owners suggest"
       },
       {

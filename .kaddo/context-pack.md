@@ -26,7 +26,7 @@ Phase: Active Delivery
 Reason:
 
 - Roadmap available
-- 30 materialized work item(s)
+- 31 materialized work item(s)
 - draft: 1
 - Ownership coverage 97%
 
@@ -40,7 +40,7 @@ Next step: Refine the existing draft Work Item with the work-item-agent.
 - Draft Work Items: 1
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 29/30
+- Ownership coverage: 30/31
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -118,6 +118,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-027-landing-demo-p-blica-dentro-de-apps-client-para-bu.md
 - ✓ WI-028-ingesta-real-a-amazon-bedrock-managed-knowledge-ba.md
 - ✓ WI-029-despliegue-del-runtime-agentic-en-amazon-bedrock-a.md
+- ✓ WI-030-control-de-costos-seguridad-y-observabilidad-de-ia.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -141,7 +142,7 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 30
+- Materialized Work Items: 31
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
@@ -188,6 +189,7 @@ Active Work Items by type:
 - WI-027 [feature] owns: apps/client/**
 - WI-028 [feature] owns: ai/knowledge/package.json, ai/knowledge/src/kb/knowledge-base-client.ts, ai/knowledge/src/kb/session-document-transformer.ts, ai/knowledge/src/kb/types.ts, ai/knowledge/src/kb/knowledge-base.test.ts
 - WI-029 [feature] owns: ai/agents/package.json, ai/agents/src/knowledge-agent.ts, ai/agents/src/journey-recommendation-agent.ts, ai/agents/src/agentcore-runtime.ts, ai/agents/src/agents.test.ts
+- WI-030 [chore] owns: ai/knowledge/src/observability/ai-metrics-tracker.ts, ai/knowledge/src/observability/cost-guardrail.ts, ai/knowledge/src/observability/observability.test.ts, ai/knowledge/src/context-analyzer.ts, ai/knowledge/src/recommendations/session-reranker.ts, ai/knowledge/src/index.ts
 
 ## Mapped Modules
 
