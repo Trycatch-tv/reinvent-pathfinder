@@ -10,6 +10,7 @@ import type {
   AnalyzeContextRequest,
   AnalyzeContextResponse,
   RankRecommendationsRequest,
+  RankRecommendationsResponse,
 } from "@pathfinder/contracts"
 import type {
   KnowledgeGap,
@@ -26,7 +27,7 @@ import {
   AwsEventsNotFoundError,
   AwsEventsThrottlingError,
   AwsEventsUnauthorizedError,
-  InMemoryTokenStore,
+  LocalStorageTokenStore,
   SAMPLE_RAW_SESSIONS,
   SAMPLE_USER_SCHEDULE,
   normalizeAwsSession,
@@ -56,22 +57,20 @@ export function resolveAuthRedirectUri(
 // Catálogo demo normalizado (local-first; sin AWS). Decisión de alcance WI-013.
 const DEMO_SESSIONS: readonly SessionCandidate[] =
   SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
-const tokenStore = new InMemoryTokenStore()
+const tokenStore = new LocalStorageTokenStore()
 const authClient = new AwsBuilderIdAuthClient({
   redirectUri: resolveAuthRedirectUri(),
   tokenStore,
 })
-const liveEventId = import.meta.env.VITE_AWS_EVENT_ID
+const liveEventId = import.meta.env.VITE_AWS_EVENT_ID || "reinvent-2026"
 export const eventsApiBaseUrl = import.meta.env.DEV
   ? "/aws-events/v1"
   : "https://api.awsevents.com/v1"
-const liveEventsClient = liveEventId
-  ? new AwsEventsClient({
-      baseUrl: eventsApiBaseUrl,
-      eventId: liveEventId,
-      tokenStore,
-    })
-  : null
+const liveEventsClient = new AwsEventsClient({
+  baseUrl: eventsApiBaseUrl,
+  eventId: liveEventId,
+  tokenStore,
+})
 type LiveAvailabilitySnapshot = Awaited<
   ReturnType<AwsEventsClient["fetchAvailabilitySnapshot"]>
 >
@@ -173,24 +172,80 @@ export function describeReservationReconciliation(input: {
     : "AWS Events no confirmó la reserva."
 }
 
+const JOURNEY_STORAGE_KEY = "pathfinder_journey_state"
+
+interface SavedJourneyState {
+  readonly analysisResult: AnalyzeContextResponse | null
+  readonly learningPath: LearningPath | null
+  readonly recommendations: readonly SessionRecommendation[]
+  readonly currentGaps: readonly KnowledgeGap[]
+  readonly initialGaps: readonly KnowledgeGap[]
+  readonly learningReport: LearningReport | null
+}
+
+function loadSavedJourney(): Partial<SavedJourneyState> {
+  if (typeof window === "undefined") return {}
+  try {
+    const raw = window.localStorage.getItem(JOURNEY_STORAGE_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
 export const App: React.FC = () => {
+  const savedJourney = loadSavedJourney()
   const [analysisResult, setAnalysisResult] =
-    useState<AnalyzeContextResponse | null>(null)
+    useState<AnalyzeContextResponse | null>(() => savedJourney.analysisResult ?? null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [learningPath, setLearningPath] = useState<LearningPath | null>(null)
+  const [learningPath, setLearningPath] = useState<LearningPath | null>(() => savedJourney.learningPath ?? null)
   const [recommendations, setRecommendations] = useState<
     readonly SessionRecommendation[]
-  >([])
-  const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>([])
-  const [initialGaps, setInitialGaps] = useState<readonly KnowledgeGap[]>([])
+  >(() => savedJourney.recommendations ?? [])
+  const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>(() => savedJourney.currentGaps ?? [])
+  const [initialGaps, setInitialGaps] = useState<readonly KnowledgeGap[]>(() => savedJourney.initialGaps ?? [])
   const [learningReport, setLearningReport] = useState<LearningReport | null>(
-    null,
+    () => savedJourney.learningReport ?? null,
   )
   const [isBuildingPath, setIsBuildingPath] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() =>
+    Boolean(tokenStore.getAccessToken()),
+  )
   const [liveSnapshot, setLiveSnapshot] =
     useState<LiveAvailabilitySnapshot | null>(null)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    try {
+      if (analysisResult || learningPath || currentGaps.length > 0) {
+        window.localStorage.setItem(
+          JOURNEY_STORAGE_KEY,
+          JSON.stringify({
+            analysisResult,
+            learningPath,
+            recommendations,
+            currentGaps,
+            initialGaps,
+            learningReport,
+          }),
+        )
+      } else {
+        window.localStorage.removeItem(JOURNEY_STORAGE_KEY)
+      }
+    } catch {
+      // Ignore storage errors in restricted contexts
+    }
+  }, [analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
+
+  const handleQuickDemoLogin = () => {
+    tokenStore.setTokens({
+      accessToken: "demo-builder-id-token-" + Date.now(),
+      expiresIn: 86400,
+      tokenType: "Bearer",
+    })
+    setIsAuthenticated(true)
+  }
   const [isRefreshingAvailability, setIsRefreshingAvailability] =
     useState(false)
   const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(
@@ -205,6 +260,17 @@ export const App: React.FC = () => {
   >(null)
   const [reservationMutationSessionId, setReservationMutationSessionId] =
     useState<string | null>(null)
+
+  useEffect(() => {
+    if (isAuthenticated && liveEventsClient && tokenStore.getAccessToken() && !scheduleSnapshot) {
+      void liveEventsClient
+        .getPersonalSchedule()
+        .then((s) => {
+          setScheduleSnapshot(s)
+        })
+        .catch(() => {})
+    }
+  }, [isAuthenticated, scheduleSnapshot])
   const [route, setRoute] = useState(() =>
     typeof window === "undefined" ? "/" : window.location.pathname,
   )
@@ -230,9 +296,24 @@ export const App: React.FC = () => {
     setIsLoading(true)
     setError(null)
     try {
-      // Local-first execution using Heuristic analyzer
-      const analyzer = new HeuristicContextAnalyzer()
-      const result = await analyzer.analyze(request)
+      // 1. Intentar llamar al backend con Amazon Bedrock AI real
+      let result: AnalyzeContextResponse
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(request),
+        })
+        if (response.ok) {
+          result = await response.json()
+        } else {
+          throw new Error(`API error ${response.status}`)
+        }
+      } catch {
+        // Fallback resiliente al analizador heurístico local
+        const analyzer = new HeuristicContextAnalyzer()
+        result = await analyzer.analyze(request)
+      }
       setAnalysisResult(result)
     } catch (err: unknown) {
       setError(
@@ -248,19 +329,44 @@ export const App: React.FC = () => {
     setIsBuildingPath(true)
     setError(null)
     try {
-      // 1. Rank recommendations (local-first heuristic reranker).
-      const reranker = new HeuristicSessionReranker()
+      // 1. Consultar sesiones desde la API de eventos (con fallback resiliente)
+      let candidateSessionsToRank: readonly SessionCandidate[] = DEMO_SESSIONS
+      try {
+        const snapshot = await liveEventsClient.fetchAvailabilitySnapshot()
+        if (snapshot.sessions && snapshot.sessions.length > 0) {
+          candidateSessionsToRank = snapshot.sessions
+        }
+      } catch (apiErr) {
+        console.warn("Consulta a la API de eventos no disponible, usando catálogo base:", apiErr)
+      }
+
+      // 2. Rank recommendations: llamar a Bedrock AI real via API con fallback heurístico
+      let ranked: RankRecommendationsResponse
       const rankRequest: RankRecommendationsRequest = {
         projectContext: analysisResult.projectContext,
         knowledgeGaps: analysisResult.knowledgeGaps,
-        candidateSessions: DEMO_SESSIONS,
+        candidateSessions: candidateSessionsToRank,
       }
-      const ranked = await reranker.rank(rankRequest)
+      try {
+        const response = await fetch("/api/recommendations/rank", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(rankRequest),
+        })
+        if (response.ok) {
+          ranked = await response.json()
+        } else {
+          throw new Error(`API error ${response.status}`)
+        }
+      } catch {
+        const reranker = new HeuristicSessionReranker()
+        ranked = await reranker.rank(rankRequest)
+      }
 
-      // 2. Build the LearningPath and reconcile with the demo schedule.
+      // 3. Build the LearningPath and reconcile with the schedule.
       const path = buildLearningPath({
         recommendations: ranked.recommendations,
-        candidateSessions: DEMO_SESSIONS,
+        candidateSessions: candidateSessionsToRank,
         scheduledItems: SAMPLE_USER_SCHEDULE,
         userId: "local-user",
         journeyId: analysisResult.projectContext.id,
@@ -319,6 +425,13 @@ export const App: React.FC = () => {
     setCurrentGaps([])
     setInitialGaps([])
     setLearningReport(null)
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(JOURNEY_STORAGE_KEY)
+      } catch {
+        // Ignore
+      }
+    }
   }
 
   const handleAvailabilityRefresh = async () => {
@@ -340,6 +453,9 @@ export const App: React.FC = () => {
     try {
       const snapshot = await liveEventsClient.fetchAvailabilitySnapshot()
       setLiveSnapshot(snapshot)
+      setAvailabilityMessage(
+        `Disponibilidad actualizada exitosamente (${snapshot.sessions.length} sesiones sincronizadas).`,
+      )
     } catch (err: unknown) {
       setAvailabilityMessage(
         `${describeLiveAvailabilityError(err)}${liveSnapshot ? " Se conserva el último snapshot válido." : " Se mantiene el modo fixture local."}`,
@@ -372,7 +488,11 @@ export const App: React.FC = () => {
     setIsRefreshingSchedule(true)
     setScheduleMessage(null)
     try {
-      setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
+      const schedule = await liveEventsClient.getPersonalSchedule()
+      setScheduleSnapshot(schedule)
+      setScheduleMessage(
+        `Agenda sincronizada exitosamente (${schedule.reservedSessionIds.length} reserva(s), ${schedule.favoriteSessionIds.length} favorita(s)).`,
+      )
     } catch (err: unknown) {
       setScheduleMessage(
         `${describeLiveScheduleError(err)}${scheduleSnapshot ? " Se conserva la última agenda confirmada." : ""}`,
@@ -386,7 +506,7 @@ export const App: React.FC = () => {
     sessionId: string,
     isFavorite: boolean,
   ) => {
-    if (!liveEventsClient || !scheduleSnapshot || !canLoadSchedule) return
+    if (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken()) return
     setFavoriteMutationSessionId(sessionId)
     setScheduleMessage(null)
     try {
@@ -417,7 +537,7 @@ export const App: React.FC = () => {
     sessionId: string,
     isReserved: boolean,
   ) => {
-    if (!liveEventsClient || !scheduleSnapshot || !canLoadSchedule) return
+    if (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken()) return
     setReservationMutationSessionId(sessionId)
     setScheduleMessage(null)
     try {
@@ -505,7 +625,11 @@ export const App: React.FC = () => {
               setIsAuthenticated(true)
               setRoute("/")
             }}
-            onLogout={() => setIsAuthenticated(false)}
+            onLogout={() => {
+              tokenStore.clear()
+              setIsAuthenticated(false)
+            }}
+            onQuickDemoLogin={handleQuickDemoLogin}
           />
         )}
       </header>
@@ -543,7 +667,11 @@ export const App: React.FC = () => {
             setIsAuthenticated(true)
             setRoute("/")
           }}
-          onLogout={() => setIsAuthenticated(false)}
+          onLogout={() => {
+            tokenStore.clear()
+            setIsAuthenticated(false)
+          }}
+          onQuickDemoLogin={handleQuickDemoLogin}
         />
       ) : (
         <>
@@ -561,7 +689,58 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {!analysisResult ? (
+          {!isAuthenticated ? (
+            <section
+              style={{
+                backgroundColor: "#f8fafc",
+                padding: "3rem 2rem",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+                textAlign: "center",
+                maxWidth: "600px",
+                margin: "3rem auto",
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+              }}
+            >
+              <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔐</div>
+              <h2
+                style={{ marginTop: 0, fontSize: "1.5rem", color: "#0f172a" }}
+              >
+                Inicio de sesión requerido
+              </h2>
+              <p
+                style={{
+                  color: "#475569",
+                  fontSize: "1rem",
+                  lineHeight: 1.6,
+                  marginBottom: "2rem",
+                }}
+              >
+                Para consultar el catálogo oficial de sesiones desde la API de <strong>AWS Events</strong> y construir tu ruta de aprendizaje con <strong>AWS Bedrock</strong>, es necesario autenticarte con tu cuenta de <strong>AWS Builder ID</strong>.
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <BuilderIdLogin
+                  client={authClient}
+                  authenticated={isAuthenticated}
+                  onAuthenticated={() => {
+                    setIsAuthenticated(true)
+                    setRoute("/")
+                  }}
+                  onLogout={() => {
+                    tokenStore.clear()
+                    setIsAuthenticated(false)
+                  }}
+                  onQuickDemoLogin={handleQuickDemoLogin}
+                />
+              </div>
+            </section>
+          ) : !analysisResult ? (
             <section
               style={{
                 backgroundColor: "#f8fafc",
@@ -623,6 +802,7 @@ export const App: React.FC = () => {
               <KnowledgeProfileView
                 profile={analysisResult.knowledgeProfile}
                 context={analysisResult.projectContext}
+                modelId={analysisResult.modelId}
               />
 
               <KnowledgeGapsList gaps={analysisResult.knowledgeGaps} />
@@ -651,6 +831,23 @@ export const App: React.FC = () => {
                 </div>
               )}
 
+              {scheduleMessage && (
+                <div
+                  role="status"
+                  style={{
+                    padding: "0.6rem 0.8rem",
+                    backgroundColor: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                    color: "#166534",
+                    borderRadius: "6px",
+                    marginTop: "1rem",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  {scheduleMessage}
+                </div>
+              )}
+
               {learningPath && (
                 <LearningPathView
                   learningPath={learningPath}
@@ -658,6 +855,12 @@ export const App: React.FC = () => {
                   gaps={currentGaps}
                   userId="local-user"
                   onReflectionSubmit={handleReflectionSubmit}
+                  onToggleFavorite={handleToggleFavorite}
+                  favoriteSessionIds={scheduleSnapshot?.favoriteSessionIds}
+                  favoriteMutationSessionId={favoriteMutationSessionId}
+                  onToggleReservation={handleToggleReservation}
+                  reservedSessionIds={scheduleSnapshot?.reservedSessionIds}
+                  reservationMutationSessionId={reservationMutationSessionId}
                 />
               )}
 

@@ -12,6 +12,7 @@ export interface BuilderIdLoginProps {
   readonly authenticated: boolean
   readonly onAuthenticated: () => void
   readonly onLogout: () => void
+  readonly onQuickDemoLogin?: () => void
 }
 
 function getSessionStorage(): TransactionStorage | null {
@@ -35,6 +36,7 @@ export function BuilderIdLogin({
   authenticated,
   onAuthenticated,
   onLogout,
+  onQuickDemoLogin,
 }: BuilderIdLoginProps) {
   const [isWorking, setIsWorking] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -104,11 +106,32 @@ export function BuilderIdLogin({
   return (
     <section aria-label="Sesión de AWS Builder ID">
       {authenticated ? (
-        <button type="button" onClick={handleLogout}>Cerrar sesión de AWS Builder ID</button>
-      ) : (
-        <button type="button" onClick={() => void handleLogin()} disabled={isWorking}>
-          {isWorking ? 'Redirigiendo a AWS Builder ID…' : 'Iniciar sesión con AWS Builder ID'}
+        <button type="button" onClick={handleLogout} style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer' }}>
+          Cerrar sesión de AWS Builder ID
         </button>
+      ) : (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button type="button" onClick={() => void handleLogin()} disabled={isWorking} style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer' }}>
+            {isWorking ? 'Redirigiendo a AWS Builder ID…' : 'Iniciar sesión con AWS Builder ID'}
+          </button>
+          {onQuickDemoLogin && (
+            <button
+              type="button"
+              onClick={onQuickDemoLogin}
+              style={{
+                backgroundColor: '#2563eb',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '0.4rem 0.8rem',
+                cursor: 'pointer',
+                fontWeight: '600',
+              }}
+            >
+              ⚡ Acceso Asistente (Demo)
+            </button>
+          )}
+        </div>
       )}
       {error && <p role="alert">{error}</p>}
     </section>

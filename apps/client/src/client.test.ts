@@ -423,11 +423,11 @@ describe("apps/client UI components", () => {
     expect(html).toContain("DynamoDB Single-Table Design")
   })
 
-  it("App renders step 1 capture view initially", () => {
+  it("App renders login requirement view initially when unauthenticated", () => {
     const html = renderToString(React.createElement(App))
     expect(html).toContain("re:Invent Pathfinder")
-    expect(html).toContain("Paso 1: ¿Qué estás construyendo?")
-    expect(html).toContain("Descubrir Mi Knowledge Profile y Gaps")
+    expect(html).toContain("Inicio de sesión requerido")
+    expect(html).toContain("AWS Builder ID")
   })
 
   it("LearningPathView renders ordered items, covered gaps and conflict state", () => {

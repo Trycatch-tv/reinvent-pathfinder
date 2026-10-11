@@ -70,3 +70,94 @@ export class InMemoryTokenStore implements TokenStore {
     this.currentTokens = null;
   }
 }
+
+/**
+ * Persistent localStorage implementation of TokenStore.
+ * Persists session tokens across page reloads and browser restarts.
+ */
+export class LocalStorageTokenStore implements TokenStore {
+  private readonly storageKey: string;
+  private readonly memoryFallback = new InMemoryTokenStore();
+
+  constructor(storageKey = 'pathfinder_builder_id_tokens') {
+    this.storageKey = storageKey;
+  }
+
+  private isLocalStorageAvailable(): boolean {
+    try {
+      return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+    } catch {
+      return false;
+    }
+  }
+
+  public getAccessToken(): string | null {
+    if (!this.isLocalStorageAvailable()) {
+      return this.memoryFallback.getAccessToken();
+    }
+    const tokens = this.getTokens();
+    if (!tokens || this.isExpired()) {
+      return null;
+    }
+    return tokens.accessToken;
+  }
+
+  public getTokens(): AuthTokens | null {
+    if (!this.isLocalStorageAvailable()) {
+      return this.memoryFallback.getTokens();
+    }
+    try {
+      const raw = window.localStorage.getItem(this.storageKey);
+      if (!raw) return null;
+      return JSON.parse(raw) as AuthTokens;
+    } catch {
+      return null;
+    }
+  }
+
+  public setTokens(input: SetTokensInput): void {
+    const expiresAt = Date.now() + input.expiresIn * 1000;
+    const tokens: AuthTokens = {
+      accessToken: input.accessToken,
+      tokenType: input.tokenType ?? 'Bearer',
+      expiresIn: input.expiresIn,
+      ...(input.refreshToken ? { refreshToken: input.refreshToken } : {}),
+      ...(input.scope ? { scope: input.scope } : {}),
+      expiresAt,
+    };
+
+    if (!this.isLocalStorageAvailable()) {
+      this.memoryFallback.setTokens(input);
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(this.storageKey, JSON.stringify(tokens));
+    } catch {
+      this.memoryFallback.setTokens(input);
+    }
+  }
+
+  public isExpired(skewSeconds = 60): boolean {
+    const tokens = this.getTokens();
+    if (!tokens) return true;
+    return Date.now() >= tokens.expiresAt - skewSeconds * 1000;
+  }
+
+  public hasRefreshToken(): boolean {
+    const tokens = this.getTokens();
+    return Boolean(tokens?.refreshToken);
+  }
+
+  public clear(): void {
+    if (this.isLocalStorageAvailable()) {
+      try {
+        window.localStorage.removeItem(this.storageKey);
+      } catch {
+        // ignore
+      }
+    }
+    this.memoryFallback.clear();
+  }
+}
+

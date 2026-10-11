@@ -102,6 +102,8 @@ async function main() {
     `us.${rawModelId}`,
     'anthropic.claude-haiku-4-5-20251001-v1:0',
     'us.anthropic.claude-haiku-4-5-20251001-v1:0',
+    'anthropic.claude-3-haiku-20240307-v1:0',
+    'us.anthropic.claude-3-haiku-20240307-v1:0',
     'anthropic.claude-haiku-5-5',
     'us.anthropic.claude-haiku-5-5',
     'anthropic.claude-sonnet-4-20250514-v1:0',

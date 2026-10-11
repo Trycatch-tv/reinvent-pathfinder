@@ -100,13 +100,14 @@ describe('AWS Events Client & Normalizer', () => {
   });
 
   describe('AwsEventsClient (Offline / Mock Mode)', () => {
-    const client = new AwsEventsClient({ mockMode: true });
+    const mockFourSessions = SAMPLE_RAW_SESSIONS.slice(0, 4);
+    const client = new AwsEventsClient({ mockMode: true, mockSessions: mockFourSessions });
 
     it('paginates correctly using cursor and limit', async () => {
       const page1 = await client.fetchCatalogPage({ limit: 2 });
       expect(page1.sessions).toHaveLength(2);
       expect(page1.nextCursor).toBe('2');
-      expect(page1.totalCount).toBe(SAMPLE_RAW_SESSIONS.length);
+      expect(page1.totalCount).toBe(mockFourSessions.length);
 
       const page2 = await client.fetchCatalogPage({ limit: 2, cursor: page1.nextCursor });
       expect(page2.sessions).toHaveLength(2);
@@ -115,7 +116,7 @@ describe('AWS Events Client & Normalizer', () => {
 
     it('fetches all sessions across multiple pages with fetchAllSessions', async () => {
       const all = await client.fetchAllSessions({ params: { limit: 2 } });
-      expect(all).toHaveLength(SAMPLE_RAW_SESSIONS.length);
+      expect(all).toHaveLength(mockFourSessions.length);
       expect(all[0]?.code).toBe('AIM301');
     });
 

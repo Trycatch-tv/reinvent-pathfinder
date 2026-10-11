@@ -36,10 +36,11 @@ export const ContextForm: React.FC<ContextFormProps> = ({ onSubmit, isLoading })
     );
   };
 
-  const addCustomTech = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (customTech.trim() && !selectedStack.includes(customTech.trim())) {
-      setSelectedStack((prev) => [...prev, customTech.trim()]);
+  const addCustomTech = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = customTech.trim();
+    if (trimmed && !selectedStack.includes(trimmed)) {
+      setSelectedStack((prev) => [...prev, trimmed]);
       setCustomTech('');
     }
   };
@@ -54,6 +55,8 @@ export const ContextForm: React.FC<ContextFormProps> = ({ onSubmit, isLoading })
       goals: goals.split('\n').filter((g) => g.trim().length > 0),
     });
   };
+
+  const allStackOptions = Array.from(new Set([...COMMON_STACK_OPTIONS, ...selectedStack]));
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
@@ -106,7 +109,7 @@ export const ContextForm: React.FC<ContextFormProps> = ({ onSubmit, isLoading })
           Stack y Tecnologías:
         </label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.6rem' }}>
-          {COMMON_STACK_OPTIONS.map((tech) => {
+          {allStackOptions.map((tech) => {
             const isSelected = selectedStack.includes(tech);
             return (
               <button
@@ -132,14 +135,20 @@ export const ContextForm: React.FC<ContextFormProps> = ({ onSubmit, isLoading })
         <div style={{ display: 'flex', gap: '0.4rem' }}>
           <input
             type="text"
-            placeholder="Otra tecnología..."
+            placeholder="Otra tecnología (ej. IAM, CloudWatch)..."
             value={customTech}
             onChange={(e) => setCustomTech(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addCustomTech();
+              }
+            }}
             style={{ flex: 1, padding: '0.4rem 0.6rem', borderRadius: '4px', border: '1px solid #ccc' }}
           />
           <button
             type="button"
-            onClick={addCustomTech}
+            onClick={() => addCustomTech()}
             style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer' }}
           >
             Agregar

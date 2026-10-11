@@ -4,9 +4,10 @@ import type { KnowledgeProfile, ProjectContext } from '@pathfinder/domain';
 interface KnowledgeProfileViewProps {
   readonly profile: KnowledgeProfile;
   readonly context: ProjectContext;
+  readonly modelId?: string;
 }
 
-export const KnowledgeProfileView: React.FC<KnowledgeProfileViewProps> = ({ profile, context }) => {
+export const KnowledgeProfileView: React.FC<KnowledgeProfileViewProps> = ({ profile, context, modelId }) => {
   return (
     <div style={{ backgroundColor: '#fff', border: '1px solid #e1e4e8', borderRadius: '8px', padding: '1.2rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.8rem' }}>
@@ -14,9 +15,24 @@ export const KnowledgeProfileView: React.FC<KnowledgeProfileViewProps> = ({ prof
           <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#161e2e' }}>Perfil de Conocimiento: {context.name}</h3>
           <span style={{ fontSize: '0.85rem', color: '#666' }}>Seniority actual: <strong>{context.seniority.toUpperCase()}</strong></span>
         </div>
-        <span style={{ fontSize: '0.8rem', backgroundColor: '#e2f0d9', color: '#385723', padding: '0.3rem 0.6rem', borderRadius: '12px', fontWeight: 'bold' }}>
-          Identificado
-        </span>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          {modelId && (
+            <span style={{
+              fontSize: '0.75rem',
+              backgroundColor: modelId.includes('heuristic') ? '#f3f4f6' : '#e0f2fe',
+              color: modelId.includes('heuristic') ? '#4b5563' : '#0369a1',
+              border: `1px solid ${modelId.includes('heuristic') ? '#d1d5db' : '#bae6fd'}`,
+              padding: '0.25rem 0.6rem',
+              borderRadius: '12px',
+              fontWeight: '600'
+            }}>
+              {modelId.includes('heuristic') ? '⚡ Modo Heurístico Local' : `✨ AWS Bedrock (${modelId})`}
+            </span>
+          )}
+          <span style={{ fontSize: '0.8rem', backgroundColor: '#e2f0d9', color: '#385723', padding: '0.3rem 0.6rem', borderRadius: '12px', fontWeight: 'bold' }}>
+            Identificado
+          </span>
+        </div>
       </div>
 
       <div style={{ marginBottom: '1.2rem' }}>

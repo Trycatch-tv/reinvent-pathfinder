@@ -18,6 +18,12 @@ interface LearningPathViewProps {
   readonly userId?: string
   /** Cierra el ciclo adaptativo: aplica la reflexión y recalcula la ruta. */
   readonly onReflectionSubmit?: (reflection: Reflection) => void
+  readonly onToggleFavorite?: (sessionId: string, isFavorite: boolean) => void
+  readonly favoriteSessionIds?: readonly string[]
+  readonly favoriteMutationSessionId?: string | null
+  readonly onToggleReservation?: (sessionId: string, isReserved: boolean) => void
+  readonly reservedSessionIds?: readonly string[]
+  readonly reservationMutationSessionId?: string | null
 }
 
 function conflictsForSession(
@@ -36,12 +42,26 @@ export const LearningPathView: React.FC<LearningPathViewProps> = ({
   gaps = [],
   userId = "local-user",
   onReflectionSubmit,
+  onToggleFavorite,
+  favoriteSessionIds,
+  favoriteMutationSessionId,
+  onToggleReservation,
+  reservedSessionIds,
+  reservationMutationSessionId,
 }) => {
   const recById = useMemo(
     () => new Map(recommendations.map((r) => [r.sessionId, r])),
     [recommendations],
   )
   const gapById = useMemo(() => new Map(gaps.map((g) => [g.id, g])), [gaps])
+  const favoriteSet = useMemo(
+    () => new Set(favoriteSessionIds ?? []),
+    [favoriteSessionIds],
+  )
+  const reservedSet = useMemo(
+    () => new Set(reservedSessionIds ?? []),
+    [reservedSessionIds],
+  )
 
   const [discarded, setDiscarded] = useState<ReadonlySet<string>>(new Set())
   const [reflectingSessionId, setReflectingSessionId] = useState<string | null>(
@@ -211,57 +231,155 @@ export const LearningPathView: React.FC<LearningPathViewProps> = ({
                     )}
                   </div>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "0.3rem",
-                      alignItems: "flex-end",
-                    }}
-                  >
-                    {onReflectionSubmit && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setReflectingSessionId(
-                            reflectingSessionId === item.sessionId
-                              ? null
-                              : item.sessionId,
-                          )
-                        }
-                        title="Registrar reflexión tras asistir a esta sesión"
+                  {(() => {
+                    const isFavorite = favoriteSet.has(item.sessionId)
+                    const isReserved = reservedSet.has(item.sessionId)
+                    const isMutatingFavorite =
+                      favoriteMutationSessionId === item.sessionId
+                    const isMutatingReservation =
+                      reservationMutationSessionId === item.sessionId
+
+                    return (
+                      <div
                         style={{
-                          background: "none",
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "4px",
-                          color: "#0284c7",
-                          cursor: "pointer",
-                          fontSize: "0.75rem",
-                          padding: "0.2rem 0.5rem",
-                          whiteSpace: "nowrap",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.4rem",
+                          alignItems: "flex-end",
+                          minWidth: "150px",
                         }}
                       >
-                        {reflectingSessionId === item.sessionId
-                          ? "Cerrar"
-                          : "Reflexionar"}
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleDiscard(item.sessionId)}
-                      title="Descartar esta sesión de tu ruta"
-                      style={{
-                        background: "none",
-                        border: "none",
-                        color: "#9ca3af",
-                        cursor: "pointer",
-                        fontSize: "1.1rem",
-                        padding: "0.2rem 0.5rem",
-                      }}
-                    >
-                      ×
-                    </button>
-                  </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.3rem",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          {onToggleFavorite && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onToggleFavorite(item.sessionId, isFavorite)
+                              }
+                              disabled={isMutatingFavorite}
+                              title={
+                                isFavorite
+                                  ? "Quitar de tus favoritas"
+                                  : "Marcar como favorita"
+                              }
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.2rem",
+                                background: isFavorite ? "#fef9c3" : "#f8fafc",
+                                border: isFavorite
+                                  ? "1px solid #facc15"
+                                  : "1px solid #cbd5e1",
+                                borderRadius: "4px",
+                                color: isFavorite ? "#854d0e" : "#475569",
+                                cursor: isMutatingFavorite ? "wait" : "pointer",
+                                fontSize: "0.75rem",
+                                padding: "0.25rem 0.5rem",
+                                fontWeight: isFavorite ? "600" : "normal",
+                              }}
+                            >
+                              {isMutatingFavorite
+                                ? "…"
+                                : isFavorite
+                                  ? "★ Favorita"
+                                  : "☆ Favorita"}
+                            </button>
+                          )}
+
+                          {onToggleReservation && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onToggleReservation(item.sessionId, isReserved)
+                              }
+                              disabled={isMutatingReservation}
+                              title={
+                                isReserved
+                                  ? "Cancelar tu reserva para esta sesión"
+                                  : "Reservar asiento en AWS Events"
+                              }
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.2rem",
+                                background: isReserved ? "#dcfce7" : "#f0f9ff",
+                                border: isReserved
+                                  ? "1px solid #86efac"
+                                  : "1px solid #bae6fd",
+                                borderRadius: "4px",
+                                color: isReserved ? "#166534" : "#0284c7",
+                                cursor: isMutatingReservation
+                                  ? "wait"
+                                  : "pointer",
+                                fontSize: "0.75rem",
+                                padding: "0.25rem 0.5rem",
+                                fontWeight: isReserved ? "600" : "normal",
+                              }}
+                            >
+                              {isMutatingReservation
+                                ? "…"
+                                : isReserved
+                                  ? "✓ Reservada"
+                                  : "🎟️ Reservar"}
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleDiscard(item.sessionId)}
+                            title="Descartar esta sesión de tu ruta"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#9ca3af",
+                              cursor: "pointer",
+                              fontSize: "1.1rem",
+                              padding: "0 0.2rem",
+                              lineHeight: 1,
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+
+                        {onReflectionSubmit && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setReflectingSessionId(
+                                reflectingSessionId === item.sessionId
+                                  ? null
+                                  : item.sessionId,
+                              )
+                            }
+                            title="Registrar reflexión tras asistir a esta sesión"
+                            style={{
+                              background: "none",
+                              border: "1px solid #cbd5e1",
+                              borderRadius: "4px",
+                              color: "#0284c7",
+                              cursor: "pointer",
+                              fontSize: "0.75rem",
+                              padding: "0.2rem 0.5rem",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {reflectingSessionId === item.sessionId
+                              ? "Cerrar"
+                              : "Reflexionar"}
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {onReflectionSubmit &&
