@@ -17,10 +17,17 @@ export interface CostValidationResult {
 }
 
 const MODEL_PRICING_PER_1K: Record<string, { input: number; output: number }> = {
-  // Claude 3.5 Sonnet: $0.003 / 1k input, $0.015 / 1k output
+  // Amazon Nova Micro: $0.035 / 1M input, $0.14 / 1M output
+  'nova-micro': { input: 0.000035, output: 0.00014 },
+  // Amazon Nova Lite: $0.06 / 1M input, $0.24 / 1M output
+  'nova-lite': { input: 0.00006, output: 0.00024 },
+  // Amazon Nova Pro: $0.80 / 1M input, $3.20 / 1M output
+  'nova-pro': { input: 0.0008, output: 0.0032 },
+  'nova': { input: 0.000035, output: 0.00014 },
+  // Claude models
   'anthropic.claude-3-5-sonnet': { input: 0.003, output: 0.015 },
-  // Claude 3 Haiku: $0.00025 / 1k input, $0.00125 / 1k output
   'anthropic.claude-3-haiku': { input: 0.00025, output: 0.00125 },
+  'claude': { input: 0.003, output: 0.015 },
   // Default fallback for unknown models
   default: { input: 0.003, output: 0.015 },
 };

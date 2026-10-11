@@ -17,7 +17,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "typecheck": "tsc -b",
-    "auth:demo": "node --import tsx packages/events-client/src/demo-auth.ts"
+    "auth:demo": "node --import tsx packages/events-client/src/demo-auth.ts",
+    "test:ai": "pnpm --filter @pathfinder/ai-knowledge exec tsx scripts/test-bedrock-live.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

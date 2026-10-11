@@ -245,7 +245,7 @@ export class BedrockSessionReranker implements SessionRerankerProvider {
   public readonly tracker?: AiMetricsTracker;
 
   constructor(options: BedrockRerankerOptions = {}) {
-    this.modelId = options.modelId ?? process.env.BEDROCK_MODEL_ID ?? 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+    this.modelId = options.modelId ?? process.env.BEDROCK_MODEL_ID ?? 'us.amazon.nova-micro-v1:0';
     this.region = options.region ?? process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-1';
     this.fallbackReranker = new HeuristicSessionReranker(options.weights);
     this.filter = new CandidateFilter();
