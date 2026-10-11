@@ -47,6 +47,7 @@ import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LandingView } from "./components/LandingView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
+import { ModeSelector } from "./components/ModeSelector.js"
 import { ReflectionForm } from "./components/ReflectionForm.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 
@@ -423,11 +424,26 @@ describe("apps/client UI components", () => {
     expect(html).toContain("DynamoDB Single-Table Design")
   })
 
-  it("App renders login requirement view initially when unauthenticated", () => {
-    const html = renderToString(React.createElement(App))
-    expect(html).toContain("re:Invent Pathfinder")
-    expect(html).toContain("Inicio de sesión requerido")
-    expect(html).toContain("AWS Builder ID")
+  it("App renders login requirement view in Live mode when unauthenticated", () => {
+    const storageValues = new Map<string, string>([
+      ["pathfinder_experience_mode", "live"],
+    ])
+    vi.stubGlobal("window", {
+      location: { pathname: "/" },
+      localStorage: {
+        getItem: (k: string) => storageValues.get(k) ?? null,
+        setItem: (k: string, v: string) => storageValues.set(k, v),
+        removeItem: (k: string) => storageValues.delete(k),
+      },
+    })
+    try {
+      const html = renderToString(React.createElement(App))
+      expect(html).toContain("re:Invent Pathfinder")
+      expect(html).toContain("Inicio de sesión requerido (Modo Live)")
+      expect(html).toContain("AWS Builder ID")
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it("LearningPathView renders ordered items, covered gaps and conflict state", () => {
@@ -638,4 +654,53 @@ describe("apps/client UI components", () => {
     expect(html).toContain('href="/about"')
     expect(html).toContain("Qué es Pathfinder")
   })
+
+  it("renders ModeSelector with Demo and Live options and descriptions", () => {
+    const html = renderToString(
+      React.createElement(ModeSelector, {
+        currentMode: "demo",
+        onSelectMode: () => {},
+        isAuthenticated: false,
+      }),
+    )
+
+    expect(html).toContain("Modo Demo")
+    expect(html).toContain("Modo Live (re:Invent)")
+    expect(html).toContain("Sin credenciales ni llamadas reales a AWS")
+    expect(html).toContain("Requiere autenticación con AWS Builder ID")
+    expect(html).toContain("✓ Explorando en Demo")
+    expect(html).toContain("ACTIVO")
+  })
+
+  it("defaults App to Demo mode with badge and context capture form without fake token injection", () => {
+    const html = renderToString(React.createElement(App))
+    expect(html).toContain("Modo Demo")
+    expect(html).toContain("Cambiar a")
+    expect(html).toContain("Paso 1: ¿Qué estás construyendo?")
+    expect(html).not.toContain("Acceso rápido Demo")
+  })
+
+  it("displays Builder ID login gate when in Live mode and unauthenticated", () => {
+    const storageValues = new Map<string, string>([
+      ["pathfinder_experience_mode", "live"],
+    ])
+    vi.stubGlobal("window", {
+      location: { pathname: "/" },
+      localStorage: {
+        getItem: (k: string) => storageValues.get(k) ?? null,
+        setItem: (k: string, v: string) => storageValues.set(k, v),
+        removeItem: (k: string) => storageValues.delete(k),
+      },
+    })
+    try {
+      const html = renderToString(React.createElement(App))
+      expect(html).toContain("Modo Live")
+      expect(html).toContain("Inicio de sesión requerido (Modo Live)")
+      expect(html).toContain("Iniciar sesión con AWS Builder ID")
+      expect(html).not.toContain("Acceso rápido Demo")
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
 })
+

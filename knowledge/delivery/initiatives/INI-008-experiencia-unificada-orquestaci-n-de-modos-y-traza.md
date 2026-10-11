@@ -59,6 +59,7 @@ candidates:
       Demo y Live deben ser modos explícitos. El modo debe conservarse de forma
       segura durante navegación y recargas. Ningún token simulado debe
       representar una sesión real de Builder ID.
+    materialized_as: WI-032
   - id: WI-CANDIDATE-004
     title: Providers aislados para ejecución Demo y Live
     type: refactor

@@ -12,6 +12,7 @@ export * from './types/schedule-conflict.js';
 export * from './types/learning-path.js';
 export * from './types/reflection.js';
 export * from './types/attendee-journey.js';
+export * from './types/experience-mode.js';
 
 // Logic & Domain services
 export * from './logic/gap-transitions.js';

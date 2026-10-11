@@ -13,6 +13,7 @@ import type {
   RankRecommendationsResponse,
 } from "@pathfinder/contracts"
 import type {
+  ExperienceMode,
   KnowledgeGap,
   LearningPath,
   Reflection,
@@ -41,6 +42,7 @@ import { KnowledgeProfileView } from "./components/KnowledgeProfileView.js"
 import { LandingView } from "./components/LandingView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
+import { ModeSelector } from "./components/ModeSelector.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 
 export function resolveAuthRedirectUri(
@@ -80,7 +82,15 @@ type LiveScheduleSnapshot = Awaited<
 
 export function selectAvailabilitySnapshot(
   snapshot: LiveAvailabilitySnapshot | null,
+  mode: ExperienceMode = "live",
 ) {
+  if (mode === "demo") {
+    return {
+      sessions: DEMO_SESSIONS,
+      availability: SAMPLE_HEATMAP_AVAILABILITY,
+      source: "fixture" as const,
+    }
+  }
   return snapshot
     ? { ...snapshot, source: "live" as const }
     : {
@@ -173,8 +183,10 @@ export function describeReservationReconciliation(input: {
 }
 
 const JOURNEY_STORAGE_KEY = "pathfinder_journey_state"
+const MODE_STORAGE_KEY = "pathfinder_experience_mode"
 
 interface SavedJourneyState {
+  readonly mode?: ExperienceMode
   readonly analysisResult: AnalyzeContextResponse | null
   readonly learningPath: LearningPath | null
   readonly recommendations: readonly SessionRecommendation[]
@@ -195,6 +207,21 @@ function loadSavedJourney(): Partial<SavedJourneyState> {
 
 export const App: React.FC = () => {
   const savedJourney = loadSavedJourney()
+  const [mode, setMode] = useState<ExperienceMode>(() => {
+    if (savedJourney.mode === "demo" || savedJourney.mode === "live") {
+      return savedJourney.mode
+    }
+    if (typeof window !== "undefined") {
+      try {
+        const stored = window.localStorage.getItem(MODE_STORAGE_KEY)
+        if (stored === "demo" || stored === "live") return stored
+      } catch {
+        // Ignore localStorage access errors in private/restricted environments
+      }
+    }
+    return "demo"
+  })
+
   const [analysisResult, setAnalysisResult] =
     useState<AnalyzeContextResponse | null>(() => savedJourney.analysisResult ?? null)
   const [isLoading, setIsLoading] = useState(false)
@@ -222,6 +249,7 @@ export const App: React.FC = () => {
         window.localStorage.setItem(
           JOURNEY_STORAGE_KEY,
           JSON.stringify({
+            mode,
             analysisResult,
             learningPath,
             recommendations,
@@ -236,16 +264,19 @@ export const App: React.FC = () => {
     } catch {
       // Ignore storage errors in restricted contexts
     }
-  }, [analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
+  }, [mode, analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
 
-  const handleQuickDemoLogin = () => {
-    tokenStore.setTokens({
-      accessToken: "demo-builder-id-token-" + Date.now(),
-      expiresIn: 86400,
-      tokenType: "Bearer",
-    })
-    setIsAuthenticated(true)
+  const handleSelectMode = (newMode: ExperienceMode) => {
+    setMode(newMode)
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem(MODE_STORAGE_KEY, newMode)
+      } catch {
+        // Ignore localStorage access errors in private/restricted environments
+      }
+    }
   }
+
   const [isRefreshingAvailability, setIsRefreshingAvailability] =
     useState(false)
   const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(
@@ -277,7 +308,7 @@ export const App: React.FC = () => {
   const isAvailabilityRoute = route === "/availability"
   const isCallbackRoute = route === "/callback"
   const isAboutRoute = route === "/about"
-  const availabilityView = selectAvailabilitySnapshot(liveSnapshot)
+  const availabilityView = selectAvailabilitySnapshot(liveSnapshot, mode)
 
   useEffect(() => {
     const onPopState = () => setRoute(window.location.pathname)
@@ -506,6 +537,30 @@ export const App: React.FC = () => {
     sessionId: string,
     isFavorite: boolean,
   ) => {
+    if (mode === "demo") {
+      setScheduleSnapshot((prev) => {
+        const cur = prev ?? {
+          reservedSessionIds: ["sess-aim-301"],
+          favoriteSessionIds: ["sess-sec-305"],
+          personalTime: [],
+          lastSyncedAt: new Date().toISOString(),
+          items: SAMPLE_USER_SCHEDULE,
+        }
+        const updatedFavorites = isFavorite
+          ? cur.favoriteSessionIds.filter((id) => id !== sessionId)
+          : [...cur.favoriteSessionIds, sessionId]
+        return {
+          ...cur,
+          favoriteSessionIds: updatedFavorites,
+        }
+      })
+      setScheduleMessage(
+        isFavorite
+          ? "Favorito removido (Modo Demo)."
+          : "Favorito guardado (Modo Demo).",
+      )
+      return
+    }
     if (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken()) return
     setFavoriteMutationSessionId(sessionId)
     setScheduleMessage(null)
@@ -537,6 +592,30 @@ export const App: React.FC = () => {
     sessionId: string,
     isReserved: boolean,
   ) => {
+    if (mode === "demo") {
+      setScheduleSnapshot((prev) => {
+        const cur = prev ?? {
+          reservedSessionIds: ["sess-aim-301"],
+          favoriteSessionIds: ["sess-sec-305"],
+          personalTime: [],
+          lastSyncedAt: new Date().toISOString(),
+          items: SAMPLE_USER_SCHEDULE,
+        }
+        const updatedReserved = isReserved
+          ? cur.reservedSessionIds.filter((id) => id !== sessionId)
+          : [...cur.reservedSessionIds, sessionId]
+        return {
+          ...cur,
+          reservedSessionIds: updatedReserved,
+        }
+      })
+      setScheduleMessage(
+        isReserved
+          ? "Cancelación de reserva confirmada (Modo Demo)."
+          : "Reserva confirmada (Modo Demo).",
+      )
+      return
+    }
     if (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken()) return
     setReservationMutationSessionId(sessionId)
     setScheduleMessage(null)
@@ -584,16 +663,87 @@ export const App: React.FC = () => {
           paddingBottom: "1rem",
         }}
       >
-        <h1 style={{ margin: 0, fontSize: "1.8rem", color: "#0f172a" }}>
-          re:Invent Pathfinder
-        </h1>
-        <p
-          style={{ margin: "0.4rem 0 0 0", color: "#475569", fontSize: "1rem" }}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: "1rem",
+          }}
         >
-          AI companion que transforma el catálogo de AWS re:Invent en una ruta
-          de aprendizaje adaptativa.
-        </p>
-        <p style={{ marginBottom: 0, display: "flex", gap: "1rem" }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: "1.8rem", color: "#0f172a" }}>
+              re:Invent Pathfinder
+            </h1>
+            <p
+              style={{
+                margin: "0.4rem 0 0 0",
+                color: "#475569",
+                fontSize: "1rem",
+              }}
+            >
+              AI companion que transforma el catálogo de AWS re:Invent en una ruta
+              de aprendizaje adaptativa.
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.75rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 12px",
+                borderRadius: "9999px",
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                background:
+                  mode === "live"
+                    ? "rgba(249, 115, 22, 0.12)"
+                    : "rgba(56, 189, 248, 0.12)",
+                color: mode === "live" ? "#ea580c" : "#0284c7",
+                border:
+                  mode === "live" ? "1px solid #f97316" : "1px solid #38bdf8",
+              }}
+            >
+              {mode === "live" ? "🔴 Modo Live" : "🧪 Modo Demo"}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                handleSelectMode(mode === "live" ? "demo" : "live")
+              }
+              style={{
+                fontSize: "0.8rem",
+                background: "#f1f5f9",
+                border: "1px solid #cbd5e1",
+                borderRadius: "6px",
+                padding: "4px 8px",
+                color: "#475569",
+                cursor: "pointer",
+                fontWeight: 500,
+              }}
+            >
+              Cambiar a {mode === "live" ? "Demo" : "Live"}
+            </button>
+          </div>
+        </div>
+
+        <p
+          style={{
+            margin: "1rem 0 0 0",
+            display: "flex",
+            gap: "1rem",
+            flexWrap: "wrap",
+          }}
+        >
           {!isAboutRoute && (
             <a
               href="/about"
@@ -617,26 +767,30 @@ export const App: React.FC = () => {
             </a>
           )}
         </p>
-        {!isCallbackRoute && (
-          <BuilderIdLogin
-            client={authClient}
-            authenticated={isAuthenticated}
-            onAuthenticated={() => {
-              setIsAuthenticated(true)
-              setRoute("/")
-            }}
-            onLogout={() => {
-              tokenStore.clear()
-              setIsAuthenticated(false)
-            }}
-            onQuickDemoLogin={handleQuickDemoLogin}
-          />
+        {!isCallbackRoute && mode === "live" && (
+          <div style={{ marginTop: "1rem" }}>
+            <BuilderIdLogin
+              client={authClient}
+              authenticated={isAuthenticated}
+              onAuthenticated={() => {
+                setIsAuthenticated(true)
+                setRoute("/")
+              }}
+              onLogout={() => {
+                tokenStore.clear()
+                setIsAuthenticated(false)
+              }}
+            />
+          </div>
         )}
       </header>
 
       {isAboutRoute ? (
         <LandingView
-          onNavigateDemo={() => navigate("/availability")}
+          onNavigateDemo={() => {
+            handleSelectMode("demo")
+            navigate("/availability")
+          }}
           onNavigateHome={() => navigate("/")}
         />
       ) : isAvailabilityRoute ? (
@@ -647,12 +801,12 @@ export const App: React.FC = () => {
           snapshotAt={liveSnapshot?.observedAt}
           liveStatus={availabilityMessage ?? scheduleMessage ?? undefined}
           isRefreshing={isRefreshingAvailability}
-          canRefreshLive={isAuthenticated}
+          canRefreshLive={mode === "live" && isAuthenticated}
           onRefreshLive={handleAvailabilityRefresh}
           onReturnHome={() => navigate("/")}
           schedule={scheduleSnapshot ?? undefined}
           isRefreshingSchedule={isRefreshingSchedule}
-          canRefreshSchedule={canLoadSchedule}
+          canRefreshSchedule={mode === "live" && canLoadSchedule}
           onRefreshSchedule={handleScheduleRefresh}
           onToggleFavorite={handleToggleFavorite}
           favoriteMutationSessionId={favoriteMutationSessionId}
@@ -671,10 +825,15 @@ export const App: React.FC = () => {
             tokenStore.clear()
             setIsAuthenticated(false)
           }}
-          onQuickDemoLogin={handleQuickDemoLogin}
         />
       ) : (
         <>
+          <ModeSelector
+            currentMode={mode}
+            onSelectMode={handleSelectMode}
+            isAuthenticated={isAuthenticated}
+          />
+
           {error && (
             <div
               style={{
@@ -689,7 +848,7 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {!isAuthenticated ? (
+          {mode === "live" && !isAuthenticated ? (
             <section
               style={{
                 backgroundColor: "#f8fafc",
@@ -706,7 +865,7 @@ export const App: React.FC = () => {
               <h2
                 style={{ marginTop: 0, fontSize: "1.5rem", color: "#0f172a" }}
               >
-                Inicio de sesión requerido
+                Inicio de sesión requerido (Modo Live)
               </h2>
               <p
                 style={{
@@ -716,13 +875,15 @@ export const App: React.FC = () => {
                   marginBottom: "2rem",
                 }}
               >
-                Para consultar el catálogo oficial de sesiones desde la API de <strong>AWS Events</strong> y construir tu ruta de aprendizaje con <strong>AWS Bedrock</strong>, es necesario autenticarte con tu cuenta de <strong>AWS Builder ID</strong>.
+                Para consultar el catálogo oficial de sesiones desde la API de <strong>AWS Events</strong> y construir tu ruta de aprendizaje con <strong>AWS Bedrock</strong>, es necesario autenticarte con tu cuenta de <strong>AWS Builder ID</strong>. Si prefieres explorar sin credenciales, cambia al <strong>Modo Demo</strong>.
               </p>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  gap: "1rem",
+                  flexWrap: "wrap",
                 }}
               >
                 <BuilderIdLogin
@@ -736,8 +897,22 @@ export const App: React.FC = () => {
                     tokenStore.clear()
                     setIsAuthenticated(false)
                   }}
-                  onQuickDemoLogin={handleQuickDemoLogin}
                 />
+                <button
+                  type="button"
+                  onClick={() => handleSelectMode("demo")}
+                  style={{
+                    backgroundColor: "#0284c7",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "0.4rem 0.8rem",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                  }}
+                >
+                  🧪 Cambiar a Modo Demo
+                </button>
               </div>
             </section>
           ) : !analysisResult ? (
