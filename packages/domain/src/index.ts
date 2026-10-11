@@ -13,6 +13,7 @@ export * from './types/learning-path.js';
 export * from './types/reflection.js';
 export * from './types/attendee-journey.js';
 export * from './types/experience-mode.js';
+export * from './types/ai-trace.js';
 
 // Logic & Domain services
 export * from './logic/gap-transitions.js';

@@ -3,12 +3,14 @@ import {
   buildLearningReport,
 } from "@pathfinder/ai-knowledge"
 import type {
+  ExecutionStage,
   KnowledgeGap,
   KnowledgeProfile,
   ProjectContext,
   Reflection,
   SessionCandidate,
   SessionRecommendation,
+  StageExecutionTrace,
 } from "@pathfinder/domain"
 import {
   AwsEventsForbiddenError,
@@ -37,6 +39,8 @@ import {
   type BuilderIdAuthClient,
   type TransactionStorage,
 } from "./auth/builder-id-transaction.js"
+import { AITraceBadge } from "./components/AITraceBadge.js"
+import { AITracePanel } from "./components/AITracePanel.js"
 import {
   AvailabilityHeatmap,
   createAvailabilityProjection,
@@ -721,6 +725,99 @@ describe("apps/client UI components", () => {
     } finally {
       vi.unstubAllGlobals()
     }
+  })
+
+  describe("AI Traceability components", () => {
+    it("renders AITraceBadge for Bedrock inference correctly", () => {
+      const trace: StageExecutionTrace = {
+        stage: "context_analysis",
+        stageName: "Diagnóstico de Competencias",
+        engine: "bedrock",
+        modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+        durationMs: 420,
+        executedAt: "2026-10-11T12:00:00Z",
+        summary: "Análisis generativo de contexto y extracción de gaps",
+      }
+      const html = renderToString(
+        React.createElement(AITraceBadge, { trace })
+      )
+      expect(html).toContain("Bedrock (claude-3-5-sonnet-20241022-v2:0)")
+      expect(html).toContain("420ms")
+    })
+
+    it("renders AITraceBadge for heuristic fallback correctly", () => {
+      const trace: StageExecutionTrace = {
+        stage: "session_ranking",
+        stageName: "Ranking de Sesiones",
+        engine: "heuristic",
+        durationMs: 45,
+        executedAt: "2026-10-11T12:00:00Z",
+        fallbackReason: "Credenciales de AWS no configuradas",
+        summary: "Ranking heurístico local",
+      }
+      const html = renderToString(
+        React.createElement(AITraceBadge, { trace })
+      )
+      expect(html).toContain("Heurístico Local (Fallback)")
+      expect(html).toContain("45ms")
+    })
+
+    it("renders AITraceBadge for deterministic execution correctly", () => {
+      const trace: StageExecutionTrace = {
+        stage: "path_construction",
+        stageName: "Construcción de Learning Path",
+        engine: "deterministic",
+        durationMs: 12,
+        executedAt: "2026-10-11T12:00:00Z",
+        summary: "Reconciliación determinística de agenda y disponibilidad",
+      }
+      const html = renderToString(
+        React.createElement(AITraceBadge, { trace })
+      )
+      expect(html).toContain("Determinístico")
+      expect(html).toContain("12ms")
+    })
+
+    it("renders AITraceBadge fallback when trace is undefined", () => {
+      const html = renderToString(
+        React.createElement(AITraceBadge, { trace: undefined })
+      )
+      expect(html).toContain("Pendiente")
+    })
+
+    it("renders AITracePanel with multiple stage traces and descriptions when expanded", () => {
+      const traces: Partial<Record<ExecutionStage, StageExecutionTrace>> = {
+        context_analysis: {
+          stage: "context_analysis",
+          stageName: "Diagnóstico de Competencias",
+          engine: "bedrock",
+          modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+          durationMs: 450,
+          executedAt: "2026-10-11T12:00:00Z",
+          summary: "Análisis semántico",
+        },
+        path_construction: {
+          stage: "path_construction",
+          stageName: "Construcción de Learning Path",
+          engine: "deterministic",
+          durationMs: 15,
+          executedAt: "2026-10-11T12:00:01Z",
+          summary: "Algoritmo voraz de horarios",
+        },
+      }
+      const html = renderToString(
+        React.createElement(AITracePanel, {
+          traces,
+          defaultExpanded: true,
+        })
+      )
+      expect(html).toContain("Trazabilidad de Pipeline e IA")
+      expect(html).toContain("2 / 5 etapas registradas")
+      expect(html).toContain("Diagnóstico de Competencias")
+      expect(html).toContain("Construcción de Learning Path")
+      expect(html).toContain("Análisis semántico")
+      expect(html).toContain("Algoritmo voraz de horarios")
+    })
   })
 })
 

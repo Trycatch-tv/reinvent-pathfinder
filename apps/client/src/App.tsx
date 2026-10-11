@@ -13,12 +13,14 @@ import type {
   RankRecommendationsResponse,
 } from "@pathfinder/contracts"
 import type {
+  ExecutionStage,
   ExperienceMode,
   KnowledgeGap,
   LearningPath,
   Reflection,
   SessionCandidate,
   SessionRecommendation,
+  StageExecutionTrace,
 } from "@pathfinder/domain"
 import {
   AwsBuilderIdAuthClient,
@@ -34,6 +36,8 @@ import {
   normalizeAwsSession,
 } from "@pathfinder/events-client"
 import React, { useEffect, useMemo, useRef, useState } from "react"
+import { AITraceBadge } from "./components/AITraceBadge.js"
+import { AITracePanel } from "./components/AITracePanel.js"
 import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
 import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 import { ContextForm } from "./components/ContextForm.js"
@@ -189,6 +193,7 @@ const MODE_STORAGE_KEY = "pathfinder_experience_mode"
 interface SavedJourneyState {
   readonly mode?: ExperienceMode
   readonly activeCatalog?: readonly SessionCandidate[]
+  readonly traces?: Partial<Record<ExecutionStage, StageExecutionTrace>>
   readonly analysisResult: AnalyzeContextResponse | null
   readonly learningPath: LearningPath | null
   readonly recommendations: readonly SessionRecommendation[]
@@ -232,6 +237,14 @@ export const App: React.FC = () => {
   const [activeCatalog, setActiveCatalog] = useState<
     readonly SessionCandidate[]
   >(() => savedJourney.activeCatalog ?? DEMO_SESSIONS)
+  const [traces, setTraces] = useState<
+    Partial<Record<ExecutionStage, StageExecutionTrace>>
+  >(() => savedJourney.traces ?? {})
+
+  const recordTrace = (trace: StageExecutionTrace) => {
+    setTraces((prev) => ({ ...prev, [trace.stage]: trace }))
+  }
+
   const [analysisResult, setAnalysisResult] =
     useState<AnalyzeContextResponse | null>(() => savedJourney.analysisResult ?? null)
   const [isLoading, setIsLoading] = useState(false)
@@ -261,6 +274,7 @@ export const App: React.FC = () => {
           JSON.stringify({
             mode,
             activeCatalog,
+            traces,
             analysisResult,
             learningPath,
             recommendations,
@@ -275,7 +289,7 @@ export const App: React.FC = () => {
     } catch {
       // Ignore storage errors in restricted contexts
     }
-  }, [mode, activeCatalog, analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
+  }, [mode, activeCatalog, traces, analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
 
   const handleSelectMode = (newMode: ExperienceMode) => {
     setMode(newMode)
@@ -409,6 +423,7 @@ export const App: React.FC = () => {
     try {
       // 1. Intentar llamar al backend con Amazon Bedrock AI real
       let result: AnalyzeContextResponse
+      let engine: "bedrock" | "heuristic" = "bedrock"
       try {
         const response = await fetch("/api/analyze", {
           method: "POST",
@@ -421,10 +436,22 @@ export const App: React.FC = () => {
           throw new Error(`API error ${response.status}`)
         }
       } catch {
+        engine = "heuristic"
         // Fallback resiliente al analizador heurístico local
         const analyzer = new HeuristicContextAnalyzer()
         result = await analyzer.analyze(request)
       }
+      recordTrace({
+        stage: "context_analysis",
+        stageName: "Diagnóstico de Competencias",
+        engine,
+        modelId: result.modelId,
+        summary:
+          engine === "bedrock"
+            ? `Inferencia generativa de Knowledge Profile con modelo ${result.modelId}`
+            : "Análisis heurístico local tras contingencia de red/API",
+        executedAt: new Date().toISOString(),
+      })
       setAnalysisResult(result)
     } catch (err: unknown) {
       setError(
@@ -459,6 +486,7 @@ export const App: React.FC = () => {
 
       // 2. Rank recommendations: llamar a Bedrock AI real via API con fallback heurístico
       let ranked: RankRecommendationsResponse
+      let rankEngine: "bedrock" | "heuristic" = "bedrock"
       const rankRequest: RankRecommendationsRequest = {
         projectContext: analysisResult.projectContext,
         knowledgeGaps: analysisResult.knowledgeGaps,
@@ -476,9 +504,22 @@ export const App: React.FC = () => {
           throw new Error(`API error ${response.status}`)
         }
       } catch {
+        rankEngine = "heuristic"
         const reranker = new HeuristicSessionReranker()
         ranked = await reranker.rank(rankRequest)
       }
+
+      recordTrace({
+        stage: "session_ranking",
+        stageName: "Ranking de Sesiones",
+        engine: rankEngine,
+        modelId: ranked.modelId,
+        summary:
+          rankEngine === "bedrock"
+            ? `Reranking semántico con Amazon Bedrock (${ranked.modelId})`
+            : "Reranker heurístico basado en coincidencia semántica de gaps",
+        executedAt: new Date().toISOString(),
+      })
 
       // 3. Build the LearningPath and reconcile with the schedule.
       const path = buildLearningPath({
@@ -487,6 +528,15 @@ export const App: React.FC = () => {
         scheduledItems: currentSchedule.items,
         userId: "local-user",
         journeyId: analysisResult.projectContext.id,
+      })
+
+      recordTrace({
+        stage: "path_construction",
+        stageName: "Construcción de Learning Path",
+        engine: "deterministic",
+        summary:
+          "Evaluación determinística de conflictos y reconciliación con la agenda",
+        executedAt: new Date().toISOString(),
       })
 
       setRecommendations(ranked.recommendations)
@@ -509,7 +559,15 @@ export const App: React.FC = () => {
   // Cierra el ciclo del producto (Journey 6): contrasta los gaps iniciales con
   // los actuales (tras reflexiones) y genera el Learning Report. Local-first.
   const handleGenerateReport = () => {
-    setLearningReport(buildLearningReport({ initialGaps, currentGaps }))
+    const report = buildLearningReport({ initialGaps, currentGaps })
+    recordTrace({
+      stage: "report_generation",
+      stageName: "Síntesis de Learning Report",
+      engine: "deterministic",
+      summary: "Comparación determinística de brechas cubiertas vs pendientes",
+      executedAt: new Date().toISOString(),
+    })
+    setLearningReport(report)
   }
 
   // Cierra el ciclo adaptativo (Journey 5): aplica la reflexión, recalcula gaps,
@@ -540,6 +598,14 @@ export const App: React.FC = () => {
         userId: "local-user",
         journeyId: analysisResult.projectContext.id,
       })
+      recordTrace({
+        stage: "reflection_adaptation",
+        stageName: "Reflexión Adaptativa",
+        engine: "heuristic",
+        summary:
+          "Reajuste heurístico de gaps y recomendaciones tras feedback de sesión",
+        executedAt: new Date().toISOString(),
+      })
       setCurrentGaps(result.updatedGaps)
       setRecommendations(result.recommendations)
       setLearningPath(result.learningPath)
@@ -550,6 +616,7 @@ export const App: React.FC = () => {
 
   const handleReset = () => {
     setActiveCatalog(DEMO_SESSIONS)
+    setTraces({})
     setAnalysisResult(null)
     setLearningPath(null)
     setRecommendations([])
@@ -1063,11 +1130,16 @@ export const App: React.FC = () => {
                   justifyContent: "space-between",
                   alignItems: "center",
                   marginBottom: "1.5rem",
+                  flexWrap: "wrap",
+                  gap: "0.5rem",
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: "1.4rem", color: "#0f172a" }}>
-                  Tu Diagnóstico de Aprendizaje
-                </h2>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <h2 style={{ margin: 0, fontSize: "1.4rem", color: "#0f172a" }}>
+                    Tu Diagnóstico de Aprendizaje
+                  </h2>
+                  <AITraceBadge trace={traces.context_analysis} />
+                </div>
                 <button
                   type="button"
                   onClick={handleReset}
@@ -1134,19 +1206,45 @@ export const App: React.FC = () => {
               )}
 
               {learningPath && (
-                <LearningPathView
-                  learningPath={learningPath}
-                  recommendations={recommendations}
-                  gaps={currentGaps}
-                  userId="local-user"
-                  onReflectionSubmit={handleReflectionSubmit}
-                  onToggleFavorite={handleToggleFavorite}
-                  favoriteSessionIds={scheduleSnapshot?.favoriteSessionIds}
-                  favoriteMutationSessionId={favoriteMutationSessionId}
-                  onToggleReservation={handleToggleReservation}
-                  reservedSessionIds={scheduleSnapshot?.reservedSessionIds}
-                  reservationMutationSessionId={reservationMutationSessionId}
-                />
+                <div style={{ marginTop: "2rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                      marginBottom: "0.75rem",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#64748b",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Trazabilidad de la Ruta:
+                    </span>
+                    <AITraceBadge trace={traces.session_ranking} />
+                    <AITraceBadge trace={traces.path_construction} />
+                    {traces.reflection_adaptation && (
+                      <AITraceBadge trace={traces.reflection_adaptation} />
+                    )}
+                  </div>
+                  <LearningPathView
+                    learningPath={learningPath}
+                    recommendations={recommendations}
+                    gaps={currentGaps}
+                    userId="local-user"
+                    onReflectionSubmit={handleReflectionSubmit}
+                    onToggleFavorite={handleToggleFavorite}
+                    favoriteSessionIds={scheduleSnapshot?.favoriteSessionIds}
+                    favoriteMutationSessionId={favoriteMutationSessionId}
+                    onToggleReservation={handleToggleReservation}
+                    reservedSessionIds={scheduleSnapshot?.reservedSessionIds}
+                    reservationMutationSessionId={reservationMutationSessionId}
+                  />
+                </div>
               )}
 
               {learningPath && (
@@ -1172,7 +1270,32 @@ export const App: React.FC = () => {
                 </div>
               )}
 
-              {learningReport && <LearningReportView report={learningReport} />}
+              {learningReport && (
+                <div style={{ marginTop: "2rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                      marginBottom: "0.75rem",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#64748b",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Trazabilidad del Reporte:
+                    </span>
+                    <AITraceBadge trace={traces.report_generation} />
+                  </div>
+                  <LearningReportView report={learningReport} />
+                </div>
+              )}
+
+              <AITracePanel traces={traces} />
             </section>
           )}
         </>

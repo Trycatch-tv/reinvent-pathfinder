@@ -97,6 +97,7 @@ candidates:
       Auditar analyze, rank, buildLearningPath, reflection y report. No atribuir
       inferencia a operaciones que no la realizan. Añadir metadata de ejecución
       sin exponer credenciales ni prompts sensibles.
+    materialized_as: WI-035
   - id: WI-CANDIDATE-007
     title: 'Refinamiento de Learning Path, relevancia y agenda'
     type: feature

@@ -14,6 +14,7 @@ import {
   type Reflection,
   type AttendeeJourney,
   type ProjectContext,
+  STAGE_DESCRIPTIONS,
 } from './index.js';
 
 describe('Domain Models and Logic', () => {
@@ -364,4 +365,15 @@ describe('Domain Models and Logic', () => {
       expect(updated.phase).toBe('during');
     });
   });
+
+  describe('AI Pipeline Traceability', () => {
+    it('defines metadata and default engines for all execution stages', () => {
+      expect(STAGE_DESCRIPTIONS.context_analysis.defaultEngine).toBe('bedrock');
+      expect(STAGE_DESCRIPTIONS.session_ranking.defaultEngine).toBe('bedrock');
+      expect(STAGE_DESCRIPTIONS.path_construction.defaultEngine).toBe('deterministic');
+      expect(STAGE_DESCRIPTIONS.reflection_adaptation.defaultEngine).toBe('heuristic');
+      expect(STAGE_DESCRIPTIONS.report_generation.defaultEngine).toBe('deterministic');
+    });
+  });
 });
+
