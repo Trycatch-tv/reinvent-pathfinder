@@ -72,6 +72,7 @@ candidates:
       Separar datos del catálogo, disponibilidad, agenda, favoritos, reservas,
       análisis y ranking. No sustituir silenciosamente resultados Live por
       fixtures cuando una llamada falle.
+    materialized_as: WI-033
   - id: WI-CANDIDATE-005
     title: 'Carga automática de disponibilidad, catálogo y agenda'
     type: feature

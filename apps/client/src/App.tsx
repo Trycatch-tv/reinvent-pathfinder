@@ -30,10 +30,10 @@ import {
   AwsEventsUnauthorizedError,
   LocalStorageTokenStore,
   SAMPLE_RAW_SESSIONS,
-  SAMPLE_USER_SCHEDULE,
+  type UserScheduleResult,
   normalizeAwsSession,
 } from "@pathfinder/events-client"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
 import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 import { ContextForm } from "./components/ContextForm.js"
@@ -44,6 +44,7 @@ import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
 import { ModeSelector } from "./components/ModeSelector.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
+import { createPathfinderDataProvider } from "./providers/index.js"
 
 export function resolveAuthRedirectUri(
   envUri = import.meta.env.VITE_AUTH_REDIRECT_URI,
@@ -187,6 +188,7 @@ const MODE_STORAGE_KEY = "pathfinder_experience_mode"
 
 interface SavedJourneyState {
   readonly mode?: ExperienceMode
+  readonly activeCatalog?: readonly SessionCandidate[]
   readonly analysisResult: AnalyzeContextResponse | null
   readonly learningPath: LearningPath | null
   readonly recommendations: readonly SessionRecommendation[]
@@ -222,6 +224,14 @@ export const App: React.FC = () => {
     return "demo"
   })
 
+  const dataProvider = useMemo(
+    () => createPathfinderDataProvider(mode, { liveEventsClient }),
+    [mode],
+  )
+
+  const [activeCatalog, setActiveCatalog] = useState<
+    readonly SessionCandidate[]
+  >(() => savedJourney.activeCatalog ?? DEMO_SESSIONS)
   const [analysisResult, setAnalysisResult] =
     useState<AnalyzeContextResponse | null>(() => savedJourney.analysisResult ?? null)
   const [isLoading, setIsLoading] = useState(false)
@@ -250,6 +260,7 @@ export const App: React.FC = () => {
           JOURNEY_STORAGE_KEY,
           JSON.stringify({
             mode,
+            activeCatalog,
             analysisResult,
             learningPath,
             recommendations,
@@ -264,7 +275,7 @@ export const App: React.FC = () => {
     } catch {
       // Ignore storage errors in restricted contexts
     }
-  }, [mode, analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
+  }, [mode, activeCatalog, analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
 
   const handleSelectMode = (newMode: ExperienceMode) => {
     setMode(newMode)
@@ -360,15 +371,21 @@ export const App: React.FC = () => {
     setIsBuildingPath(true)
     setError(null)
     try {
-      // 1. Consultar sesiones desde la API de eventos (con fallback resiliente)
-      let candidateSessionsToRank: readonly SessionCandidate[] = DEMO_SESSIONS
+      // 1. Obtener catálogo desde el provider activo (sin fallback silencioso en Live)
+      const candidateSessionsToRank = await dataProvider.catalog.getCatalog()
+      setActiveCatalog(candidateSessionsToRank)
+
+      let currentSchedule: UserScheduleResult
       try {
-        const snapshot = await liveEventsClient.fetchAvailabilitySnapshot()
-        if (snapshot.sessions && snapshot.sessions.length > 0) {
-          candidateSessionsToRank = snapshot.sessions
+        currentSchedule = await dataProvider.schedule.getSchedule()
+      } catch {
+        currentSchedule = {
+          reservedSessionIds: [],
+          favoriteSessionIds: [],
+          personalTime: [],
+          lastSyncedAt: new Date().toISOString(),
+          items: [],
         }
-      } catch (apiErr) {
-        console.warn("Consulta a la API de eventos no disponible, usando catálogo base:", apiErr)
       }
 
       // 2. Rank recommendations: llamar a Bedrock AI real via API con fallback heurístico
@@ -398,7 +415,7 @@ export const App: React.FC = () => {
       const path = buildLearningPath({
         recommendations: ranked.recommendations,
         candidateSessions: candidateSessionsToRank,
-        scheduledItems: SAMPLE_USER_SCHEDULE,
+        scheduledItems: currentSchedule.items,
         userId: "local-user",
         journeyId: analysisResult.projectContext.id,
       })
@@ -427,17 +444,30 @@ export const App: React.FC = () => {
   }
 
   // Cierra el ciclo adaptativo (Journey 5): aplica la reflexión, recalcula gaps,
-  // recomendaciones y Learning Path. Local-first.
+  // recomendaciones y Learning Path usando el catálogo activo del Journey.
   const handleReflectionSubmit = async (reflection: Reflection) => {
     if (!analysisResult || !learningPath) return
     setError(null)
     try {
+      let currentSchedule: UserScheduleResult
+      try {
+        currentSchedule = await dataProvider.schedule.getSchedule()
+      } catch {
+        currentSchedule = {
+          reservedSessionIds: [],
+          favoriteSessionIds: [],
+          personalTime: [],
+          lastSyncedAt: new Date().toISOString(),
+          items: [],
+        }
+      }
+
       const result = await adaptLearningPathFromReflection({
         reflection,
         gaps: currentGaps,
-        candidateSessions: DEMO_SESSIONS,
+        candidateSessions: activeCatalog,
         projectContext: analysisResult.projectContext,
-        scheduledItems: SAMPLE_USER_SCHEDULE,
+        scheduledItems: currentSchedule.items,
         userId: "local-user",
         journeyId: analysisResult.projectContext.id,
       })
@@ -450,6 +480,7 @@ export const App: React.FC = () => {
   }
 
   const handleReset = () => {
+    setActiveCatalog(DEMO_SESSIONS)
     setAnalysisResult(null)
     setLearningPath(null)
     setRecommendations([])
@@ -504,6 +535,19 @@ export const App: React.FC = () => {
   )
 
   const handleScheduleRefresh = async () => {
+    if (mode === "demo") {
+      setIsRefreshingSchedule(true)
+      try {
+        const schedule = await dataProvider.schedule.getSchedule()
+        setScheduleSnapshot(schedule)
+        setScheduleMessage(
+          `Agenda sincronizada exitosamente (${schedule.reservedSessionIds.length} reserva(s), ${schedule.favoriteSessionIds.length} favorita(s)).`,
+        )
+      } finally {
+        setIsRefreshingSchedule(false)
+      }
+      return
+    }
     if (!liveEventsClient || !liveSnapshot) {
       setScheduleMessage(
         "Actualiza primero la disponibilidad live para consultar tu agenda.",
@@ -519,7 +563,7 @@ export const App: React.FC = () => {
     setIsRefreshingSchedule(true)
     setScheduleMessage(null)
     try {
-      const schedule = await liveEventsClient.getPersonalSchedule()
+      const schedule = await dataProvider.schedule.getSchedule()
       setScheduleSnapshot(schedule)
       setScheduleMessage(
         `Agenda sincronizada exitosamente (${schedule.reservedSessionIds.length} reserva(s), ${schedule.favoriteSessionIds.length} favorita(s)).`,
@@ -537,52 +581,44 @@ export const App: React.FC = () => {
     sessionId: string,
     isFavorite: boolean,
   ) => {
-    if (mode === "demo") {
-      setScheduleSnapshot((prev) => {
-        const cur = prev ?? {
-          reservedSessionIds: ["sess-aim-301"],
-          favoriteSessionIds: ["sess-sec-305"],
-          personalTime: [],
-          lastSyncedAt: new Date().toISOString(),
-          items: SAMPLE_USER_SCHEDULE,
-        }
-        const updatedFavorites = isFavorite
-          ? cur.favoriteSessionIds.filter((id) => id !== sessionId)
-          : [...cur.favoriteSessionIds, sessionId]
-        return {
-          ...cur,
-          favoriteSessionIds: updatedFavorites,
-        }
-      })
-      setScheduleMessage(
-        isFavorite
-          ? "Favorito removido (Modo Demo)."
-          : "Favorito guardado (Modo Demo).",
-      )
+    if (
+      mode === "live" &&
+      (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken())
+    )
       return
-    }
-    if (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken()) return
     setFavoriteMutationSessionId(sessionId)
     setScheduleMessage(null)
     try {
-      const result = isFavorite
-        ? (await liveEventsClient.removeFavorite(sessionId),
-          { successfulSessionIds: [sessionId], failed: [] })
-        : await liveEventsClient.addFavorite(sessionId)
-      const reconciled = await liveEventsClient.getPersonalSchedule()
-      setScheduleSnapshot(reconciled)
-      setScheduleMessage(
-        result.failed.length
-          ? `AWS Events rechazó ${result.failed.length} favorito(s); se mostró la agenda confirmada.`
-          : "Agenda reconciliada con AWS Events.",
+      const result = await dataProvider.schedule.toggleFavorite(
+        sessionId,
+        isFavorite,
       )
+      const reconciled = await dataProvider.schedule.getSchedule()
+      setScheduleSnapshot(reconciled)
+      if (mode === "demo") {
+        setScheduleMessage(
+          isFavorite
+            ? "Favorito removido (Modo Demo)."
+            : "Favorito guardado (Modo Demo).",
+        )
+      } else {
+        setScheduleMessage(
+          result.failed.length
+            ? `AWS Events rechazó ${result.failed.length} favorito(s); se mostró la agenda confirmada.`
+            : "Agenda reconciliada con AWS Events.",
+        )
+      }
     } catch (err: unknown) {
       try {
-        setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
+        setScheduleSnapshot(await dataProvider.schedule.getSchedule())
       } catch {
         // Preserve the last confirmed schedule when reconciliation also fails.
       }
-      setScheduleMessage(describeLiveScheduleError(err))
+      setScheduleMessage(
+        mode === "demo"
+          ? "Error al actualizar favorito en demo."
+          : describeLiveScheduleError(err),
+      )
     } finally {
       setFavoriteMutationSessionId(null)
     }
@@ -592,55 +628,47 @@ export const App: React.FC = () => {
     sessionId: string,
     isReserved: boolean,
   ) => {
-    if (mode === "demo") {
-      setScheduleSnapshot((prev) => {
-        const cur = prev ?? {
-          reservedSessionIds: ["sess-aim-301"],
-          favoriteSessionIds: ["sess-sec-305"],
-          personalTime: [],
-          lastSyncedAt: new Date().toISOString(),
-          items: SAMPLE_USER_SCHEDULE,
-        }
-        const updatedReserved = isReserved
-          ? cur.reservedSessionIds.filter((id) => id !== sessionId)
-          : [...cur.reservedSessionIds, sessionId]
-        return {
-          ...cur,
-          reservedSessionIds: updatedReserved,
-        }
-      })
-      setScheduleMessage(
-        isReserved
-          ? "Cancelación de reserva confirmada (Modo Demo)."
-          : "Reserva confirmada (Modo Demo).",
-      )
+    if (
+      mode === "live" &&
+      (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken())
+    )
       return
-    }
-    if (!liveEventsClient || !isAuthenticated || !tokenStore.getAccessToken()) return
     setReservationMutationSessionId(sessionId)
     setScheduleMessage(null)
     try {
-      const result = isReserved
-        ? (await liveEventsClient.cancelReservation(sessionId),
-          { successfulSessionIds: [sessionId], failed: [] })
-        : await liveEventsClient.reserveSession(sessionId)
-      const reconciled = await liveEventsClient.getPersonalSchedule()
-      setScheduleSnapshot(reconciled)
-      setScheduleMessage(
-        describeReservationReconciliation({
-          wasReserved: isReserved,
-          sessionId,
-          reservedSessionIds: reconciled.reservedSessionIds,
-          failed: result.failed,
-        }),
+      const result = await dataProvider.schedule.toggleReservation(
+        sessionId,
+        isReserved,
       )
+      const reconciled = await dataProvider.schedule.getSchedule()
+      setScheduleSnapshot(reconciled)
+      if (mode === "demo") {
+        setScheduleMessage(
+          isReserved
+            ? "Cancelación de reserva confirmada (Modo Demo)."
+            : "Reserva confirmada (Modo Demo).",
+        )
+      } else {
+        setScheduleMessage(
+          describeReservationReconciliation({
+            wasReserved: isReserved,
+            sessionId,
+            reservedSessionIds: reconciled.reservedSessionIds,
+            failed: result.failed,
+          }),
+        )
+      }
     } catch (err: unknown) {
       try {
-        setScheduleSnapshot(await liveEventsClient.getPersonalSchedule())
+        setScheduleSnapshot(await dataProvider.schedule.getSchedule())
       } catch {
         // Preserve the last confirmed schedule when reconciliation also fails.
       }
-      setScheduleMessage(describeLiveReservationError(err))
+      setScheduleMessage(
+        mode === "demo"
+          ? "Error al actualizar reserva en demo."
+          : describeLiveReservationError(err),
+      )
     } finally {
       setReservationMutationSessionId(null)
     }
