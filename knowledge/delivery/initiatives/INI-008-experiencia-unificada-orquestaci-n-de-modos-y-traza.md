@@ -1,7 +1,7 @@
 ---
 type: initiative
 id: INI-008
-title: Experiencia unificada, orquestación de modos y trazabilidad de IA
+title: 'Experiencia unificada, orquestación de modos y trazabilidad de IA'
 status: planned
 knowledge_level: K2
 domains:
@@ -20,128 +20,128 @@ related_capabilities:
   - ai-execution-traceability
 created_at: '2026-10-11'
 external_links:
-  - https://github.com/Trycatch-tv/reinvent-pathfinder
+  - 'https://github.com/Trycatch-tv/reinvent-pathfinder'
 candidates:
   - id: WI-CANDIDATE-001
-    title: Auditoría E2E de modos, fuentes de datos y participación de IA
+    title: 'Auditoría E2E de modos, fuentes de datos y participación de IA'
     type: spike
     suggested_knowledge_level: K3
     expected_value: >-
-      Establece el mapa verificable de cómo se ejecuta cada etapa de
-      Pathfinder, identificando fuentes reales, fixtures, inferencia,
-      reglas determinísticas, fallbacks y mezclas inconsistentes.
+      Establece el mapa verificable de cómo se ejecuta cada etapa de Pathfinder,
+      identificando fuentes reales, fixtures, inferencia, reglas
+      determinísticas, fallbacks y mezclas inconsistentes.
     notes: >-
-      Revisar App.tsx, handlers API, providers, reflexión adaptativa,
-      Learning Report, autenticación, persistencia y Availability.
-      Documentar evidencia antes de refactorizar.
+      Revisar App.tsx, handlers API, providers, reflexión adaptativa, Learning
+      Report, autenticación, persistencia y Availability. Documentar evidencia
+      antes de refactorizar.
+    materialized_as: WI-031
   - id: WI-CANDIDATE-002
-    title: Identidad visual unificada, Design System y App Shell
+    title: 'Identidad visual unificada, Design System y App Shell'
     type: feature
     suggested_knowledge_level: K2
     expected_value: >-
-      Unifica navegación, componentes, jerarquía visual, tipografía,
-      colores y estados de interfaz para convertir las pantallas
-      existentes en una experiencia coherente de Pathfinder.
+      Unifica navegación, componentes, jerarquía visual, tipografía, colores y
+      estados de interfaz para convertir las pantallas existentes en una
+      experiencia coherente de Pathfinder.
     notes: >-
-      Reutilizar React y Vite. Definir tokens y componentes compartidos
-      antes de rediseñar las vistas. Conservar la identidad de producto
-      y evitar introducir cambios funcionales innecesarios.
+      Reutilizar React y Vite. Definir tokens y componentes compartidos antes de
+      rediseñar las vistas. Conservar la identidad de producto y evitar
+      introducir cambios funcionales innecesarios.
   - id: WI-CANDIDATE-003
     title: Selección inicial y orquestación global de Demo y Live
     type: feature
     suggested_knowledge_level: K3
     expected_value: >-
-      Convierte la decisión inicial del usuario en una política global
-      que gobierna autenticación, fuentes de datos, navegación y
-      disponibilidad de acciones durante todo el Journey.
+      Convierte la decisión inicial del usuario en una política global que
+      gobierna autenticación, fuentes de datos, navegación y disponibilidad de
+      acciones durante todo el Journey.
     notes: >-
-      Demo y Live deben ser modos explícitos. El modo debe conservarse
-      de forma segura durante navegación y recargas. Ningún token
-      simulado debe representar una sesión real de Builder ID.
+      Demo y Live deben ser modos explícitos. El modo debe conservarse de forma
+      segura durante navegación y recargas. Ningún token simulado debe
+      representar una sesión real de Builder ID.
   - id: WI-CANDIDATE-004
     title: Providers aislados para ejecución Demo y Live
     type: refactor
     suggested_knowledge_level: K3
     expected_value: >-
-      Elimina mezclas entre fixtures y servicios reales mediante
-      contratos compartidos e implementaciones independientes,
-      reutilizando domain, events-client y los servicios de IA.
+      Elimina mezclas entre fixtures y servicios reales mediante contratos
+      compartidos e implementaciones independientes, reutilizando domain,
+      events-client y los servicios de IA.
     notes: >-
-      Separar datos del catálogo, disponibilidad, agenda, favoritos,
-      reservas, análisis y ranking. No sustituir silenciosamente
-      resultados Live por fixtures cuando una llamada falle.
+      Separar datos del catálogo, disponibilidad, agenda, favoritos, reservas,
+      análisis y ranking. No sustituir silenciosamente resultados Live por
+      fixtures cuando una llamada falle.
   - id: WI-CANDIDATE-005
-    title: Carga automática de disponibilidad, catálogo y agenda
+    title: 'Carga automática de disponibilidad, catálogo y agenda'
     type: feature
     suggested_knowledge_level: K2
     expected_value: >-
-      Elimina la necesidad de actualizar manualmente la disponibilidad
-      al entrar y carga automáticamente los datos del modo seleccionado,
-      con manejo de loading, errores y snapshots.
+      Elimina la necesidad de actualizar manualmente la disponibilidad al entrar
+      y carga automáticamente los datos del modo seleccionado, con manejo de
+      loading, errores y snapshots.
     notes: >-
-      Evitar llamadas duplicadas, respetar throttling y conservar
-      refresh manual como acción secundaria. Sin polling agresivo.
+      Evitar llamadas duplicadas, respetar throttling y conservar refresh manual
+      como acción secundaria. Sin polling agresivo.
   - id: WI-CANDIDATE-006
     title: Consistencia del pipeline de IA y trazabilidad por etapa
     type: feature
     suggested_knowledge_level: K3
     expected_value: >-
-      Permite verificar qué etapas utilizan Bedrock, cuáles usan
-      heurísticas y cuáles son determinísticas, manteniendo el mismo
-      contexto y las mismas sesiones durante todo el Journey.
+      Permite verificar qué etapas utilizan Bedrock, cuáles usan heurísticas y
+      cuáles son determinísticas, manteniendo el mismo contexto y las mismas
+      sesiones durante todo el Journey.
     notes: >-
-      Auditar analyze, rank, buildLearningPath, reflection y report.
-      No atribuir inferencia a operaciones que no la realizan.
-      Añadir metadata de ejecución sin exponer credenciales ni prompts
-      sensibles.
+      Auditar analyze, rank, buildLearningPath, reflection y report. No atribuir
+      inferencia a operaciones que no la realizan. Añadir metadata de ejecución
+      sin exponer credenciales ni prompts sensibles.
   - id: WI-CANDIDATE-007
-    title: Refinamiento de Learning Path, relevancia y agenda
+    title: 'Refinamiento de Learning Path, relevancia y agenda'
     type: feature
     suggested_knowledge_level: K2
     expected_value: >-
       Transforma la lista de recomendaciones en una ruta priorizada,
-      diferenciando sesiones principales, alternativas y baja
-      relevancia, con información operativa y justificación visible.
+      diferenciando sesiones principales, alternativas y baja relevancia, con
+      información operativa y justificación visible.
     notes: >-
-      Mantener la reconciliación determinística con disponibilidad,
-      agenda y conflictos. No eliminar recomendaciones útiles
-      exclusivamente por un umbral arbitrario.
+      Mantener la reconciliación determinística con disponibilidad, agenda y
+      conflictos. No eliminar recomendaciones útiles exclusivamente por un
+      umbral arbitrario.
   - id: WI-CANDIDATE-008
     title: Rediseño de reflexión adaptativa y Learning Report
     type: feature
     suggested_knowledge_level: K3
     expected_value: >-
-      Mejora la captura de aprendizaje y convierte el reporte final
-      en una síntesis útil del progreso, sustentada en reflexiones,
-      cobertura de gaps y recomendaciones posteriores.
+      Mejora la captura de aprendizaje y convierte el reporte final en una
+      síntesis útil del progreso, sustentada en reflexiones, cobertura de gaps y
+      recomendaciones posteriores.
     notes: >-
-      Preservar el comparador determinístico existente. Considerar
-      síntesis generativa como capacidad opcional y auditable, no como
-      sustituto de los hechos del Journey.
+      Preservar el comparador determinístico existente. Considerar síntesis
+      generativa como capacidad opcional y auditable, no como sustituto de los
+      hechos del Journey.
   - id: WI-CANDIDATE-009
-    title: Persistencia, aislamiento de sesiones y seguridad del estado
+    title: 'Persistencia, aislamiento de sesiones y seguridad del estado'
     type: refactor
     suggested_knowledge_level: K3
     expected_value: >-
-      Asegura que los Journeys, los datos Demo y Live, las sesiones
-      Builder ID y los tokens no se contaminen ni persistan de manera
-      insegura al cambiar de modo o recargar la aplicación.
+      Asegura que los Journeys, los datos Demo y Live, las sesiones Builder ID y
+      los tokens no se contaminen ni persistan de manera insegura al cambiar de
+      modo o recargar la aplicación.
     notes: >-
-      Auditar LocalStorageTokenStore y pathfinder_journey_state.
-      Revisar alternativas seguras para la sesión autenticada antes
-      de cambiar su comportamiento. Evitar regresiones del OAuth.
+      Auditar LocalStorageTokenStore y pathfinder_journey_state. Revisar
+      alternativas seguras para la sesión autenticada antes de cambiar su
+      comportamiento. Evitar regresiones del OAuth.
   - id: WI-CANDIDATE-010
-    title: Validación E2E, accesibilidad y consistencia de despliegues
+    title: 'Validación E2E, accesibilidad y consistencia de despliegues'
     type: chore
     suggested_knowledge_level: K3
     expected_value: >-
-      Demuestra que todos los recorridos Demo y Live mantienen
-      consistencia funcional, visual y de seguridad, tanto en
-      desarrollo local como en el despliegue público soportado.
+      Demuestra que todos los recorridos Demo y Live mantienen consistencia
+      funcional, visual y de seguridad, tanto en desarrollo local como en el
+      despliegue público soportado.
     notes: >-
-      Incorporar pruebas de journey, regresión, responsive,
-      accesibilidad y estados de error. Documentar explícitamente
-      qué puede ejecutarse de forma real en cada entorno.
+      Incorporar pruebas de journey, regresión, responsive, accesibilidad y
+      estados de error. Documentar explícitamente qué puede ejecutarse de forma
+      real en cada entorno.
 horizon: now
 priority: high
 ---

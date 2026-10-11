@@ -3,11 +3,7 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import react from "@vitejs/plugin-react"
 import { defineConfig, type Plugin } from "vite"
-import {
-  BedrockContextAnalyzer,
-  BedrockSessionReranker,
-} from "@pathfinder/ai-knowledge"
-import { SAMPLE_RAW_SESSIONS } from "@pathfinder/events-client"
+import { SAMPLE_RAW_SESSIONS } from "@pathfinder/events-client/dist/fixtures/sample-sessions.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -56,6 +52,9 @@ function aiBackendPlugin(): Plugin {
           req.on("end", async () => {
             try {
               const parsed = JSON.parse(body)
+              const { BedrockContextAnalyzer } = await import(
+                "@pathfinder/ai-knowledge/dist/index.js"
+              )
               const analyzer = new BedrockContextAnalyzer()
               const result = await analyzer.analyze(parsed)
               res.setHeader("Content-Type", "application/json")
@@ -81,6 +80,9 @@ function aiBackendPlugin(): Plugin {
           req.on("end", async () => {
             try {
               const parsed = JSON.parse(body)
+              const { BedrockSessionReranker } = await import(
+                "@pathfinder/ai-knowledge/dist/index.js"
+              )
               const reranker = new BedrockSessionReranker()
               const result = await reranker.rank(parsed)
               res.setHeader("Content-Type", "application/json")
