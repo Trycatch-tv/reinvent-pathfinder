@@ -90,4 +90,49 @@ describe('buildLearningReport', () => {
     expect(g?.initialStatus).toBe('open');
     expect(g?.finalStatus).toBe('open');
   });
+
+  it('calcula coveragePercentage, consolida reflexiones y produce executiveSummary', () => {
+    const currentGaps = [
+      gap('g1', 'critical', 'closed', ['sess-1']),
+      gap('g2', 'important', 'addressed', ['sess-2']),
+      gap('g3', 'nice-to-have', 'open'),
+    ];
+
+    const reflections = [
+      {
+        id: 'r1',
+        userId: 'u1',
+        sessionId: 'sess-1',
+        rating: 5,
+        keyTakeaways: 'Aprendí Bedrock AgentCore a fondo.',
+        actionItem: 'Implementar agentes en staging.',
+        gapUpdates: [{ gapId: 'g1', newStatus: 'closed' as const }],
+        createdAt: '2026-12-01T15:00:00Z',
+      },
+      {
+        id: 'r2',
+        userId: 'u1',
+        sessionId: 'sess-2',
+        rating: 4,
+        keyTakeaways: 'Buen overview de DynamoDB single-table.',
+        actionItem: 'Revisar particiones de órdenes.',
+        gapUpdates: [{ gapId: 'g2', newStatus: 'addressed' as const }],
+        createdAt: '2026-12-02T16:00:00Z',
+      },
+    ];
+
+    const report = buildLearningReport({ initialGaps, currentGaps, reflections });
+
+    // 1 cubierto + 1 parcial (0.5) / 3 = 1.5 / 3 = 50%
+    expect(report.coveragePercentage).toBe(50);
+    expect(report.reflectionsSummary.totalReflections).toBe(2);
+    expect(report.reflectionsSummary.averageRating).toBe(4.5);
+    expect(report.reflectionsSummary.keyActionItems).toEqual([
+      'Implementar agentes en staging.',
+      'Revisar particiones de órdenes.',
+    ]);
+    expect(report.executiveSummary).toContain('50%');
+    expect(report.executiveSummary).toContain('2 reflexiones');
+    expect(report.nextRoute[0]?.recommendedAction).toBeDefined();
+  });
 });

@@ -621,6 +621,89 @@ describe("apps/client UI components", () => {
     expect(html).toContain("Pendientes:")
     expect(html).toContain("Ruta de aprendizaje posterior")
     expect(html).toContain("DynamoDB single-table")
+    expect(html).toContain("Copiar Reporte en Markdown")
+    expect(html).toContain("Progreso de Cobertura Formativa")
+  })
+
+  it("ReflectionForm renders actionItem input and interactive rating elements", () => {
+    const relatedGaps: readonly KnowledgeGap[] = [
+      {
+        id: "gap-1",
+        topic: "Bedrock Guardrails",
+        description: "safety filter",
+        targetProficiency: "professional",
+        severity: "critical",
+        status: "open",
+        rationale: "security",
+        addressedBySessionIds: [],
+      },
+    ]
+
+    const html = renderToString(
+      React.createElement(ReflectionForm, {
+        sessionId: "sess-100",
+        sessionTitle: "Guardrails Deep Dive",
+        userId: "user-1",
+        relatedGaps,
+        onSubmit: () => {},
+      }),
+    )
+
+    expect(html).toContain("¿Qué acción implementarás en tu proyecto?")
+    expect(html).toContain("Abordado parcialmente")
+    expect(html).toContain("Cerrado")
+  })
+
+  it("LearningReportView renders documented reflections, action items, and coverage bar", () => {
+    const report = buildLearningReport({
+      initialGaps: [
+        {
+          id: "g1",
+          topic: "Bedrock AgentCore",
+          description: "d1",
+          targetProficiency: "professional",
+          severity: "critical",
+          status: "open",
+          rationale: "r1",
+          addressedBySessionIds: [],
+        },
+      ],
+      currentGaps: [
+        {
+          id: "g1",
+          topic: "Bedrock AgentCore",
+          description: "d1",
+          targetProficiency: "professional",
+          severity: "critical",
+          status: "closed",
+          rationale: "r1",
+          addressedBySessionIds: ["sess-1"],
+        },
+      ],
+      reflections: [
+        {
+          id: "refl-1",
+          userId: "user-1",
+          sessionId: "sess-1",
+          rating: 5,
+          keyTakeaways: "Gran entendimiento de AgentCore Runtime",
+          actionItem: "Implementar agente de atención al cliente",
+          gapUpdates: [{ gapId: "g1", newStatus: "closed" }],
+          createdAt: "2026-12-02T12:00:00Z",
+        },
+      ],
+    })
+
+    const html = renderToString(
+      React.createElement(LearningReportView, { report }),
+    )
+
+    expect(html).toContain("100%")
+    expect(html).toContain("Compromisos de Implementación en tu Proyecto")
+    expect(html).toContain("Implementar agente de atención al cliente")
+    expect(html).toContain("Reflexiones Documentadas (1)")
+    expect(html).toContain("Gran entendimiento de AgentCore Runtime")
+    expect(html).toContain("5 / 5 promedio")
   })
 
   it("LandingView explains the product, how to run it locally and links to demo/repo", () => {

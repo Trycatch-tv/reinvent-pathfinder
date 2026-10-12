@@ -123,6 +123,7 @@ candidates:
       Preservar el comparador determinístico existente. Considerar síntesis
       generativa como capacidad opcional y auditable, no como sustituto de los
       hechos del Journey.
+    materialized_as: WI-037
   - id: WI-CANDIDATE-009
     title: 'Persistencia, aislamiento de sesiones y seguridad del estado'
     type: refactor

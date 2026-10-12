@@ -12,6 +12,7 @@ export interface Reflection {
   readonly sessionId: string;
   readonly rating: number; // 1 - 5
   readonly keyTakeaways: string;
+  readonly actionItem?: string;
   readonly gapUpdates: readonly GapUpdateIntent[];
   readonly createdAt: string;
 }

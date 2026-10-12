@@ -199,6 +199,7 @@ interface SavedJourneyState {
   readonly recommendations: readonly SessionRecommendation[]
   readonly currentGaps: readonly KnowledgeGap[]
   readonly initialGaps: readonly KnowledgeGap[]
+  readonly reflections?: readonly Reflection[]
   readonly learningReport: LearningReport | null
 }
 
@@ -255,6 +256,9 @@ export const App: React.FC = () => {
   >(() => savedJourney.recommendations ?? [])
   const [currentGaps, setCurrentGaps] = useState<readonly KnowledgeGap[]>(() => savedJourney.currentGaps ?? [])
   const [initialGaps, setInitialGaps] = useState<readonly KnowledgeGap[]>(() => savedJourney.initialGaps ?? [])
+  const [reflections, setReflections] = useState<readonly Reflection[]>(
+    () => savedJourney.reflections ?? [],
+  )
   const [learningReport, setLearningReport] = useState<LearningReport | null>(
     () => savedJourney.learningReport ?? null,
   )
@@ -280,6 +284,7 @@ export const App: React.FC = () => {
             recommendations,
             currentGaps,
             initialGaps,
+            reflections,
             learningReport,
           }),
         )
@@ -289,7 +294,7 @@ export const App: React.FC = () => {
     } catch {
       // Ignore storage errors in restricted contexts
     }
-  }, [mode, activeCatalog, traces, analysisResult, learningPath, recommendations, currentGaps, initialGaps, learningReport])
+  }, [mode, activeCatalog, traces, analysisResult, learningPath, recommendations, currentGaps, initialGaps, reflections, learningReport])
 
   const handleSelectMode = (newMode: ExperienceMode) => {
     setMode(newMode)
@@ -559,12 +564,13 @@ export const App: React.FC = () => {
   // Cierra el ciclo del producto (Journey 6): contrasta los gaps iniciales con
   // los actuales (tras reflexiones) y genera el Learning Report. Local-first.
   const handleGenerateReport = () => {
-    const report = buildLearningReport({ initialGaps, currentGaps })
+    const report = buildLearningReport({ initialGaps, currentGaps, reflections })
     recordTrace({
       stage: "report_generation",
       stageName: "Síntesis de Learning Report",
       engine: "deterministic",
-      summary: "Comparación determinística de brechas cubiertas vs pendientes",
+      summary:
+        "Comparación determinística de brechas cubiertas vs pendientes y consolidación de reflexiones",
       executedAt: new Date().toISOString(),
     })
     setLearningReport(report)
@@ -606,9 +612,20 @@ export const App: React.FC = () => {
           "Reajuste heurístico de gaps y recomendaciones tras feedback de sesión",
         executedAt: new Date().toISOString(),
       })
+      const nextReflections = [...reflections, reflection]
+      setReflections(nextReflections)
       setCurrentGaps(result.updatedGaps)
       setRecommendations(result.recommendations)
       setLearningPath(result.learningPath)
+      if (learningReport) {
+        setLearningReport(
+          buildLearningReport({
+            initialGaps,
+            currentGaps: result.updatedGaps,
+            reflections: nextReflections,
+          }),
+        )
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al adaptar la ruta.")
     }
@@ -622,6 +639,7 @@ export const App: React.FC = () => {
     setRecommendations([])
     setCurrentGaps([])
     setInitialGaps([])
+    setReflections([])
     setLearningReport(null)
     if (typeof window !== "undefined") {
       try {
