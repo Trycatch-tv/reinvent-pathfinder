@@ -110,6 +110,7 @@ candidates:
       Mantener la reconciliación determinística con disponibilidad, agenda y
       conflictos. No eliminar recomendaciones útiles exclusivamente por un
       umbral arbitrario.
+    materialized_as: WI-036
   - id: WI-CANDIDATE-008
     title: Rediseño de reflexión adaptativa y Learning Report
     type: feature

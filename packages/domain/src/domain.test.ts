@@ -375,5 +375,18 @@ describe('Domain Models and Logic', () => {
       expect(STAGE_DESCRIPTIONS.report_generation.defaultEngine).toBe('deterministic');
     });
   });
+
+  describe('Learning Path Tiers', () => {
+    it('supports relevance tiers on learning path items', () => {
+      const item: import('./types/learning-path.js').LearningPathItem = {
+        sessionId: 'ses-1',
+        order: 1,
+        targetGapIds: ['gap-1'],
+        status: 'planned',
+        tier: 'primary',
+      };
+      expect(item.tier).toBe('primary');
+    });
+  });
 });
 

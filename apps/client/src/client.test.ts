@@ -819,6 +819,122 @@ describe("apps/client UI components", () => {
       expect(html).toContain("Algoritmo voraz de horarios")
     })
   })
+
+  describe("Learning Path Relevance Tiers and Operational Details", () => {
+    it("renders tier badges, operational details and visible justifications", () => {
+      const recommendations: readonly SessionRecommendation[] = [
+        {
+          sessionId: "ses-prim",
+          sessionCode: "AIM301",
+          title: "Autonomous Agents on Bedrock",
+          relevanceScore: 0.95,
+          coveredGapIds: ["gap-1"],
+          explanation: "Excelente cobertura directa para el stack de agentes",
+        },
+        {
+          sessionId: "ses-alt",
+          sessionCode: "DAT202",
+          title: "DynamoDB Patterns",
+          relevanceScore: 0.72,
+          coveredGapIds: ["gap-2"],
+          explanation: "Alternativa viable para storage",
+        },
+        {
+          sessionId: "ses-exp",
+          sessionCode: "GEN101",
+          title: "Intro to Generative AI",
+          relevanceScore: 0.45,
+          coveredGapIds: ["gap-1"],
+          explanation: "Sesión complementaria introductoria",
+        },
+      ]
+
+      const candidateSessions: readonly SessionCandidate[] = [
+        {
+          id: "ses-prim",
+          code: "AIM301",
+          title: "Autonomous Agents on Bedrock",
+          description: "Hands-on agents",
+          level: 300,
+          format: "breakout",
+          topics: ["ai"],
+          schedule: { day: "2026-12-02", startTime: "10:00", endTime: "11:00" },
+          location: { venue: "Venetian", room: "Palazzo A" },
+          capacityRemaining: 25,
+        },
+        {
+          id: "ses-alt",
+          code: "DAT202",
+          title: "DynamoDB Patterns",
+          description: "Database patterns",
+          level: 200,
+          format: "chalk-talk",
+          topics: ["database"],
+          schedule: { day: "2026-12-02", startTime: "10:30", endTime: "11:30" },
+          location: { venue: "Caesars Forum", room: "Summit 1" },
+          capacityRemaining: 0,
+        },
+        {
+          id: "ses-exp",
+          code: "GEN101",
+          title: "Intro to Generative AI",
+          description: "Basics of GenAI",
+          level: 100,
+          format: "breakout",
+          topics: ["general"],
+        },
+      ]
+
+      const path = buildLearningPath({
+        recommendations,
+        candidateSessions,
+        scheduledItems: [
+          {
+            id: "sched-1",
+            type: "reserved",
+            title: "Reunión",
+            day: "2026-12-02",
+            startTime: "10:00",
+            endTime: "11:30",
+          },
+        ],
+        userId: "user-1",
+        journeyId: "j-1",
+      })
+
+      const html = renderToString(
+        React.createElement(LearningPathView, {
+          learningPath: path,
+          recommendations,
+          candidateSessions,
+          gaps: mockGaps,
+        })
+      )
+
+      // Tab filters
+      expect(html).toContain("Todas (3)")
+      expect(html).toContain("⭐ Principales")
+      expect(html).toContain("🔄 Alternativas")
+      expect(html).toContain("🧭 Exploratorias")
+
+      // Tier badges in items
+      expect(html).toContain("⭐ Principal")
+      expect(html).toContain("🔄 Alternativa")
+      expect(html).toContain("🧭 Exploratoria")
+
+      // Operational info
+      expect(html).toContain("Nivel 300")
+      expect(html).toContain("Venetian · Palazzo A")
+      expect(html).toContain("25 cupos")
+      expect(html).toContain("Lleno / Lista de espera")
+
+      // Visible justification
+      expect(html).toContain("💡 Justificación:")
+      expect(html).toContain("Excelente cobertura directa para el stack de agentes")
+      expect(html).toContain("Alternativa viable para storage")
+      expect(html).toContain("Sesión complementaria introductoria")
+    })
+  })
 })
 
 

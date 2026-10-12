@@ -115,4 +115,46 @@ describe('buildLearningPath', () => {
 
     expect(path.conflicts).toEqual([]);
   });
+
+  it('clasifica determinísticamente los tiers de relevancia sin descartar sesiones', () => {
+    const lowRec: SessionRecommendation = {
+      sessionId: 'sess-low',
+      sessionCode: 'LOW-101',
+      title: 'Sesión exploratoria de baja relevancia',
+      relevanceScore: 0.45,
+      coveredGapIds: ['gap-1'],
+      explanation: 'cobertura secundaria',
+    };
+    const lowSession: SessionCandidate = {
+      id: 'sess-low',
+      code: 'LOW-101',
+      title: 'Sesión exploratoria de baja relevancia',
+      description: 'Introductory level',
+      level: 100,
+      format: 'breakout',
+      topics: ['general'],
+      schedule: { day: '2026-12-04', startTime: '14:00', endTime: '15:00' },
+    };
+
+    const path = buildLearningPath({
+      recommendations: [...recommendations, lowRec],
+      candidateSessions: [freeSession, overlappingSession, lowSession],
+      scheduledItems: SAMPLE_USER_SCHEDULE,
+      userId: 'user-1',
+      journeyId: 'journey-1',
+    });
+
+    expect(path.items).toHaveLength(3);
+    // freeSession: score 0.9, no conflict -> primary
+    expect(path.items[0]?.sessionId).toBe('sess-free');
+    expect(path.items[0]?.tier).toBe('primary');
+
+    // overlappingSession: score 0.7, has conflict with schedule -> alternative
+    expect(path.items[1]?.sessionId).toBe('sess-overlap');
+    expect(path.items[1]?.tier).toBe('alternative');
+
+    // lowSession: score 0.45 -> exploratory (never discarded)
+    expect(path.items[2]?.sessionId).toBe('sess-low');
+    expect(path.items[2]?.tier).toBe('exploratory');
+  });
 });

@@ -1234,6 +1234,7 @@ export const App: React.FC = () => {
                   <LearningPathView
                     learningPath={learningPath}
                     recommendations={recommendations}
+                    candidateSessions={activeCatalog}
                     gaps={currentGaps}
                     userId="local-user"
                     onReflectionSubmit={handleReflectionSubmit}
