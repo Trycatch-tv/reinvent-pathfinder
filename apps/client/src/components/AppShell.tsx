@@ -133,7 +133,7 @@ export function AppShell({
                     re:Invent Pathfinder
                   </h1>
                   <Badge variant="teal" style={{ fontSize: '0.7rem' }}>
-                    v0.21.0
+                    v0.22.0
                   </Badge>
                 </div>
                 <p
