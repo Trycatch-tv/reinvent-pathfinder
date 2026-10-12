@@ -4,6 +4,8 @@ import {
   AwsEventsClient,
   AwsEventsError,
   InMemoryTokenStore,
+  LocalStorageTokenStore,
+  SessionStorageTokenStore,
   buildAuthorizationUrl,
   generateCodeChallenge,
   generateCodeVerifier,
@@ -103,6 +105,85 @@ describe("OAuth 2.0 + PKCE with AWS Builder ID", () => {
       expect(store.getAccessToken()).toBeNull()
       expect(store.getTokens()).toBeNull()
       expect(store.isExpired()).toBe(true)
+    })
+  })
+
+  describe("LocalStorageTokenStore", () => {
+    let mockStorage: Record<string, string>
+
+    beforeEach(() => {
+      mockStorage = {}
+      vi.stubGlobal("localStorage", {
+        getItem: vi.fn((key: string) => mockStorage[key] ?? null),
+        setItem: vi.fn((key: string, val: string) => {
+          mockStorage[key] = val
+        }),
+        removeItem: vi.fn((key: string) => {
+          delete mockStorage[key]
+        }),
+      })
+      vi.stubGlobal("window", { localStorage: globalThis.localStorage })
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it("persists tokens to localStorage and reads them back", () => {
+      const store = new LocalStorageTokenStore("test_local_tokens")
+      store.setTokens({
+        accessToken: "ls-access-token",
+        expiresIn: 3600,
+        refreshToken: "ls-refresh-token",
+      })
+
+      expect(store.getAccessToken()).toBe("ls-access-token")
+      expect(store.hasRefreshToken()).toBe(true)
+      expect(mockStorage["test_local_tokens"]).toBeTruthy()
+
+      const freshStoreInstance = new LocalStorageTokenStore("test_local_tokens")
+      expect(freshStoreInstance.getAccessToken()).toBe("ls-access-token")
+
+      freshStoreInstance.clear()
+      expect(freshStoreInstance.getAccessToken()).toBeNull()
+      expect(mockStorage["test_local_tokens"]).toBeUndefined()
+    })
+  })
+
+  describe("SessionStorageTokenStore", () => {
+    let mockSessionStorage: Record<string, string>
+
+    beforeEach(() => {
+      mockSessionStorage = {}
+      vi.stubGlobal("sessionStorage", {
+        getItem: vi.fn((key: string) => mockSessionStorage[key] ?? null),
+        setItem: vi.fn((key: string, val: string) => {
+          mockSessionStorage[key] = val
+        }),
+        removeItem: vi.fn((key: string) => {
+          delete mockSessionStorage[key]
+        }),
+      })
+      vi.stubGlobal("window", { sessionStorage: globalThis.sessionStorage })
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it("stores tokens in sessionStorage for ephemeral tab sessions", () => {
+      const store = new SessionStorageTokenStore("test_session_tokens")
+      store.setTokens({
+        accessToken: "tab-session-token",
+        expiresIn: 1800,
+      })
+
+      expect(store.getAccessToken()).toBe("tab-session-token")
+      expect(mockSessionStorage["test_session_tokens"]).toBeTruthy()
+
+      store.clear()
+      expect(store.getAccessToken()).toBeNull()
+      expect(mockSessionStorage["test_session_tokens"]).toBeUndefined()
     })
   })
 

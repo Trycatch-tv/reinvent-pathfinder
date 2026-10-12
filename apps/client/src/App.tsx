@@ -189,10 +189,14 @@ export function describeReservationReconciliation(input: {
     : "AWS Events no confirmó la reserva."
 }
 
-const JOURNEY_STORAGE_KEY = "pathfinder_journey_state"
-const MODE_STORAGE_KEY = "pathfinder_experience_mode"
+export const LEGACY_JOURNEY_STORAGE_KEY = "pathfinder_journey_state"
+export const MODE_STORAGE_KEY = "pathfinder_experience_mode"
 
-interface SavedJourneyState {
+export function getJourneyStorageKey(mode: ExperienceMode): string {
+  return `pathfinder_journey_state_${mode}`
+}
+
+export interface SavedJourneyState {
   readonly mode?: ExperienceMode
   readonly activeCatalog?: readonly SessionCandidate[]
   readonly traces?: Partial<Record<ExecutionStage, StageExecutionTrace>>
@@ -205,22 +209,57 @@ interface SavedJourneyState {
   readonly learningReport: LearningReport | null
 }
 
-function loadSavedJourney(): Partial<SavedJourneyState> {
-  if (typeof window === "undefined") return {}
+export function migrateLegacyJourneyState(): void {
+  if (typeof window === "undefined") return
   try {
-    const raw = window.localStorage.getItem(JOURNEY_STORAGE_KEY)
-    return raw ? JSON.parse(raw) : {}
+    const raw = window.localStorage.getItem(LEGACY_JOURNEY_STORAGE_KEY)
+    if (!raw) return
+    const parsed = JSON.parse(raw)
+    const targetMode: ExperienceMode =
+      parsed?.mode === "live" ? "live" : "demo"
+    const targetKey = getJourneyStorageKey(targetMode)
+    if (!window.localStorage.getItem(targetKey)) {
+      window.localStorage.setItem(targetKey, raw)
+    }
+    window.localStorage.removeItem(LEGACY_JOURNEY_STORAGE_KEY)
+  } catch {
+    // Ignore migration errors
+  }
+}
+
+export function loadSavedJourney(mode: ExperienceMode): Partial<SavedJourneyState> {
+  if (typeof window === "undefined") return {}
+  migrateLegacyJourneyState()
+  try {
+    const key = getJourneyStorageKey(mode)
+    const raw = window.localStorage.getItem(key)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    if (typeof parsed !== "object" || parsed === null) return {}
+    if (parsed.mode && parsed.mode !== mode) return {}
+    return parsed
   } catch {
     return {}
   }
 }
 
-export const App: React.FC = () => {
-  const savedJourney = loadSavedJourney()
-  const [mode, setMode] = useState<ExperienceMode>(() => {
-    if (savedJourney.mode === "demo" || savedJourney.mode === "live") {
-      return savedJourney.mode
+export function clearJourneyState(mode?: ExperienceMode): void {
+  if (typeof window === "undefined") return
+  try {
+    if (mode) {
+      window.localStorage.removeItem(getJourneyStorageKey(mode))
+    } else {
+      window.localStorage.removeItem(getJourneyStorageKey("demo"))
+      window.localStorage.removeItem(getJourneyStorageKey("live"))
+      window.localStorage.removeItem(LEGACY_JOURNEY_STORAGE_KEY)
     }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+export const App: React.FC = () => {
+  const [mode, setMode] = useState<ExperienceMode>(() => {
     if (typeof window !== "undefined") {
       try {
         const stored = window.localStorage.getItem(MODE_STORAGE_KEY)
@@ -232,6 +271,8 @@ export const App: React.FC = () => {
     return "demo"
   })
 
+  const savedJourney = loadSavedJourney(mode)
+
   const dataProvider = useMemo(
     () => createPathfinderDataProvider(mode, { liveEventsClient }),
     [mode],
@@ -239,7 +280,7 @@ export const App: React.FC = () => {
 
   const [activeCatalog, setActiveCatalog] = useState<
     readonly SessionCandidate[]
-  >(() => savedJourney.activeCatalog ?? DEMO_SESSIONS)
+  >(() => savedJourney.activeCatalog ?? (mode === "demo" ? DEMO_SESSIONS : []))
   const [traces, setTraces] = useState<
     Partial<Record<ExecutionStage, StageExecutionTrace>>
   >(() => savedJourney.traces ?? {})
@@ -273,10 +314,11 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     if (typeof window === "undefined") return
+    const key = getJourneyStorageKey(mode)
     try {
       if (analysisResult || learningPath || currentGaps.length > 0) {
         window.localStorage.setItem(
-          JOURNEY_STORAGE_KEY,
+          key,
           JSON.stringify({
             mode,
             activeCatalog,
@@ -291,7 +333,7 @@ export const App: React.FC = () => {
           }),
         )
       } else {
-        window.localStorage.removeItem(JOURNEY_STORAGE_KEY)
+        window.localStorage.removeItem(key)
       }
     } catch {
       // Ignore storage errors in restricted contexts
@@ -299,14 +341,51 @@ export const App: React.FC = () => {
   }, [mode, activeCatalog, traces, analysisResult, learningPath, recommendations, currentGaps, initialGaps, reflections, learningReport])
 
   const handleSelectMode = (newMode: ExperienceMode) => {
-    setMode(newMode)
+    if (newMode === mode) return
+
+    // 1. Persist current mode's journey before switching
     if (typeof window !== "undefined") {
       try {
+        const currentKey = getJourneyStorageKey(mode)
+        if (analysisResult || learningPath || currentGaps.length > 0) {
+          window.localStorage.setItem(
+            currentKey,
+            JSON.stringify({
+              mode,
+              activeCatalog,
+              traces,
+              analysisResult,
+              learningPath,
+              recommendations,
+              currentGaps,
+              initialGaps,
+              reflections,
+              learningReport,
+            }),
+          )
+        }
         window.localStorage.setItem(MODE_STORAGE_KEY, newMode)
       } catch {
-        // Ignore localStorage access errors in private/restricted environments
+        // Ignore localStorage access errors
       }
     }
+
+    // 2. Load isolated target state
+    const targetState = loadSavedJourney(newMode)
+    setMode(newMode)
+    setActiveCatalog(
+      targetState.activeCatalog ??
+        (newMode === "demo" ? DEMO_SESSIONS : (liveSnapshot?.sessions ?? [])),
+    )
+    setTraces(targetState.traces ?? {})
+    setAnalysisResult(targetState.analysisResult ?? null)
+    setLearningPath(targetState.learningPath ?? null)
+    setRecommendations(targetState.recommendations ?? [])
+    setCurrentGaps(targetState.currentGaps ?? [])
+    setInitialGaps(targetState.initialGaps ?? [])
+    setReflections(targetState.reflections ?? [])
+    setLearningReport(targetState.learningReport ?? null)
+    setError(null)
   }
 
   const [isRefreshingAvailability, setIsRefreshingAvailability] =
@@ -645,13 +724,7 @@ export const App: React.FC = () => {
     setInitialGaps([])
     setReflections([])
     setLearningReport(null)
-    if (typeof window !== "undefined") {
-      try {
-        window.localStorage.removeItem(JOURNEY_STORAGE_KEY)
-      } catch {
-        // Ignore
-      }
-    }
+    clearJourneyState(mode)
   }
 
   const handleAvailabilityRefresh = async () => {
@@ -873,6 +946,8 @@ export const App: React.FC = () => {
             onLogout={() => {
               tokenStore.clear()
               setIsAuthenticated(false)
+              setScheduleSnapshot(null)
+              setScheduleMessage(null)
             }}
           />
         ) : null
@@ -917,6 +992,8 @@ export const App: React.FC = () => {
           onLogout={() => {
             tokenStore.clear()
             setIsAuthenticated(false)
+            setScheduleSnapshot(null)
+            setScheduleMessage(null)
           }}
         />
       ) : (
@@ -985,6 +1062,8 @@ export const App: React.FC = () => {
                   onLogout={() => {
                     tokenStore.clear()
                     setIsAuthenticated(false)
+                    setScheduleSnapshot(null)
+                    setScheduleMessage(null)
                   }}
                 />
                 <button

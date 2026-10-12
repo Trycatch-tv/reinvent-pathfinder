@@ -21,16 +21,21 @@ import {
 } from "@pathfinder/events-client"
 import React from "react"
 import { renderToString } from "react-dom/server"
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   App,
+  clearJourneyState,
   describeLiveAvailabilityError,
   describeLiveReservationError,
   describeReservationFailures,
   describeReservationReconciliation,
   eventsApiBaseUrl,
+  getJourneyStorageKey,
+  loadSavedJourney,
+  migrateLegacyJourneyState,
   resolveAuthRedirectUri,
   selectAvailabilitySnapshot,
+  LEGACY_JOURNEY_STORAGE_KEY,
 } from "./App.js"
 import {
   completeBuilderIdCallback,
@@ -1164,7 +1169,89 @@ describe("apps/client UI components", () => {
       expect(shellHtml).toContain("Heatmap")
     })
   })
+
+  describe("Persistence, Session Isolation & State Security (WI-039)", () => {
+    let mockStorage: Record<string, string>
+
+    beforeEach(() => {
+      mockStorage = {}
+      vi.stubGlobal("localStorage", {
+        getItem: vi.fn((key: string) => mockStorage[key] ?? null),
+        setItem: vi.fn((key: string, val: string) => {
+          mockStorage[key] = val
+        }),
+        removeItem: vi.fn((key: string) => {
+          delete mockStorage[key]
+        }),
+      })
+      vi.stubGlobal("window", { localStorage: globalThis.localStorage })
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it("generates mode-isolated storage keys", () => {
+      expect(getJourneyStorageKey("demo")).toBe("pathfinder_journey_state_demo")
+      expect(getJourneyStorageKey("live")).toBe("pathfinder_journey_state_live")
+    })
+
+    it("migrates legacy un-suffixed journey state to mode-isolated key", () => {
+      mockStorage[LEGACY_JOURNEY_STORAGE_KEY] = JSON.stringify({
+        mode: "demo",
+        analysisResult: {
+          projectContext: mockContext,
+          knowledgeProfile: mockProfile,
+          knowledgeGaps: mockGaps,
+          modelId: "heuristic",
+        },
+      })
+
+      migrateLegacyJourneyState()
+
+      expect(mockStorage[getJourneyStorageKey("demo")]).toBeTruthy()
+      expect(mockStorage[LEGACY_JOURNEY_STORAGE_KEY]).toBeUndefined()
+    })
+
+    it("validates integrity and loads saved journey matching active mode", () => {
+      mockStorage[getJourneyStorageKey("demo")] = JSON.stringify({
+        mode: "demo",
+        analysisResult: {
+          projectContext: mockContext,
+          knowledgeProfile: mockProfile,
+          knowledgeGaps: mockGaps,
+        },
+      })
+
+      const loadedDemo = loadSavedJourney("demo")
+      expect(loadedDemo.mode).toBe("demo")
+      expect(loadedDemo.analysisResult?.projectContext.id).toBe("ctx-1")
+
+      // Cross-mode isolation: live should not load demo data
+      const loadedLive = loadSavedJourney("live")
+      expect(loadedLive.analysisResult).toBeUndefined()
+    })
+
+    it("handles corrupted or invalid JSON in storage gracefully", () => {
+      mockStorage[getJourneyStorageKey("demo")] = "{ bad json ..."
+      const loaded = loadSavedJourney("demo")
+      expect(loaded).toEqual({})
+    })
+
+    it("clears isolated journey states on clearJourneyState", () => {
+      mockStorage[getJourneyStorageKey("demo")] = JSON.stringify({ mode: "demo" })
+      mockStorage[getJourneyStorageKey("live")] = JSON.stringify({ mode: "live" })
+
+      clearJourneyState("demo")
+      expect(mockStorage[getJourneyStorageKey("demo")]).toBeUndefined()
+      expect(mockStorage[getJourneyStorageKey("live")]).toBeTruthy()
+
+      clearJourneyState()
+      expect(mockStorage[getJourneyStorageKey("live")]).toBeUndefined()
+    })
+  })
 })
+
 
 
 

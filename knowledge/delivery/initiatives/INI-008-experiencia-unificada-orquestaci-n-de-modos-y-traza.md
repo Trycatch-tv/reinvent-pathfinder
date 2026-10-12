@@ -137,6 +137,7 @@ candidates:
       Auditar LocalStorageTokenStore y pathfinder_journey_state. Revisar
       alternativas seguras para la sesión autenticada antes de cambiar su
       comportamiento. Evitar regresiones del OAuth.
+    materialized_as: WI-039
   - id: WI-CANDIDATE-010
     title: 'Validación E2E, accesibilidad y consistencia de despliegues'
     type: chore
