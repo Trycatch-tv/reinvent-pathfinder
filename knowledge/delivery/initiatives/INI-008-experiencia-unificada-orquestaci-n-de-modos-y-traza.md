@@ -47,6 +47,7 @@ candidates:
       Reutilizar React y Vite. Definir tokens y componentes compartidos antes de
       rediseñar las vistas. Conservar la identidad de producto y evitar
       introducir cambios funcionales innecesarios.
+    materialized_as: WI-038
   - id: WI-CANDIDATE-003
     title: Selección inicial y orquestación global de Demo y Live
     type: feature

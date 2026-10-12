@@ -38,6 +38,7 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { AITraceBadge } from "./components/AITraceBadge.js"
 import { AITracePanel } from "./components/AITracePanel.js"
+import { AppShell } from "./components/AppShell.js"
 import { AvailabilityHeatmap } from "./components/AvailabilityHeatmap.js"
 import { BuilderIdLogin } from "./components/BuilderIdLogin.js"
 import { ContextForm } from "./components/ContextForm.js"
@@ -47,6 +48,7 @@ import { LandingView } from "./components/LandingView.js"
 import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
 import { ModeSelector } from "./components/ModeSelector.js"
+import { Alert } from "./components/ui/Alert.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 import { createPathfinderDataProvider } from "./providers/index.js"
 
@@ -415,7 +417,9 @@ export const App: React.FC = () => {
     return () => window.removeEventListener("popstate", onPopState)
   }, [])
 
-  const navigate = (path: "/" | "/availability" | "/about") => {
+  const navigate = (
+    path: "/" | "/availability" | "/about" | "/callback",
+  ) => {
     if (typeof window !== "undefined" && window.location.pathname !== path) {
       window.history.pushState({}, "", path)
     }
@@ -841,145 +845,39 @@ export const App: React.FC = () => {
     }
   }
 
+  const activeJourneyStep = learningReport
+    ? ("report" as const)
+    : learningPath
+      ? ("path" as const)
+      : analysisResult
+        ? ("diagnosis" as const)
+        : ("context" as const)
+
   return (
-    <div
-      style={{
-        maxWidth: "960px",
-        margin: "0 auto",
-        padding: "2rem 1rem",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        color: "#1f2937",
-      }}
-    >
-      <header
-        style={{
-          marginBottom: "2rem",
-          borderBottom: "2px solid #ea580c",
-          paddingBottom: "1rem",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          <div>
-            <h1 style={{ margin: 0, fontSize: "1.8rem", color: "#0f172a" }}>
-              re:Invent Pathfinder
-            </h1>
-            <p
-              style={{
-                margin: "0.4rem 0 0 0",
-                color: "#475569",
-                fontSize: "1rem",
-              }}
-            >
-              AI companion que transforma el catálogo de AWS re:Invent en una ruta
-              de aprendizaje adaptativa.
-            </p>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.75rem",
-              flexWrap: "wrap",
+    <AppShell
+      currentRoute={route}
+      onNavigate={navigate}
+      mode={mode}
+      onSelectMode={handleSelectMode}
+      isAuthenticated={isAuthenticated}
+      activeStep={activeJourneyStep}
+      authSlot={
+        !isCallbackRoute && mode === "live" ? (
+          <BuilderIdLogin
+            client={authClient}
+            authenticated={isAuthenticated}
+            onAuthenticated={() => {
+              setIsAuthenticated(true)
+              setRoute("/")
             }}
-          >
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "6px 12px",
-                borderRadius: "9999px",
-                fontSize: "0.85rem",
-                fontWeight: 700,
-                background:
-                  mode === "live"
-                    ? "rgba(249, 115, 22, 0.12)"
-                    : "rgba(56, 189, 248, 0.12)",
-                color: mode === "live" ? "#ea580c" : "#0284c7",
-                border:
-                  mode === "live" ? "1px solid #f97316" : "1px solid #38bdf8",
-              }}
-            >
-              {mode === "live" ? "🔴 Modo Live" : "🧪 Modo Demo"}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                handleSelectMode(mode === "live" ? "demo" : "live")
-              }
-              style={{
-                fontSize: "0.8rem",
-                background: "#f1f5f9",
-                border: "1px solid #cbd5e1",
-                borderRadius: "6px",
-                padding: "4px 8px",
-                color: "#475569",
-                cursor: "pointer",
-                fontWeight: 500,
-              }}
-            >
-              Cambiar a {mode === "live" ? "Demo" : "Live"}
-            </button>
-          </div>
-        </div>
-
-        <p
-          style={{
-            margin: "1rem 0 0 0",
-            display: "flex",
-            gap: "1rem",
-            flexWrap: "wrap",
-          }}
-        >
-          {!isAboutRoute && (
-            <a
-              href="/about"
-              onClick={(event) => {
-                event.preventDefault()
-                navigate("/about")
-              }}
-            >
-              Qué es Pathfinder
-            </a>
-          )}
-          {!isAvailabilityRoute && (
-            <a
-              href="/availability"
-              onClick={(event) => {
-                event.preventDefault()
-                navigate("/availability")
-              }}
-            >
-              Ver disponibilidad de sesiones
-            </a>
-          )}
-        </p>
-        {!isCallbackRoute && mode === "live" && (
-          <div style={{ marginTop: "1rem" }}>
-            <BuilderIdLogin
-              client={authClient}
-              authenticated={isAuthenticated}
-              onAuthenticated={() => {
-                setIsAuthenticated(true)
-                setRoute("/")
-              }}
-              onLogout={() => {
-                tokenStore.clear()
-                setIsAuthenticated(false)
-              }}
-            />
-          </div>
-        )}
-      </header>
-
+            onLogout={() => {
+              tokenStore.clear()
+              setIsAuthenticated(false)
+            }}
+          />
+        ) : null
+      }
+    >
       {isAboutRoute ? (
         <LandingView
           onNavigateDemo={() => {
@@ -1030,17 +928,13 @@ export const App: React.FC = () => {
           />
 
           {error && (
-            <div
-              style={{
-                backgroundColor: "#fee2e2",
-                color: "#b91c1c",
-                padding: "0.8rem",
-                borderRadius: "6px",
-                marginBottom: "1.5rem",
-              }}
+            <Alert
+              variant="danger"
+              style={{ marginBottom: "1.5rem" }}
+              onDismiss={() => setError(null)}
             >
               {error}
-            </div>
+            </Alert>
           )}
 
           {mode === "live" && !isAuthenticated ? (
@@ -1319,6 +1213,6 @@ export const App: React.FC = () => {
           )}
         </>
       )}
-    </div>
+    </AppShell>
   )
 }

@@ -53,6 +53,9 @@ import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
 import { ModeSelector } from "./components/ModeSelector.js"
 import { ReflectionForm } from "./components/ReflectionForm.js"
+import { AppShell } from "./components/AppShell.js"
+import { tokens } from "./theme/tokens.js"
+import { Alert, Badge, Button, Card } from "./components/ui/index.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 
 const mockProfile: KnowledgeProfile = {
@@ -1018,6 +1021,150 @@ describe("apps/client UI components", () => {
       expect(html).toContain("Sesión complementaria introductoria")
     })
   })
+
+  describe("Design System & Unified App Shell (WI-038)", () => {
+    it("exposes canonical brand and semantic design tokens", () => {
+      expect(tokens.colors.brand.navyDark).toBe("#0a0f1d")
+      expect(tokens.colors.brand.orange).toBe("#ea580c")
+      expect(tokens.colors.brand.blue).toBe("#0284c7")
+      expect(tokens.colors.semantic.success).toBe("#16a34a")
+      expect(tokens.colors.semantic.danger).toBe("#dc2626")
+      expect(tokens.typography.fontFamily).toContain("system-ui")
+      expect(tokens.spacing.md).toBe("1rem")
+      expect(tokens.radii.md).toBe("6px")
+    })
+
+    it("renders Button component variants and states", () => {
+      const primaryHtml = renderToString(
+        React.createElement(Button, { variant: "primary" }, "Guardar")
+      )
+      expect(primaryHtml).toContain("Guardar")
+
+      const loadingHtml = renderToString(
+        React.createElement(Button, { isLoading: true }, "Cargando")
+      )
+      expect(loadingHtml).toContain("⏳")
+      expect(loadingHtml).toContain("disabled")
+
+      const disabledHtml = renderToString(
+        React.createElement(Button, { disabled: true, variant: "secondary" }, "Deshabilitado")
+      )
+      expect(disabledHtml).toContain("disabled")
+    })
+
+    it("renders Card component with variants and padding", () => {
+      const defaultCard = renderToString(
+        React.createElement(Card, { padding: "md" }, "Contenido Card")
+      )
+      expect(defaultCard).toContain("Contenido Card")
+
+      const interactiveCard = renderToString(
+        React.createElement(Card, { variant: "interactive" }, "Card interactiva")
+      )
+      expect(interactiveCard).toContain("Card interactiva")
+    })
+
+    it("renders Badge component with variants and indicator dot", () => {
+      const liveBadge = renderToString(
+        React.createElement(Badge, { variant: "live", withDot: true }, "Modo Live")
+      )
+      expect(liveBadge).toContain("Modo Live")
+
+      const demoBadge = renderToString(
+        React.createElement(Badge, { variant: "demo" }, "Modo Demo")
+      )
+      expect(demoBadge).toContain("Modo Demo")
+
+      const tealBadge = renderToString(
+        React.createElement(Badge, { variant: "teal" }, "v0.8")
+      )
+      expect(tealBadge).toContain("v0.8")
+    })
+
+    it("renders Alert component with semantic styling and dismiss button", () => {
+      const alertHtml = renderToString(
+        React.createElement(
+          Alert,
+          {
+            variant: "danger",
+            title: "Error crítico",
+            onDismiss: () => {},
+          },
+          "Ocurrió una falla de red"
+        )
+      )
+      expect(alertHtml).toContain("Error crítico")
+      expect(alertHtml).toContain("Ocurrió una falla de red")
+      expect(alertHtml).toContain("🚨")
+      expect(alertHtml).toContain("✕")
+    })
+
+    it("renders AppShell with brand header, mode switcher, navigation links, and footer", () => {
+      const shellHtml = renderToString(
+        React.createElement(
+          AppShell,
+          {
+            currentRoute: "/",
+            onNavigate: () => {},
+            mode: "demo",
+            onSelectMode: () => {},
+            isAuthenticated: false,
+            activeStep: "diagnosis",
+          },
+          React.createElement("div", null, "Contenido Principal")
+        )
+      )
+
+      // Header branding
+      expect(shellHtml).toContain("re:Invent Pathfinder")
+      expect(shellHtml).toContain("AI companion adaptativo")
+      expect(shellHtml).toContain("Modo Demo")
+      expect(shellHtml).toContain("Cambiar a Live")
+
+      // Navigation links
+      expect(shellHtml).toContain("Journey Pathfinder")
+      expect(shellHtml).toContain("Ver disponibilidad de sesiones")
+      expect(shellHtml).toContain("Qué es Pathfinder")
+
+      // Journey progress bar
+      expect(shellHtml).toContain("1. Contexto")
+      expect(shellHtml).toContain("2. Diagnóstico")
+      expect(shellHtml).toContain("3. Learning Path")
+      expect(shellHtml).toContain("4. Reflexión")
+      expect(shellHtml).toContain("5. Learning Report")
+
+      // Body & Footer
+      expect(shellHtml).toContain("Contenido Principal")
+      expect(shellHtml).toContain("Demo (Local-First)")
+      expect(shellHtml).toContain("Sin autenticación")
+      expect(shellHtml).toContain("Documentación")
+    })
+
+    it("renders AppShell with live mode, authentication status, and custom authSlot", () => {
+      const shellHtml = renderToString(
+        React.createElement(
+          AppShell,
+          {
+            currentRoute: "/availability",
+            onNavigate: () => {},
+            mode: "live",
+            onSelectMode: () => {},
+            isAuthenticated: true,
+            authSlot: React.createElement("button", null, "Cerrar sesión"),
+          },
+          React.createElement("div", null, "Heatmap")
+        )
+      )
+
+      expect(shellHtml).toContain("Modo Live")
+      expect(shellHtml).toContain("Cambiar a Demo")
+      expect(shellHtml).toContain("Cerrar sesión")
+      expect(shellHtml).toContain("Live (AWS Events + Bedrock)")
+      expect(shellHtml).toContain("Builder ID autenticado")
+      expect(shellHtml).toContain("Heatmap")
+    })
+  })
 })
+
 
 
