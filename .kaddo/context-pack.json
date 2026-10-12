@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "generatedAt": "2026-10-11T00:15:45.858Z",
+  "generatedAt": "2026-10-12T16:35:53.727Z",
   "project": {
     "name": "pathfinder",
     "state": "new",
@@ -780,6 +780,269 @@
         "affectedModules": [
           "reinvent-pathfinder"
         ]
+      },
+      {
+        "id": "WI-031",
+        "type": "spike",
+        "title": "Auditoría E2E de modos, fuentes de datos y participación de IA",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "ai",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-032",
+        "type": "feature",
+        "title": "Selección inicial y orquestación global de Demo y Live",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-033",
+        "type": "refactor",
+        "title": "Providers aislados para ejecución Demo y Live",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "architecture",
+          "frontend",
+          "product",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-034",
+        "type": "feature",
+        "title": "Carga automática de disponibilidad, catálogo y agenda",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-005",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-035",
+        "type": "feature",
+        "title": "Consistencia del pipeline de IA y trazabilidad por etapa",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "product",
+          "experience",
+          "frontend",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-006",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-036",
+        "type": "feature",
+        "title": "Refinamiento de Learning Path, relevancia y agenda",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "recommendations",
+          "learning-path"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-007",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-037",
+        "type": "feature",
+        "title": "Rediseño de reflexión adaptativa y Learning Report",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "ai",
+          "learning-path"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-008",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-038",
+        "type": "feature",
+        "title": "Identidad visual unificada, Design System y App Shell",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "frontend",
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-039",
+        "type": "refactor",
+        "title": "Persistencia, aislamiento de sesiones y seguridad del estado",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "architecture",
+          "security",
+          "experience",
+          "frontend"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-009",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-040",
+        "type": "chore",
+        "title": "Validación E2E, accesibilidad y consistencia de despliegues",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "frontend",
+          "experience",
+          "architecture",
+          "testing"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-010",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
       }
     ],
     "archivedWorkItems": [],
@@ -1504,6 +1767,269 @@
         ]
       },
       {
+        "id": "WI-031",
+        "type": "spike",
+        "title": "Auditoría E2E de modos, fuentes de datos y participación de IA",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "ai",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-001",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "passed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-032",
+        "type": "feature",
+        "title": "Selección inicial y orquestación global de Demo y Live",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-003",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-033",
+        "type": "refactor",
+        "title": "Providers aislados para ejecución Demo y Live",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "architecture",
+          "frontend",
+          "product",
+          "experience"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-004",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-034",
+        "type": "feature",
+        "title": "Carga automática de disponibilidad, catálogo y agenda",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-005",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "in-progress",
+        "validationStatus": "in-progress",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-035",
+        "type": "feature",
+        "title": "Consistencia del pipeline de IA y trazabilidad por etapa",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "ai",
+          "product",
+          "experience",
+          "frontend",
+          "architecture"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-006",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-036",
+        "type": "feature",
+        "title": "Refinamiento de Learning Path, relevancia y agenda",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "recommendations",
+          "learning-path"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-007",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-037",
+        "type": "feature",
+        "title": "Rediseño de reflexión adaptativa y Learning Report",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "product",
+          "experience",
+          "frontend",
+          "ai",
+          "learning-path"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-008",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-038",
+        "type": "feature",
+        "title": "Identidad visual unificada, Design System y App Shell",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K2",
+        "domains": [
+          "frontend",
+          "experience",
+          "product"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-002",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-039",
+        "type": "refactor",
+        "title": "Persistencia, aislamiento de sesiones y seguridad del estado",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "architecture",
+          "security",
+          "experience",
+          "frontend"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-009",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
+        "id": "WI-040",
+        "type": "chore",
+        "title": "Validación E2E, accesibilidad y consistencia de despliegues",
+        "status": "completed",
+        "lifecycle": "completed",
+        "knowledgeLevel": "K3",
+        "domains": [
+          "frontend",
+          "experience",
+          "architecture",
+          "testing"
+        ],
+        "source": {
+          "type": "unknown",
+          "id": "WI-CANDIDATE-010",
+          "inferred": true,
+          "reason": "Invalid source value: \"initiative\"."
+        },
+        "implementationStatus": "completed",
+        "validationStatus": "completed",
+        "releaseStatus": "not-assessed",
+        "affectedModules": [
+          "reinvent-pathfinder"
+        ]
+      },
+      {
         "id": "WI-026",
         "type": "feature",
         "title": "Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery",
@@ -1868,6 +2394,142 @@
           "ai/knowledge/src/recommendations/session-reranker.ts",
           "ai/knowledge/src/index.ts"
         ]
+      },
+      {
+        "id": "WI-031",
+        "type": "spike",
+        "title": "Auditoría E2E de modos, fuentes de datos y participación de IA",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/src/App.tsx",
+          "apps/client/src/components/",
+          "apps/client/src/auth/",
+          "apps/client/src/fixtures/",
+          "packages/events-client/src/",
+          "ai/knowledge/src/",
+          "services/api/src/"
+        ]
+      },
+      {
+        "id": "WI-032",
+        "type": "feature",
+        "title": "Selección inicial y orquestación global de Demo y Live",
+        "summary": "",
+        "codeGlobs": [
+          "packages/domain/src/types/",
+          "apps/client/src/App.tsx",
+          "apps/client/src/components/",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-033",
+        "type": "refactor",
+        "title": "Providers aislados para ejecución Demo y Live",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/src/providers/",
+          "apps/client/src/App.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-034",
+        "type": "feature",
+        "title": "Carga automática de disponibilidad, catálogo y agenda",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/src/App.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-035",
+        "type": "feature",
+        "title": "Consistencia del pipeline de IA y trazabilidad por etapa",
+        "summary": "",
+        "codeGlobs": [
+          "packages/domain/src/types/ai-trace.ts",
+          "packages/domain/src/index.ts",
+          "packages/domain/src/domain.test.ts",
+          "apps/client/src/components/AITraceBadge.tsx",
+          "apps/client/src/components/AITracePanel.tsx",
+          "apps/client/src/App.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-036",
+        "type": "feature",
+        "title": "Refinamiento de Learning Path, relevancia y agenda",
+        "summary": "",
+        "codeGlobs": [
+          "packages/domain/src/types/learning-path.ts",
+          "packages/domain/src/types/session-recommendation.ts",
+          "packages/domain/src/index.ts",
+          "packages/domain/src/domain.test.ts",
+          "ai/knowledge/src/recommendations/learning-path-builder.ts",
+          "ai/knowledge/src/recommendations/learning-path-builder.test.ts",
+          "apps/client/src/components/LearningPathView.tsx",
+          "apps/client/src/App.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-037",
+        "type": "feature",
+        "title": "Rediseño de reflexión adaptativa y Learning Report",
+        "summary": "",
+        "codeGlobs": [
+          "packages/domain/src/types/reflection.ts",
+          "packages/domain/src/domain.test.ts",
+          "ai/knowledge/src/recommendations/learning-report-builder.ts",
+          "ai/knowledge/src/recommendations/learning-report-builder.test.ts",
+          "apps/client/src/components/ReflectionForm.tsx",
+          "apps/client/src/components/LearningReportView.tsx",
+          "apps/client/src/App.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-038",
+        "type": "feature",
+        "title": "Identidad visual unificada, Design System y App Shell",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/src/theme/tokens.ts",
+          "apps/client/src/components/ui/Button.tsx",
+          "apps/client/src/components/ui/Card.tsx",
+          "apps/client/src/components/ui/Badge.tsx",
+          "apps/client/src/components/ui/Alert.tsx",
+          "apps/client/src/components/ui/index.ts",
+          "apps/client/src/components/AppShell.tsx",
+          "apps/client/src/App.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-039",
+        "type": "refactor",
+        "title": "Persistencia, aislamiento de sesiones y seguridad del estado",
+        "summary": "",
+        "codeGlobs": [
+          "packages/events-client/src/auth/token-store.ts",
+          "packages/events-client/src/auth/auth.test.ts",
+          "apps/client/src/App.tsx",
+          "apps/client/src/client.test.ts"
+        ]
+      },
+      {
+        "id": "WI-040",
+        "type": "chore",
+        "title": "Validación E2E, accesibilidad y consistencia de despliegues",
+        "summary": "",
+        "codeGlobs": [
+          "apps/client/src/client.test.ts",
+          "apps/client/.env.example",
+          "knowledge/tech/codebase.md"
+        ]
       }
     ]
   },
@@ -1893,6 +2555,7 @@
       "detected": [
         "codebase.md",
         "current-state.md",
+        "e2e-modes-data-ai-audit.md",
         "knowledge.md"
       ]
     },
@@ -1907,6 +2570,7 @@
         "INI-005-cierre-de-ciclo-y-exposici-n.md",
         "INI-006-habilitaci-n-de-ia-real-en-aws-bedrock-agentcore-m.md",
         "INI-007-live-event-experience-disponibilidad-agenda-y-rese.md",
+        "INI-008-experiencia-unificada-orquestaci-n-de-modos-y-traza.md",
         "WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md",
         "WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md",
         "WI-003-modelo-de-dominio-base-en-packages-domain.md",
@@ -1938,6 +2602,16 @@
         "WI-028-ingesta-real-a-amazon-bedrock-managed-knowledge-ba.md",
         "WI-029-despliegue-del-runtime-agentic-en-amazon-bedrock-a.md",
         "WI-030-control-de-costos-seguridad-y-observabilidad-de-ia.md",
+        "WI-031-auditor-a-e2e-de-modos-fuentes-de-datos-y-particip.md",
+        "WI-032-selecci-n-inicial-y-orquestaci-n-global-de-demo-y-.md",
+        "WI-033-providers-aislados-para-ejecuci-n-demo-y-live.md",
+        "WI-034-carga-autom-tica-de-disponibilidad-cat-logo-y-agen.md",
+        "WI-035-consistencia-del-pipeline-de-ia-y-trazabilidad-por.md",
+        "WI-036-refinamiento-de-learning-path-relevancia-y-agenda.md",
+        "WI-037-redise-o-de-reflexi-n-adaptativa-y-learning-report.md",
+        "WI-038-identidad-visual-unificada-design-system-y-app-she.md",
+        "WI-039-persistencia-aislamiento-de-sesiones-y-seguridad-d.md",
+        "WI-040-validaci-n-e2e-accesibilidad-y-consistencia-de-des.md",
         "roadmap.md"
       ]
     }
@@ -1974,19 +2648,19 @@
     "present": true,
     "initiatives": 0,
     "work_item_candidates": 0,
-    "materialized_work_items": 31,
+    "materialized_work_items": 41,
     "remaining_work_item_candidates": 0,
     "candidates": 0,
-    "materialized": 31,
+    "materialized": 41,
     "remaining": 0
   },
   "phase": {
     "phase": "Active Delivery",
     "reasons": [
       "Roadmap available",
-      "31 materialized work item(s)",
+      "41 materialized work item(s)",
       "draft: 1",
-      "Ownership coverage 97%"
+      "Ownership coverage 98%"
     ],
     "recommendedAgents": [
       "work-item-agent"
@@ -2011,7 +2685,7 @@
         "id": "suggest-ownership",
         "label": "Run `kaddo owners suggest` for Work Items without code ownership.",
         "command": "kaddo owners suggest",
-        "reason": "Ownership coverage is 30/31."
+        "reason": "Ownership coverage is 40/41."
       }
     ]
   },
@@ -2025,8 +2699,8 @@
     "ready_multirepo_wi_ids": [],
     "in_progress_work_items": 0,
     "blocked_work_items": 0,
-    "total_work_items": 31,
-    "ownership_coverage": "30/31",
+    "total_work_items": 41,
+    "ownership_coverage": "40/41",
     "remaining_work_item_candidates": 0,
     "decision_candidates": 0,
     "accepted_adrs": 0,
@@ -2076,7 +2750,7 @@
     }
   },
   "installedAssets": {
-    "version": "3.123.0",
+    "version": "3.124.2",
     "agents": {
       "total": 20,
       "installed": 20,
@@ -2093,13 +2767,13 @@
     }
   },
   "workItemSummary": {
-    "total": 31,
+    "total": 41,
     "active": 1,
     "draft": 1,
     "ready": 0,
     "in_progress": 0,
     "blocked": 0,
-    "completed": 30,
+    "completed": 40,
     "archived": 0,
     "summary": "draft-only"
   },
@@ -2259,7 +2933,7 @@
         "id": "suggest-ownership",
         "label": "Suggest ownership",
         "status": "next",
-        "reason": "Ownership coverage is 30/31.",
+        "reason": "Ownership coverage is 40/41.",
         "command": "kaddo owners suggest"
       },
       {

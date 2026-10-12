@@ -11,9 +11,13 @@ El roadmap se organiza en Iniciativas (`knowledge/delivery/initiatives/`). Cada 
 
 ## Now
 
-Iniciativas activas prioritarias para consolidación de producto:
+Todas las iniciativas planificadas han sido completadas con éxito. El producto cuenta con paridad funcional completa en modo Demo y Live, observabilidad y trazabilidad de IA, diseño unificado y suites de validación E2E.
 
-- **INI-008 — Experiencia unificada, orquestación de modos y trazabilidad de IA** (priority: high)
+## Completed
+
+Capacidades fundamentales ya entregadas e integradas:
+
+- **INI-008 — Experiencia unificada, orquestación de modos y trazabilidad de IA** (completed)
   - Orquestación explícita de modos Demo y Live en todo el Journey.
   - Design System, tokens compartidos y Unified App Shell.
   - Providers aislados para ejecución Demo y Live sin sustituciones silenciosas.
@@ -23,10 +27,6 @@ Iniciativas activas prioritarias para consolidación de producto:
   - Rediseño de reflexión y Learning Report.
   - Persistencia segura y aislamiento estricto de credenciales.
   - Validación E2E, accesibilidad y consistencia de despliegues.
-
-## Completed
-
-Capacidades fundamentales ya entregadas e integradas:
 
 - **INI-001 — Fundación técnica del monorepo** (completed)
   - Scaffolding del monorepo (pnpm workspace, estructura `apps`/`services`/`ai`/`packages`).

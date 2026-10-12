@@ -26,9 +26,9 @@ Phase: Active Delivery
 Reason:
 
 - Roadmap available
-- 31 materialized work item(s)
+- 41 materialized work item(s)
 - draft: 1
-- Ownership coverage 97%
+- Ownership coverage 98%
 
 Recommended next: work-item-agent
 
@@ -40,7 +40,7 @@ Next step: Refine the existing draft Work Item with the work-item-agent.
 - Draft Work Items: 1
 - Ready Work Items: 0
 - In-progress Work Items: 0
-- Ownership coverage: 30/31
+- Ownership coverage: 40/41
 - Remaining Work Item candidates: 0
 
 ## Next Step Recommendation
@@ -78,6 +78,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 ### Tech — Structured
 - ✓ codebase.md
 - ✓ current-state.md
+- ✓ e2e-modes-data-ai-audit.md
 - ✓ knowledge.md
 
 ### Delivery — Traceable
@@ -88,6 +89,7 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ INI-005-cierre-de-ciclo-y-exposici-n.md
 - ✓ INI-006-habilitaci-n-de-ia-real-en-aws-bedrock-agentcore-m.md
 - ✓ INI-007-live-event-experience-disponibilidad-agenda-y-rese.md
+- ✓ INI-008-experiencia-unificada-orquestaci-n-de-modos-y-traza.md
 - ✓ WI-001-scaffolding-del-monorepo-pnpm-workspace-estructura.md
 - ✓ WI-002-tooling-de-calidad-y-ci-lint-typecheck-vitest-pipe.md
 - ✓ WI-003-modelo-de-dominio-base-en-packages-domain.md
@@ -119,6 +121,16 @@ Knowledge maturity — Business: Consolidated · Product: Structured · Tech: St
 - ✓ WI-028-ingesta-real-a-amazon-bedrock-managed-knowledge-ba.md
 - ✓ WI-029-despliegue-del-runtime-agentic-en-amazon-bedrock-a.md
 - ✓ WI-030-control-de-costos-seguridad-y-observabilidad-de-ia.md
+- ✓ WI-031-auditor-a-e2e-de-modos-fuentes-de-datos-y-particip.md
+- ✓ WI-032-selecci-n-inicial-y-orquestaci-n-global-de-demo-y-.md
+- ✓ WI-033-providers-aislados-para-ejecuci-n-demo-y-live.md
+- ✓ WI-034-carga-autom-tica-de-disponibilidad-cat-logo-y-agen.md
+- ✓ WI-035-consistencia-del-pipeline-de-ia-y-trazabilidad-por.md
+- ✓ WI-036-refinamiento-de-learning-path-relevancia-y-agenda.md
+- ✓ WI-037-redise-o-de-reflexi-n-adaptativa-y-learning-report.md
+- ✓ WI-038-identidad-visual-unificada-design-system-y-app-she.md
+- ✓ WI-039-persistencia-aislamiento-de-sesiones-y-seguridad-d.md
+- ✓ WI-040-validaci-n-e2e-accesibilidad-y-consistencia-de-des.md
 - ✓ roadmap.md
 
 ## Technical Inventory
@@ -142,7 +154,7 @@ No project knowledge summary found yet.
 
 - Initiatives: 0
 - Work Item candidates: 0
-- Materialized Work Items: 31
+- Materialized Work Items: 41
 - Remaining Work Item candidates: 0
 
 No roadmap baseline found.
@@ -190,6 +202,16 @@ Active Work Items by type:
 - WI-028 [feature] owns: ai/knowledge/package.json, ai/knowledge/src/kb/knowledge-base-client.ts, ai/knowledge/src/kb/session-document-transformer.ts, ai/knowledge/src/kb/types.ts, ai/knowledge/src/kb/knowledge-base.test.ts
 - WI-029 [feature] owns: ai/agents/package.json, ai/agents/src/knowledge-agent.ts, ai/agents/src/journey-recommendation-agent.ts, ai/agents/src/agentcore-runtime.ts, ai/agents/src/agents.test.ts
 - WI-030 [chore] owns: ai/knowledge/src/observability/ai-metrics-tracker.ts, ai/knowledge/src/observability/cost-guardrail.ts, ai/knowledge/src/observability/observability.test.ts, ai/knowledge/src/context-analyzer.ts, ai/knowledge/src/recommendations/session-reranker.ts, ai/knowledge/src/index.ts
+- WI-031 [spike] owns: apps/client/src/App.tsx, apps/client/src/components/, apps/client/src/auth/, apps/client/src/fixtures/, packages/events-client/src/, ai/knowledge/src/, services/api/src/
+- WI-032 [feature] owns: packages/domain/src/types/, apps/client/src/App.tsx, apps/client/src/components/, apps/client/src/client.test.ts
+- WI-033 [refactor] owns: apps/client/src/providers/, apps/client/src/App.tsx, apps/client/src/client.test.ts
+- WI-034 [feature] owns: apps/client/src/App.tsx, apps/client/src/client.test.ts
+- WI-035 [feature] owns: packages/domain/src/types/ai-trace.ts, packages/domain/src/index.ts, packages/domain/src/domain.test.ts, apps/client/src/components/AITraceBadge.tsx, apps/client/src/components/AITracePanel.tsx, apps/client/src/App.tsx, apps/client/src/client.test.ts
+- WI-036 [feature] owns: packages/domain/src/types/learning-path.ts, packages/domain/src/types/session-recommendation.ts, packages/domain/src/index.ts, packages/domain/src/domain.test.ts, ai/knowledge/src/recommendations/learning-path-builder.ts, ai/knowledge/src/recommendations/learning-path-builder.test.ts, apps/client/src/components/LearningPathView.tsx, apps/client/src/App.tsx, apps/client/src/client.test.ts
+- WI-037 [feature] owns: packages/domain/src/types/reflection.ts, packages/domain/src/domain.test.ts, ai/knowledge/src/recommendations/learning-report-builder.ts, ai/knowledge/src/recommendations/learning-report-builder.test.ts, apps/client/src/components/ReflectionForm.tsx, apps/client/src/components/LearningReportView.tsx, apps/client/src/App.tsx, apps/client/src/client.test.ts
+- WI-038 [feature] owns: apps/client/src/theme/tokens.ts, apps/client/src/components/ui/Button.tsx, apps/client/src/components/ui/Card.tsx, apps/client/src/components/ui/Badge.tsx, apps/client/src/components/ui/Alert.tsx, apps/client/src/components/ui/index.ts, apps/client/src/components/AppShell.tsx, apps/client/src/App.tsx, apps/client/src/client.test.ts
+- WI-039 [refactor] owns: packages/events-client/src/auth/token-store.ts, packages/events-client/src/auth/auth.test.ts, apps/client/src/App.tsx, apps/client/src/client.test.ts
+- WI-040 [chore] owns: apps/client/src/client.test.ts, apps/client/.env.example, knowledge/tech/codebase.md
 
 ## Mapped Modules
 
