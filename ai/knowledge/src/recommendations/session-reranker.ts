@@ -122,6 +122,7 @@ export class HeuristicSessionReranker implements SessionRerankerProvider {
     const matchedGapTopics: string[] = [];
 
     // Factor 1: Gap Coverage
+    let bestGapSeverityScore = 0;
     for (const gap of gaps) {
       const gapTokens = `${gap.topic} ${gap.description}`
         .toLowerCase()
@@ -131,19 +132,28 @@ export class HeuristicSessionReranker implements SessionRerankerProvider {
       const matchCount = gapTokens.filter((token) => sessionText.includes(token)).length;
       const coverageRatio = gapTokens.length > 0 ? matchCount / gapTokens.length : 0;
 
-      // Also check direct substring of topic
+      // Direct substring match
       const directTopicMatch = sessionText.includes(gap.topic.toLowerCase().slice(0, 8));
 
       if (coverageRatio >= 0.25 || directTopicMatch) {
         coveredGapIds.push(gap.id);
         matchedGapTopics.push(gap.topic);
+        const severityWeight =
+          gap.severity === 'critical' ? 1.0 : gap.severity === 'important' ? 0.85 : 0.70;
+        if (severityWeight > bestGapSeverityScore) {
+          bestGapSeverityScore = severityWeight;
+        }
       }
     }
 
-    const gapCoverageScore = gaps.length > 0 ? Math.min(coveredGapIds.length / gaps.length, 1.0) : 0.5;
+    let gapCoverageScore = 0.2; // Baseline for sessions without direct gap match
+    if (coveredGapIds.length > 0) {
+      const multiGapBonus = Math.min((coveredGapIds.length - 1) * 0.05, 0.15);
+      gapCoverageScore = Math.min(bestGapSeverityScore + multiGapBonus, 1.0);
+    }
 
     // Factor 2: Topic Overlap with Project Context & Goals
-    let topicOverlapScore = 0.4; // Base score
+    let topicOverlapScore = 0.5; // Base score
     if (request.projectContext) {
       const contextTokens = [
         ...request.projectContext.currentStack,
@@ -154,8 +164,10 @@ export class HeuristicSessionReranker implements SessionRerankerProvider {
         .split(/\W+/)
         .filter((t) => t.length > 3);
 
-      const matches = contextTokens.filter((token) => sessionText.includes(token)).length;
-      topicOverlapScore = contextTokens.length > 0 ? Math.min(matches / contextTokens.length + 0.3, 1.0) : 0.5;
+      if (contextTokens.length > 0) {
+        const matches = contextTokens.filter((token) => sessionText.includes(token)).length;
+        topicOverlapScore = matches >= 3 ? 0.95 : matches >= 2 ? 0.85 : matches === 1 ? 0.70 : 0.40;
+      }
     }
 
     // Factor 3: Level alignment
@@ -171,7 +183,6 @@ export class HeuristicSessionReranker implements SessionRerankerProvider {
     }
 
     // Factor 4: Logistics Score
-    // Gives higher score if location is specified and capacity remaining is healthy
     let logisticsScore = 0.8;
     if (session.capacityRemaining !== undefined) {
       logisticsScore = session.capacityRemaining > 0 ? 1.0 : 0.2;
@@ -339,11 +350,18 @@ export class BedrockSessionReranker implements SessionRerankerProvider {
 Brechas: ${JSON.stringify(gapsPayload)}
 Sesiones candidatas: ${JSON.stringify(candidatesPayload)}
 
-Devuelve un JSON array con las recomendaciones ordenadas por score (de 0.0 a 1.0):
+Instrucciones de puntuación:
+- Asigna un score de 0.0 a 1.0 a cada sesión evaluada DE FORMA INDEPENDIENTE.
+- NO devuelvas una distribución de probabilidad que sume 1.0.
+- Sesiones que abordan brechas prioritarias o críticas de forma directa: score alto entre 0.80 y 0.98.
+- Sesiones alternativas o con afinidad relevante: score entre 0.65 y 0.79.
+- Sesiones complementarias o exploratorias: score menor a 0.65.
+
+Devuelve un JSON array ordenado por score (de 0.0 a 1.0):
 [
   {
     "sessionId": "id-de-sesion",
-    "score": 0.95,
+    "score": 0.92,
     "coveredGapIds": ["id-de-brecha"],
     "explanation": "Explicación contextual de por qué se recomienda.",
     "logisticsScore": 0.8
@@ -412,13 +430,23 @@ Responde ÚNICAMENTE con el bloque JSON array válido.`;
       const limit = request.maxRecommendations ?? 10;
       const recommendations: SessionRecommendation[] = [];
 
+      // Detect if model returned softmax probabilities (all scores <= 0.15)
+      const rawScores = parsed.map((item) => (typeof item.score === 'number' ? item.score : 0));
+      const maxScore = Math.max(...rawScores, 0);
+      const isSoftmax = maxScore > 0 && maxScore <= 0.15;
+
       for (const item of parsed) {
         const session = sessionsById.get(String(item.sessionId));
         if (!session) continue;
 
-        const relevanceScore = typeof item.score === 'number'
+        let relevanceScore = typeof item.score === 'number'
           ? Math.min(Math.max(item.score, 0.0), 1.0)
           : 0.5;
+
+        if (isSoftmax && maxScore > 0) {
+          // Rescale from [0, maxScore] to [0.35, 0.94] for interpretable tier ranking
+          relevanceScore = Number((0.35 + (relevanceScore / maxScore) * 0.59).toFixed(3));
+        }
 
         const coveredGapIds = Array.isArray(item.coveredGapIds)
           ? item.coveredGapIds.map(String)

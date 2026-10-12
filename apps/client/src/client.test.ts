@@ -633,6 +633,30 @@ describe("apps/client UI components", () => {
     expect(html).toContain("Progreso de Cobertura Formativa")
   })
 
+  it("LearningReportView handles legacy reports gracefully when reflectionsSummary is undefined", () => {
+    const legacyReport = {
+      counts: { covered: 1, partial: 0, pending: 1, total: 2 },
+      coveragePercentage: 50,
+      executiveSummary: "Resumen previo de compatibilidad",
+      gaps: [
+        {
+          gapId: "g-1",
+          topic: "Serverless",
+          initialStatus: "open",
+          finalStatus: "addressed",
+          coverage: "covered",
+          severity: "critical",
+        },
+      ],
+      nextRoute: [],
+      generatedAt: new Date().toISOString(),
+    } as unknown as Parameters<typeof LearningReportView>[0]["report"]
+
+    expect(() => {
+      renderToString(React.createElement(LearningReportView, { report: legacyReport }))
+    }).not.toThrow()
+  })
+
   it("ReflectionForm renders actionItem input and interactive rating elements", () => {
     const relatedGaps: readonly KnowledgeGap[] = [
       {
@@ -1004,14 +1028,14 @@ describe("apps/client UI components", () => {
 
       // Tab filters
       expect(html).toContain("Todas (3)")
-      expect(html).toContain("⭐ Principales")
-      expect(html).toContain("🔄 Alternativas")
-      expect(html).toContain("🧭 Exploratorias")
+      expect(html).toContain("Principales")
+      expect(html).toContain("Alternativas")
+      expect(html).toContain("Exploratorias")
 
       // Tier badges in items
-      expect(html).toContain("⭐ Principal")
-      expect(html).toContain("🔄 Alternativa")
-      expect(html).toContain("🧭 Exploratoria")
+      expect(html).toContain("Principal")
+      expect(html).toContain("Alternativa")
+      expect(html).toContain("Exploratoria")
 
       // Operational info
       expect(html).toContain("Nivel 300")
@@ -1353,7 +1377,7 @@ describe("apps/client UI components", () => {
       const pathHtml = renderToString(React.createElement(App))
       expect(pathHtml).toContain("Tu Learning Path")
       expect(pathHtml).toContain("Trazabilidad de la Ruta:")
-      expect(pathHtml).toContain("⭐ Principales")
+      expect(pathHtml).toContain("Principales")
       expect(pathHtml).toContain("Building Autonomous Multi-Agent Systems")
       expect(pathHtml).toContain("Generar Learning Report (cierre de ciclo) →")
 
@@ -1403,7 +1427,7 @@ describe("apps/client UI components", () => {
       expect(reportHtml).toContain("50%")
       expect(reportHtml).toContain("Compromisos de Implementación en tu Proyecto")
       expect(reportHtml).toContain("Implementar evaluación de agentes con Kaddo")
-      expect(reportHtml).toContain("📋 Copiar Reporte en Markdown")
+      expect(reportHtml).toContain("Copiar Reporte en Markdown")
       expect(reportHtml).toContain("5. Learning Report")
     })
 
@@ -1413,7 +1437,7 @@ describe("apps/client UI components", () => {
       const liveGatedHtml = renderToString(React.createElement(App))
       expect(liveGatedHtml).toContain("Inicio de sesión requerido (Modo Live)")
       expect(liveGatedHtml).toContain("Iniciar sesión con AWS Builder ID")
-      expect(liveGatedHtml).toContain("🧪 Cambiar a Modo Demo")
+      expect(liveGatedHtml).toContain("Cambiar a Modo Demo")
       expect(liveGatedHtml).not.toContain("Paso 1: ¿Qué estás construyendo?")
     })
 

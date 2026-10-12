@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import type { SeniorityLevel } from '@pathfinder/domain';
-import type { AnalyzeContextRequest } from '@pathfinder/contracts';
+import React, { useState } from 'react'
+import type { SeniorityLevel } from '@pathfinder/domain'
+import type { AnalyzeContextRequest } from '@pathfinder/contracts'
+import { Sparkles, Plus, Check } from 'lucide-react'
+import { colors, radii, spacing, typography } from '../theme/tokens.js'
+import { Button } from './ui/Button.js'
+import { Input } from './ui/Input.js'
+import { Select } from './ui/Select.js'
 
 interface ContextFormProps {
-  readonly onSubmit: (request: AnalyzeContextRequest) => void;
-  readonly isLoading?: boolean;
+  readonly onSubmit: (request: AnalyzeContextRequest) => void
+  readonly isLoading?: boolean
 }
 
 const COMMON_STACK_OPTIONS = [
@@ -18,174 +23,213 @@ const COMMON_STACK_OPTIONS = [
   'API Gateway',
   'ECS / Fargate',
   'OAuth / Security',
-];
+]
 
 export const ContextForm: React.FC<ContextFormProps> = ({ onSubmit, isLoading }) => {
-  const [projectName, setProjectName] = useState('Mi Proyecto re:Invent');
+  const [projectName, setProjectName] = useState('Mi Proyecto re:Invent')
   const [description, setDescription] = useState(
-    'Estoy construyendo un sistema de agentes autónomos y recuperación semántica con Amazon Bedrock y single-table design en DynamoDB.'
-  );
-  const [seniority, setSeniority] = useState<SeniorityLevel>('intermediate');
-  const [selectedStack, setSelectedStack] = useState<string[]>(['Bedrock', 'DynamoDB', 'Lambda']);
-  const [customTech, setCustomTech] = useState('');
-  const [goals, setGoals] = useState('Diseñar arquitectura resiliente y minimizar costos de inferencia en agentes.');
+    'Estoy construyendo un sistema de agentes autónomos y recuperación semántica con Amazon Bedrock y single-table design en DynamoDB.',
+  )
+  const [seniority, setSeniority] = useState<SeniorityLevel>('intermediate')
+  const [selectedStack, setSelectedStack] = useState<string[]>(['Bedrock', 'DynamoDB', 'Lambda'])
+  const [customTech, setCustomTech] = useState('')
+  const [goals, setGoals] = useState('Diseñar arquitectura resiliente y minimizar costos de inferencia en agentes.')
 
   const toggleTech = (tech: string) => {
     setSelectedStack((prev) =>
-      prev.includes(tech) ? prev.filter((t) => t !== tech) : [...prev, tech]
-    );
-  };
+      prev.includes(tech) ? prev.filter((t) => t !== tech) : [...prev, tech],
+    )
+  }
 
   const addCustomTech = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    const trimmed = customTech.trim();
+    if (e) e.preventDefault()
+    const trimmed = customTech.trim()
     if (trimmed && !selectedStack.includes(trimmed)) {
-      setSelectedStack((prev) => [...prev, trimmed]);
-      setCustomTech('');
+      setSelectedStack((prev) => [...prev, trimmed])
+      setCustomTech('')
     }
-  };
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     onSubmit({
       projectName,
       description,
       seniority,
       currentStack: selectedStack,
       goals: goals.split('\n').filter((g) => g.trim().length > 0),
-    });
-  };
+    })
+  }
 
-  const allStackOptions = Array.from(new Set([...COMMON_STACK_OPTIONS, ...selectedStack]));
+  const allStackOptions = Array.from(new Set([...COMMON_STACK_OPTIONS, ...selectedStack]))
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-      <div>
-        <label htmlFor="projectName" style={{ fontWeight: '600', display: 'block', marginBottom: '0.4rem' }}>
-          Nombre del Proyecto o Iniciativa:
-        </label>
-        <input
-          id="projectName"
-          type="text"
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
-          required
-          style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc' }}
-        />
-      </div>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
+      <Input
+        label="Nombre del Proyecto o Iniciativa"
+        id="projectName"
+        type="text"
+        value={projectName}
+        onChange={(e) => setProjectName(e.target.value)}
+        required
+      />
 
-      <div>
-        <label htmlFor="description" style={{ fontWeight: '600', display: 'block', marginBottom: '0.4rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+        <label
+          htmlFor="description"
+          style={{
+            fontSize: typography.fontSize.xs,
+            fontWeight: typography.fontWeight.semibold,
+            color: colors.neutral.slate700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}
+        >
           ¿Qué estás construyendo y qué retos enfrentas?
         </label>
         <textarea
           id="description"
-          rows={4}
+          rows={3}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
-          style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc', fontFamily: 'inherit' }}
+          style={{
+            width: '100%',
+            padding: '0.6rem 0.75rem',
+            borderRadius: radii.md,
+            border: `1px solid ${colors.neutral.slate300}`,
+            fontSize: typography.fontSize.sm,
+            fontFamily: typography.fontFamily,
+            color: colors.neutral.slate900,
+            boxSizing: 'border-box',
+            outline: 'none',
+          }}
         />
       </div>
 
-      <div>
-        <label htmlFor="seniority" style={{ fontWeight: '600', display: 'block', marginBottom: '0.4rem' }}>
-          Seniority Técnico:
-        </label>
-        <select
-          id="seniority"
-          value={seniority}
-          onChange={(e) => setSeniority(e.target.value as SeniorityLevel)}
-          style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc' }}
-        >
-          <option value="beginner">Principiante (Foundational / Nivel 100-200)</option>
-          <option value="intermediate">Intermedio (Intermediate / Nivel 200-300)</option>
-          <option value="advanced">Avanzado (Specialist / Nivel 300-400)</option>
-        </select>
-      </div>
+      <Select
+        label="Seniority Técnico"
+        id="seniority"
+        value={seniority}
+        onChange={(e) => setSeniority(e.target.value as SeniorityLevel)}
+        options={[
+          { value: 'beginner', label: 'Principiante (Foundational / Nivel 100-200)' },
+          { value: 'intermediate', label: 'Intermedio (Intermediate / Nivel 200-300)' },
+          { value: 'advanced', label: 'Avanzado (Specialist / Nivel 300-400)' },
+        ]}
+      />
 
-      <div>
-        <label style={{ fontWeight: '600', display: 'block', marginBottom: '0.4rem' }}>
-          Stack y Tecnologías:
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+        <label
+          style={{
+            fontSize: typography.fontSize.xs,
+            fontWeight: typography.fontWeight.semibold,
+            color: colors.neutral.slate700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}
+        >
+          Stack y Tecnologías del Proyecto:
         </label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.6rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.4rem' }}>
           {allStackOptions.map((tech) => {
-            const isSelected = selectedStack.includes(tech);
+            const isSelected = selectedStack.includes(tech)
             return (
               <button
                 key={tech}
                 type="button"
                 onClick={() => toggleTech(tech)}
                 style={{
-                  padding: '0.4rem 0.8rem',
-                  borderRadius: '16px',
-                  border: isSelected ? '1px solid #0056b3' : '1px solid #ddd',
-                  backgroundColor: isSelected ? '#e7f1ff' : '#f8f9fa',
-                  color: isSelected ? '#0056b3' : '#333',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: radii.full,
+                  border: isSelected ? `1px solid ${colors.brand.blue}` : `1px solid ${colors.neutral.slate300}`,
+                  backgroundColor: isSelected ? colors.brand.blueMuted : colors.neutral.white,
+                  color: isSelected ? colors.brand.blue : colors.neutral.slate700,
+                  fontSize: typography.fontSize.xs,
+                  fontWeight: isSelected ? typography.fontWeight.semibold : typography.fontWeight.normal,
                   cursor: 'pointer',
-                  fontWeight: isSelected ? '600' : 'normal',
+                  transition: 'all 0.15s ease',
                 }}
               >
-                {isSelected ? `✓ ${tech}` : `+ ${tech}`}
+                {isSelected ? <Check size={12} strokeWidth={2.5} /> : <Plus size={12} />}
+                <span>{tech}</span>
               </button>
-            );
+            )
           })}
         </div>
 
         <div style={{ display: 'flex', gap: '0.4rem' }}>
-          <input
-            type="text"
-            placeholder="Otra tecnología (ej. IAM, CloudWatch)..."
+          <Input
+            placeholder="Agregar otra tecnología (ej. IAM, S3, ECS)..."
             value={customTech}
             onChange={(e) => setCustomTech(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                e.preventDefault();
-                addCustomTech();
+                e.preventDefault()
+                addCustomTech()
               }
             }}
-            style={{ flex: 1, padding: '0.4rem 0.6rem', borderRadius: '4px', border: '1px solid #ccc' }}
           />
-          <button
-            type="button"
-            onClick={() => addCustomTech()}
-            style={{ padding: '0.4rem 0.8rem', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer' }}
-          >
+          <Button type="button" variant="secondary" size="sm" onClick={() => addCustomTech()}>
             Agregar
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div>
-        <label htmlFor="goals" style={{ fontWeight: '600', display: 'block', marginBottom: '0.4rem' }}>
-          Objetivos de aprendizaje para re:Invent:
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+        <label
+          htmlFor="goals"
+          style={{
+            fontSize: typography.fontSize.xs,
+            fontWeight: typography.fontWeight.semibold,
+            color: colors.neutral.slate700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}
+        >
+          Objetivos de Aprendizaje para re:Invent:
         </label>
         <textarea
           id="goals"
           rows={2}
           value={goals}
           onChange={(e) => setGoals(e.target.value)}
-          style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc', fontFamily: 'inherit' }}
+          style={{
+            width: '100%',
+            padding: '0.6rem 0.75rem',
+            borderRadius: radii.md,
+            border: `1px solid ${colors.neutral.slate300}`,
+            fontSize: typography.fontSize.sm,
+            fontFamily: typography.fontFamily,
+            color: colors.neutral.slate900,
+            boxSizing: 'border-box',
+            outline: 'none',
+          }}
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        style={{
-          padding: '0.8rem 1.2rem',
-          backgroundColor: '#ff9900',
-          color: '#111',
-          border: 'none',
-          borderRadius: '4px',
-          fontWeight: '700',
-          fontSize: '1rem',
-          cursor: isLoading ? 'not-allowed' : 'pointer',
-          marginTop: '0.5rem',
-        }}
-      >
-        {isLoading ? 'Analizando Contexto...' : 'Descubrir Mi Knowledge Profile y Gaps →'}
-      </button>
+      <div style={{ marginTop: '0.5rem' }}>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          disabled={isLoading}
+          isLoading={isLoading}
+          leftIcon={<Sparkles size={16} />}
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            backgroundColor: colors.brand.orange,
+            borderColor: colors.brand.orange,
+            color: colors.neutral.white,
+          }}
+        >
+          {isLoading ? 'Analizando Contexto...' : 'Descubrir Mi Knowledge Profile y Gaps'}
+        </Button>
+      </div>
     </form>
-  );
-};
+  )
+}

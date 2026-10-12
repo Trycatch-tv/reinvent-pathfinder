@@ -1,5 +1,17 @@
 import React, { useState } from 'react'
 import type { LearningReport, GapCoverage } from '@pathfinder/ai-knowledge'
+import {
+  FileText,
+  Copy,
+  Check,
+  Rocket,
+  Star,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
+import { colors, radii, shadows, spacing, typography } from '../theme/tokens.js'
+import { Button } from './ui/Button.js'
+import { Badge } from './ui/Badge.js'
 
 export interface LearningReportViewProps {
   readonly report: LearningReport
@@ -14,6 +26,31 @@ const coverageVisuals: Record<GapCoverage, { label: string; bg: string; color: s
 export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }) => {
   const { counts, coveragePercentage, executiveSummary, gaps, nextRoute, reflectionsSummary } = report
   const [copied, setCopied] = useState(false)
+  const [expandedGapIds, setExpandedGapIds] = useState<Set<string>>(new Set())
+
+  const toggleGapExpand = (gapId: string) => {
+    setExpandedGapIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(gapId)) {
+        next.delete(gapId)
+      } else {
+        next.add(gapId)
+      }
+      return next
+    })
+  }
+
+  const safeReflections = reflectionsSummary ?? {
+    totalReflections: 0,
+    averageRating: 0,
+    items: [],
+    keyActionItems: [],
+  }
+  const keyActionItems = safeReflections.keyActionItems ?? []
+  const reflectionItems = safeReflections.items ?? []
+  const safeCounts = counts ?? { covered: 0, partial: 0, pending: 0, total: 0 }
+  const safeGaps = gaps ?? []
+  const safeNextRoute = nextRoute ?? []
 
   const handleCopyMarkdown = () => {
     const lines: string[] = [
@@ -24,24 +61,24 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }
       `**Resumen Ejecutivo:** ${executiveSummary}`,
       ``,
       `## Métricas`,
-      `- Cubiertos: ${counts.covered}`,
-      `- Parciales: ${counts.partial}`,
-      `- Pendientes: ${counts.pending}`,
-      `- Total Brechas: ${counts.total}`,
+      `- Cubiertos: ${safeCounts.covered}`,
+      `- Parciales: ${safeCounts.partial}`,
+      `- Pendientes: ${safeCounts.pending}`,
+      `- Total Brechas: ${safeCounts.total}`,
       ``,
     ]
 
-    if (reflectionsSummary.keyActionItems.length > 0) {
+    if (keyActionItems.length > 0) {
       lines.push(`## Compromisos de Implementación en el Proyecto`)
-      reflectionsSummary.keyActionItems.forEach((item) => {
+      keyActionItems.forEach((item) => {
         lines.push(`- ${item}`)
       })
       lines.push(``)
     }
 
-    if (reflectionsSummary.items.length > 0) {
-      lines.push(`## Reflexiones Documentadas (${reflectionsSummary.totalReflections})`)
-      reflectionsSummary.items.forEach((r, idx) => {
+    if (reflectionItems.length > 0) {
+      lines.push(`## Reflexiones Documentadas (${safeReflections.totalReflections})`)
+      reflectionItems.forEach((r, idx) => {
         lines.push(`### Sesión ${idx + 1}: ${r.sessionId} (★ ${r.rating}/5)`)
         lines.push(`- **Aprendizaje:** ${r.takeaways}`)
         if (r.actionItem) {
@@ -52,14 +89,14 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }
     }
 
     lines.push(`## Detalle por Brecha`)
-    gaps.forEach((g) => {
+    safeGaps.forEach((g) => {
       lines.push(`- **${g.topic}** [${g.coverage.toUpperCase()}]: ${g.initialStatus} → ${g.finalStatus}`)
     })
     lines.push(``)
 
-    if (nextRoute.length > 0) {
+    if (safeNextRoute.length > 0) {
       lines.push(`## Ruta de Aprendizaje Posterior`)
-      nextRoute.forEach((g) => {
+      safeNextRoute.forEach((g) => {
         lines.push(`- **${g.topic}** (${g.severity}): ${g.recommendedAction ?? 'Estudio autodidacta'}`)
       })
     }
@@ -77,78 +114,73 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }
     <section
       aria-label="Learning Report"
       style={{
-        backgroundColor: '#fff',
-        border: '1px solid #e1e4e8',
-        borderRadius: '8px',
-        padding: '1.5rem',
-        marginTop: '1.5rem',
+        backgroundColor: colors.neutral.white,
+        border: `1px solid ${colors.neutral.slate200}`,
+        borderRadius: radii.xl,
+        padding: spacing.xl,
+        marginTop: spacing.lg,
+        boxShadow: shadows.sm,
       }}
     >
+      {/* Header */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          borderBottom: '1px solid #eee',
-          paddingBottom: '1rem',
-          marginBottom: '1.2rem',
+          borderBottom: `1px solid ${colors.neutral.slate200}`,
+          paddingBottom: spacing.md,
+          marginBottom: spacing.lg,
           flexWrap: 'wrap',
-          gap: '0.8rem',
+          gap: spacing.sm,
         }}
       >
         <div>
-          <h3 style={{ margin: 0, fontSize: '1.3rem', color: '#161e2e' }}>
-            Learning Report
-          </h3>
-          <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+            <FileText size={20} color={colors.brand.navy} />
+            <h3 style={{ margin: 0, fontSize: typography.fontSize.xl, color: colors.brand.navy, fontWeight: typography.fontWeight.bold }}>
+              Learning Report
+            </h3>
+            <Badge variant="teal">{`${coveragePercentage}% Cobertura`}</Badge>
+          </div>
+          <span style={{ fontSize: typography.fontSize.xs, color: colors.neutral.slate500 }}>
             Tu progreso de aprendizaje al cierre del evento
           </span>
         </div>
-        <button
-          type="button"
+
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={handleCopyMarkdown}
-          style={{
-            padding: '6px 14px',
-            backgroundColor: copied ? '#10b981' : '#f8fafc',
-            color: copied ? '#ffffff' : '#334155',
-            border: copied ? '1px solid #10b981' : '1px solid #cbd5e1',
-            borderRadius: '6px',
-            fontSize: '0.82rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'all 0.15s ease',
-          }}
+          leftIcon={copied ? <Check size={14} color={colors.semantic.success} /> : <Copy size={14} />}
         >
-          {copied ? '✓ Copiado en Markdown' : '📋 Copiar Reporte en Markdown'}
-        </button>
+          {copied ? 'Copiado en Markdown' : 'Copiar Reporte en Markdown'}
+        </Button>
       </div>
 
       {/* Resumen Ejecutivo y Barra de Progreso */}
       <div
         style={{
-          backgroundColor: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          padding: '1.2rem',
-          marginBottom: '1.5rem',
+          backgroundColor: colors.neutral.slate50,
+          border: `1px solid ${colors.neutral.slate200}`,
+          borderRadius: radii.lg,
+          padding: spacing.lg,
+          marginBottom: spacing.lg,
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
-          <strong style={{ fontSize: '0.95rem', color: '#0f172a' }}>
+          <strong style={{ fontSize: typography.fontSize.sm, color: colors.brand.navy }}>
             Progreso de Cobertura Formativa
           </strong>
-          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0284c7' }}>
+          <span style={{ fontSize: typography.fontSize.lg, fontWeight: typography.fontWeight.bold, color: colors.brand.blue }}>
             {`${coveragePercentage}%`}
           </span>
         </div>
         <div
           style={{
-            height: '10px',
-            backgroundColor: '#e2e8f0',
-            borderRadius: '9999px',
+            height: '8px',
+            backgroundColor: colors.neutral.slate200,
+            borderRadius: radii.full,
             overflow: 'hidden',
             marginBottom: '0.8rem',
           }}
@@ -157,54 +189,55 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }
             style={{
               height: '100%',
               width: `${coveragePercentage}%`,
-              backgroundColor: coveragePercentage >= 80 ? '#10b981' : coveragePercentage >= 40 ? '#0284c7' : '#f59e0b',
-              borderRadius: '9999px',
+              backgroundColor: coveragePercentage >= 80 ? colors.semantic.success : coveragePercentage >= 40 ? colors.brand.blue : colors.semantic.warning,
+              borderRadius: radii.full,
               transition: 'width 0.3s ease',
             }}
           />
         </div>
-        <p style={{ margin: 0, fontSize: '0.88rem', color: '#334155', lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: typography.fontSize.xs, color: colors.neutral.slate700, lineHeight: 1.5 }}>
           {executiveSummary}
         </p>
       </div>
 
       {/* Métricas clave */}
-      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-        <div style={{ flex: '1 1 120px', background: coverageVisuals.covered.bg, color: coverageVisuals.covered.color, borderRadius: '8px', padding: '0.8rem 1rem', border: '1px solid #bbf7d0' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: spacing.lg }}>
+        <div style={{ flex: '1 1 120px', background: coverageVisuals.covered.bg, color: coverageVisuals.covered.color, borderRadius: radii.md, padding: '0.8rem 1rem', border: '1px solid #bbf7d0' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Cubiertos:</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{counts.covered}</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{safeCounts.covered}</div>
         </div>
-        <div style={{ flex: '1 1 120px', background: coverageVisuals.partial.bg, color: coverageVisuals.partial.color, borderRadius: '8px', padding: '0.8rem 1rem', border: '1px solid #fef08a' }}>
+        <div style={{ flex: '1 1 120px', background: coverageVisuals.partial.bg, color: coverageVisuals.partial.color, borderRadius: radii.md, padding: '0.8rem 1rem', border: '1px solid #fef08a' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Parciales:</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{counts.partial}</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{safeCounts.partial}</div>
         </div>
-        <div style={{ flex: '1 1 120px', background: coverageVisuals.pending.bg, color: coverageVisuals.pending.color, borderRadius: '8px', padding: '0.8rem 1rem', border: '1px solid #fecaca' }}>
+        <div style={{ flex: '1 1 120px', background: coverageVisuals.pending.bg, color: coverageVisuals.pending.color, borderRadius: radii.md, padding: '0.8rem 1rem', border: '1px solid #fecaca' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Pendientes:</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{counts.pending}</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{safeCounts.pending}</div>
         </div>
-        <div style={{ flex: '1 1 120px', background: '#f1f5f9', color: '#334155', borderRadius: '8px', padding: '0.8rem 1rem', border: '1px solid #cbd5e1' }}>
+        <div style={{ flex: '1 1 120px', background: '#f1f5f9', color: '#334155', borderRadius: radii.md, padding: '0.8rem 1rem', border: '1px solid #cbd5e1' }}>
           <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Total:</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{counts.total}</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{safeCounts.total}</div>
         </div>
       </div>
 
       {/* Compromisos de Implementación */}
-      {reflectionsSummary.keyActionItems.length > 0 && (
+      {keyActionItems.length > 0 && (
         <div
           style={{
             backgroundColor: '#eff6ff',
             border: '1px solid #bfdbfe',
-            borderRadius: '8px',
+            borderRadius: radii.md,
             padding: '1rem',
-            marginBottom: '1.5rem',
+            marginBottom: spacing.lg,
           }}
         >
-          <h4 style={{ margin: '0 0 0.6rem 0', fontSize: '0.95rem', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>🚀 Compromisos de Implementación en tu Proyecto</span>
+          <h4 style={{ margin: '0 0 0.6rem 0', fontSize: typography.fontSize.sm, color: '#1e40af', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Rocket size={15} />
+            <span>Compromisos de Implementación en tu Proyecto</span>
           </h4>
           <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            {reflectionsSummary.keyActionItems.map((item, idx) => (
-              <li key={idx} style={{ fontSize: '0.88rem', color: '#1e3a8a' }}>
+            {keyActionItems.map((item, idx) => (
+              <li key={idx} style={{ fontSize: typography.fontSize.xs, color: '#1e3a8a' }}>
                 {item}
               </li>
             ))}
@@ -213,36 +246,37 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }
       )}
 
       {/* Reflexiones Registradas */}
-      {reflectionsSummary.items.length > 0 && (
-        <div style={{ marginBottom: '1.5rem' }}>
+      {reflectionItems.length > 0 && (
+        <div style={{ marginBottom: spacing.lg }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
-            <h4 style={{ margin: 0, fontSize: '0.95rem', color: '#4b5563' }}>
-              {`Reflexiones Documentadas (${reflectionsSummary.totalReflections})`}
+            <h4 style={{ margin: 0, fontSize: typography.fontSize.sm, color: colors.brand.navy }}>
+              {`Reflexiones Documentadas (${safeReflections.totalReflections})`}
             </h4>
-            <span style={{ fontSize: '0.8rem', color: '#f59e0b', fontWeight: 600 }}>
-              {`★ ${reflectionsSummary.averageRating} / 5 promedio`}
+            <span style={{ fontSize: typography.fontSize.xs, color: '#f59e0b', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+              <Star size={13} fill="#f59e0b" />
+              {`${safeReflections.averageRating} / 5 promedio`}
             </span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-            {reflectionsSummary.items.map((r, idx) => (
+            {reflectionItems.map((r, idx) => (
               <div
                 key={idx}
                 style={{
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '6px',
+                  border: `1px solid ${colors.neutral.slate200}`,
+                  borderRadius: radii.md,
                   padding: '0.8rem 1rem',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: colors.neutral.white,
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-                  <strong style={{ fontSize: '0.85rem', color: '#0f172a' }}>{r.sessionId}</strong>
-                  <span style={{ fontSize: '0.8rem', color: '#f59e0b' }}>{'★'.repeat(r.rating)}</span>
+                  <strong style={{ fontSize: typography.fontSize.xs, color: colors.brand.navy }}>{r.sessionId}</strong>
+                  <span style={{ fontSize: typography.fontSize.xs, color: '#f59e0b' }}>{'★'.repeat(r.rating)}</span>
                 </div>
-                <p style={{ margin: '0 0 0.3rem 0', fontSize: '0.85rem', color: '#334155' }}>
+                <p style={{ margin: '0 0 0.3rem 0', fontSize: typography.fontSize.xs, color: colors.neutral.slate700 }}>
                   {r.takeaways}
                 </p>
                 {r.actionItem && (
-                  <div style={{ fontSize: '0.8rem', color: '#0284c7', fontWeight: 500 }}>
+                  <div style={{ fontSize: '0.75rem', color: colors.brand.blue, fontWeight: 500 }}>
                     {`↳ Acción: ${r.actionItem}`}
                   </div>
                 )}
@@ -252,25 +286,58 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }
         </div>
       )}
 
-      {/* Detalle por Brecha */}
-      <h4 style={{ margin: '0 0 0.6rem 0', fontSize: '0.95rem', color: '#4b5563' }}>
+      {/* Detalle por Brecha con secciones expandibles */}
+      <h4 style={{ margin: '0 0 0.6rem 0', fontSize: typography.fontSize.sm, color: colors.brand.navy }}>
         Detalle por brecha
       </h4>
-      {gaps.length === 0 ? (
-        <p style={{ color: '#888', fontStyle: 'italic' }}>No hay brechas registradas en tu journey.</p>
+      {safeGaps.length === 0 ? (
+        <p style={{ color: colors.neutral.slate500, fontStyle: 'italic', fontSize: typography.fontSize.xs }}>No hay brechas registradas en tu journey.</p>
       ) : (
         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.5rem 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {gaps.map((gap) => {
+          {safeGaps.map((gap) => {
             const visual = coverageVisuals[gap.coverage]
+            const isExpanded = expandedGapIds.has(gap.gapId)
             return (
-              <li key={gap.gapId} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '0.6rem 0.8rem', flexWrap: 'wrap' }}>
-                <span style={{ background: visual.bg, color: visual.color, fontSize: '0.72rem', fontWeight: 'bold', padding: '0.2rem 0.5rem', borderRadius: '10px' }}>
-                  {visual.label}
-                </span>
-                <strong style={{ fontSize: '0.9rem', color: '#111827' }}>{gap.topic}</strong>
-                <span style={{ fontSize: '0.75rem', color: '#9ca3af', marginLeft: 'auto' }}>
-                  {`${gap.initialStatus} → ${gap.finalStatus}`}
-                </span>
+              <li
+                key={gap.gapId}
+                style={{
+                  border: `1px solid ${colors.neutral.slate200}`,
+                  borderRadius: radii.md,
+                  padding: '0.6rem 0.8rem',
+                  backgroundColor: colors.neutral.white,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', width: '100%' }}>
+                  <span style={{ background: visual.bg, color: visual.color, fontSize: '0.72rem', fontWeight: 'bold', padding: '0.2rem 0.5rem', borderRadius: radii.full }}>
+                    {visual.label}
+                  </span>
+                  <strong style={{ fontSize: typography.fontSize.xs, color: colors.brand.navy }}>{gap.topic}</strong>
+                  <span style={{ fontSize: '0.75rem', color: colors.neutral.slate500, marginLeft: 'auto' }}>
+                    {`${gap.initialStatus} → ${gap.finalStatus}`}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toggleGapExpand(gap.gapId)}
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      color: colors.neutral.slate400,
+                      cursor: 'pointer',
+                      padding: '2px',
+                    }}
+                  >
+                    {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </button>
+                </div>
+                {isExpanded && (
+                  <div style={{ fontSize: '0.75rem', color: colors.neutral.slate600, borderTop: `1px solid ${colors.neutral.slate100}`, paddingTop: '4px', marginTop: '2px' }}>
+                    <span>Severidad: <strong>{gap.severity}</strong></span>
+                    {gap.recommendedAction && <span> · Acción recomendada: {gap.recommendedAction}</span>}
+                  </div>
+                )}
               </li>
             )
           })}
@@ -278,34 +345,34 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({ report }
       )}
 
       {/* Ruta Posterior */}
-      <h4 style={{ margin: '0 0 0.6rem 0', fontSize: '0.95rem', color: '#4b5563' }}>
-        {`Ruta de aprendizaje posterior (${nextRoute.length})`}
+      <h4 style={{ margin: '0 0 0.6rem 0', fontSize: typography.fontSize.sm, color: colors.brand.navy }}>
+        {`Ruta de aprendizaje posterior (${safeNextRoute.length})`}
       </h4>
-      {nextRoute.length === 0 ? (
-        <p style={{ color: '#15803d', fontWeight: 600 }}>¡Cerraste todas tus brechas! No queda ruta pendiente.</p>
+      {safeNextRoute.length === 0 ? (
+        <p style={{ color: colors.semantic.success, fontWeight: 600, fontSize: typography.fontSize.xs }}>¡Cerraste todas tus brechas! No queda ruta pendiente.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-          {nextRoute.map((gap) => (
+          {safeNextRoute.map((gap) => (
             <div
               key={gap.gapId}
               style={{
-                border: '1px solid #e2e8f0',
-                borderRadius: '6px',
+                border: `1px solid ${colors.semantic.dangerBorder}`,
+                borderRadius: radii.md,
                 padding: '0.8rem',
-                backgroundColor: '#fef2f2',
+                backgroundColor: colors.semantic.dangerBg,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ fontSize: '0.88rem', color: '#991b1b' }}>{gap.topic}</strong>
-                <span style={{ fontSize: '0.72rem', backgroundColor: '#fee2e2', color: '#b91c1c', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                <strong style={{ fontSize: typography.fontSize.xs, color: colors.semantic.danger }}>{gap.topic}</strong>
+                <span style={{ fontSize: '0.72rem', backgroundColor: '#fee2e2', color: colors.semantic.danger, padding: '2px 6px', borderRadius: radii.sm, fontWeight: 600 }}>
                   {gap.severity}
                 </span>
               </div>
               {gap.recommendedAction && (
-                <div style={{ fontSize: '0.8rem', color: '#4b5563' }}>
+                <div style={{ fontSize: typography.fontSize.xs, color: colors.neutral.slate600 }}>
                   💡 {gap.recommendedAction}
                 </div>
               )}

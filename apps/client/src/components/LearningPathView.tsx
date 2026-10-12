@@ -8,18 +8,33 @@ import type {
   SessionRecommendation,
 } from "@pathfinder/domain"
 import React, { useMemo, useState } from "react"
+import {
+  Clock,
+  MapPin,
+  Star,
+  Bookmark,
+  CheckCircle2,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+  Trash2,
+  Sparkles,
+} from "lucide-react"
+import { colors, radii, shadows, spacing, typography } from "../theme/tokens.js"
+import { Badge } from "./ui/Badge.js"
+import { Button } from "./ui/Button.js"
+import { Card } from "./ui/Card.js"
+import { Alert } from "./ui/Alert.js"
 import { ReflectionForm } from "./ReflectionForm.js"
 
 export interface LearningPathViewProps {
   readonly learningPath: LearningPath
   readonly recommendations: readonly SessionRecommendation[]
   readonly candidateSessions?: readonly SessionCandidate[]
-  /** Permite al usuario descartar un ítem; mantiene el control sobre la ruta. */
   readonly onDiscardItem?: (sessionId: string) => void
-  /** Gaps vigentes, para asociar reflexiones a los que cubre cada sesión. */
   readonly gaps?: readonly KnowledgeGap[]
   readonly userId?: string
-  /** Cierra el ciclo adaptativo: aplica la reflexión y recalcula la ruta. */
   readonly onReflectionSubmit?: (reflection: Reflection) => void
   readonly onToggleFavorite?: (sessionId: string, isFavorite: boolean) => void
   readonly favoriteSessionIds?: readonly string[]
@@ -36,6 +51,13 @@ function conflictsForSession(
   return conflicts.filter(
     (c) => c.sessionAId === sessionId || c.sessionBId === sessionId,
   )
+}
+
+function formatScheduleTime(day?: string, startTime?: string, endTime?: string): string {
+  if (!day) return "Horario a confirmar"
+  const dateParts = day.split("-")
+  const dayNum = dateParts[2] ? parseInt(dateParts[2], 10) : day
+  return `${dayNum} Dic · ${startTime ?? ""} - ${endTime ?? ""} (PST)`
 }
 
 export const LearningPathView: React.FC<LearningPathViewProps> = ({
@@ -76,6 +98,19 @@ export const LearningPathView: React.FC<LearningPathViewProps> = ({
     null,
   )
   const [selectedTier, setSelectedTier] = useState<"all" | RelevanceTier>("all")
+  const [expandedCardIds, setExpandedCardIds] = useState<Set<string>>(new Set())
+
+  const toggleExpand = (sessionId: string) => {
+    setExpandedCardIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(sessionId)) {
+        next.delete(sessionId)
+      } else {
+        next.add(sessionId)
+      }
+      return next
+    })
+  }
 
   const handleDiscard = (sessionId: string) => {
     setDiscarded((prev) => new Set(prev).add(sessionId))
@@ -108,579 +143,394 @@ export const LearningPathView: React.FC<LearningPathViewProps> = ({
   })
 
   return (
-    <div
-      style={{
-        backgroundColor: "#fff",
-        border: "1px solid #e1e4e8",
-        borderRadius: "8px",
-        padding: "1.2rem",
-        marginTop: "1.5rem",
-      }}
-    >
+    <Card style={{ padding: spacing.lg, marginTop: spacing.lg }}>
+      {/* Header */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1rem",
-          borderBottom: "1px solid #eee",
-          paddingBottom: "0.8rem",
+          alignItems: "flex-start",
+          marginBottom: spacing.md,
+          borderBottom: `1px solid ${colors.neutral.slate200}`,
+          paddingBottom: spacing.md,
           flexWrap: "wrap",
-          gap: "0.5rem",
+          gap: spacing.sm,
         }}
       >
         <div>
-          <h3 style={{ margin: 0, fontSize: "1.25rem", color: "#161e2e" }}>
-            Tu Learning Path ({visibleItems.length})
-          </h3>
-          <span style={{ fontSize: "0.85rem", color: "#666" }}>
-            Ruta priorizada según tus Knowledge Gaps y reconciliada con tu
-            agenda
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+            <h3 style={{ margin: 0, fontSize: typography.fontSize.xl, color: colors.brand.navy, fontWeight: typography.fontWeight.bold }}>
+              Tu Learning Path Personalizado
+            </h3>
+            <Badge variant="blue">{`${visibleItems.length} sesiones`}</Badge>
+          </div>
+          <span style={{ fontSize: typography.fontSize.xs, color: colors.neutral.slate600 }}>
+            Ruta adaptativa priorizada por tus Knowledge Gaps y reconciliada con tu agenda oficial.
           </span>
         </div>
-        <span
-          style={{
-            fontSize: "0.8rem",
-            backgroundColor: totalConflicts > 0 ? "#fef3c7" : "#e2f0d9",
-            color: totalConflicts > 0 ? "#b45309" : "#385723",
-            padding: "0.3rem 0.6rem",
-            borderRadius: "12px",
-            fontWeight: "bold",
-          }}
+
+        <Badge
+          variant={totalConflicts > 0 ? "warning" : "success"}
+          style={{ fontSize: typography.fontSize.xs, padding: "4px 10px" }}
         >
           {totalConflicts > 0
             ? `${totalConflicts} conflicto(s) de agenda`
             : "Sin conflictos"}
-        </span>
+        </Badge>
       </div>
 
-      {/* Tabs de filtrado por tier de relevancia */}
+      {/* Primary tier warning if 0 primary recommendations */}
+      {primaryCount === 0 && (
+        <Alert variant="warning" style={{ marginBottom: spacing.md }}>
+          <strong>Aviso de Relevancia:</strong> No se encontraron sesiones en la <em>Ruta Principal</em> que aborden directamente brechas críticas con alta afinidad. Las sesiones disponibles se clasificaron como Alternativas o Exploratorias.
+        </Alert>
+      )}
+
+      {/* Tabs de filtrado por categoría/tier */}
       <div
         role="tablist"
         aria-label="Filtro de relevancia"
         style={{
           display: "flex",
           gap: "8px",
-          marginBottom: "1.2rem",
+          marginBottom: spacing.lg,
           flexWrap: "wrap",
         }}
       >
-        <button
-          type="button"
+        <Button
+          variant={selectedTier === "all" ? "primary" : "secondary"}
+          size="sm"
           onClick={() => setSelectedTier("all")}
-          style={{
-            padding: "5px 12px",
-            fontSize: "0.85rem",
-            borderRadius: "20px",
-            border:
-              selectedTier === "all"
-                ? "1px solid #0284c7"
-                : "1px solid #e2e8f0",
-            backgroundColor: selectedTier === "all" ? "#0284c7" : "#f8fafc",
-            color: selectedTier === "all" ? "#ffffff" : "#475569",
-            fontWeight: selectedTier === "all" ? 600 : 400,
-            cursor: "pointer",
-          }}
+          style={{ borderRadius: radii.full }}
         >
           {`Todas (${visibleItems.length})`}
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant={selectedTier === "primary" ? "primary" : "secondary"}
+          size="sm"
           onClick={() => setSelectedTier("primary")}
+          leftIcon={<Star size={13} />}
           style={{
-            padding: "5px 12px",
-            fontSize: "0.85rem",
-            borderRadius: "20px",
-            border:
-              selectedTier === "primary"
-                ? "1px solid #059669"
-                : "1px solid #e2e8f0",
-            backgroundColor:
-              selectedTier === "primary" ? "#059669" : "#f8fafc",
-            color: selectedTier === "primary" ? "#ffffff" : "#475569",
-            fontWeight: selectedTier === "primary" ? 600 : 400,
-            cursor: "pointer",
+            borderRadius: radii.full,
+            backgroundColor: selectedTier === "primary" ? colors.semantic.success : undefined,
+            borderColor: selectedTier === "primary" ? colors.semantic.success : undefined,
           }}
         >
-          {`⭐ Principales (${primaryCount})`}
-        </button>
-        <button
-          type="button"
+          {`Principales (${primaryCount})`}
+        </Button>
+        <Button
+          variant={selectedTier === "alternative" ? "primary" : "secondary"}
+          size="sm"
           onClick={() => setSelectedTier("alternative")}
           style={{
-            padding: "5px 12px",
-            fontSize: "0.85rem",
-            borderRadius: "20px",
-            border:
-              selectedTier === "alternative"
-                ? "1px solid #d97706"
-                : "1px solid #e2e8f0",
-            backgroundColor:
-              selectedTier === "alternative" ? "#d97706" : "#f8fafc",
-            color: selectedTier === "alternative" ? "#ffffff" : "#475569",
-            fontWeight: selectedTier === "alternative" ? 600 : 400,
-            cursor: "pointer",
+            borderRadius: radii.full,
+            backgroundColor: selectedTier === "alternative" ? colors.semantic.warning : undefined,
+            borderColor: selectedTier === "alternative" ? colors.semantic.warning : undefined,
           }}
         >
-          {`🔄 Alternativas (${alternativeCount})`}
-        </button>
-        <button
-          type="button"
+          {`Alternativas (${alternativeCount})`}
+        </Button>
+        <Button
+          variant={selectedTier === "exploratory" ? "primary" : "secondary"}
+          size="sm"
           onClick={() => setSelectedTier("exploratory")}
-          style={{
-            padding: "5px 12px",
-            fontSize: "0.85rem",
-            borderRadius: "20px",
-            border:
-              selectedTier === "exploratory"
-                ? "1px solid #475569"
-                : "1px solid #e2e8f0",
-            backgroundColor:
-              selectedTier === "exploratory" ? "#475569" : "#f8fafc",
-            color: selectedTier === "exploratory" ? "#ffffff" : "#475569",
-            fontWeight: selectedTier === "exploratory" ? 600 : 400,
-            cursor: "pointer",
-          }}
+          style={{ borderRadius: radii.full }}
         >
-          {`🧭 Exploratorias (${exploratoryCount})`}
-        </button>
+          {`Exploratorias (${exploratoryCount})`}
+        </Button>
       </div>
 
-      {visibleItems.length === 0 ? (
-        <p style={{ color: "#888", fontStyle: "italic" }}>
-          No hay sesiones en tu ruta. Ajusta tu contexto o gaps para generar
-          recomendaciones.
-        </p>
-      ) : filteredItems.length === 0 ? (
-        <p style={{ color: "#888", fontStyle: "italic" }}>
-          No hay sesiones en la categoría seleccionada.
-        </p>
-      ) : (
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}
-        >
-          {filteredItems.map((item) => {
-            const rec = recById.get(item.sessionId)
+      {/* Lista de Sesiones */}
+      <div style={{ display: "flex", flexDirection: "column", gap: spacing.md }}>
+        {filteredItems.length === 0 ? (
+          <div style={{ padding: "2rem", textAlign: "center", color: colors.neutral.slate500, backgroundColor: colors.neutral.slate50, borderRadius: radii.md }}>
+            No hay sesiones en la categoría seleccionada.
+          </div>
+        ) : (
+          filteredItems.map((item, index) => {
             const candidate = candidateById.get(item.sessionId)
+            const rec = recById.get(item.sessionId)
             const itemConflicts = conflictsForSession(
               item.sessionId,
               learningPath.conflicts,
             )
             const hasConflict = itemConflicts.length > 0
             const tier = item.tier ?? "primary"
+            const isExpanded = expandedCardIds.has(item.sessionId)
 
             const relatedGaps = item.targetGapIds
               .map((id) => gapById.get(id))
-              .filter((g): g is NonNullable<typeof g> => g !== undefined)
+              .filter((g): g is KnowledgeGap => Boolean(g))
 
-            let tierBadgeColor = "#059669"
-            let tierBadgeBg = "#ecfdf5"
-            let tierBadgeBorder = "#a7f3d0"
-            let tierLabel = "⭐ Principal"
+            const isFavorite = favoriteSet.has(item.sessionId)
+            const isReserved = reservedSet.has(item.sessionId)
+            const isMutatingFavorite = favoriteMutationSessionId === item.sessionId
+            const isMutatingReservation = reservationMutationSessionId === item.sessionId
 
-            if (tier === "alternative") {
-              tierBadgeColor = "#d97706"
-              tierBadgeBg = "#fffbeb"
-              tierBadgeBorder = "#fde68a"
-              tierLabel = "🔄 Alternativa"
-            } else if (tier === "exploratory") {
-              tierBadgeColor = "#475569"
-              tierBadgeBg = "#f8fafc"
-              tierBadgeBorder = "#cbd5e1"
-              tierLabel = "🧭 Exploratoria"
-            }
+            const tierMeta = {
+              primary: { label: "Principal", variant: "teal" as const, border: colors.semantic.successBorder },
+              alternative: { label: "Alternativa", variant: "orange" as const, border: colors.semantic.warningBorder },
+              exploratory: { label: "Exploratoria", variant: "gray" as const, border: colors.neutral.slate200 },
+            }[tier]
 
             return (
-              <React.Fragment key={item.sessionId}>
-                <div
-                  style={{
-                    border: hasConflict
-                      ? "1px solid #fcd34d"
-                      : "1px solid #e5e7eb",
-                    borderRadius: "6px",
-                    padding: "0.9rem",
-                    backgroundColor: hasConflict ? "#fffbeb" : "#fff",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    gap: "1rem",
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div
+              <div
+                key={item.sessionId}
+                style={{
+                  border: `1px solid ${tierMeta.border}`,
+                  borderRadius: radii.lg,
+                  padding: spacing.md,
+                  backgroundColor: colors.neutral.white,
+                  boxShadow: shadows.sm,
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {/* Header row */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: spacing.sm, flexWrap: "wrap", marginBottom: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                    <span
                       style={{
-                        display: "flex",
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        backgroundColor: colors.brand.navyDark,
+                        color: colors.neutral.white,
+                        display: "inline-flex",
                         alignItems: "center",
-                        gap: "0.6rem",
-                        marginBottom: "0.4rem",
-                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        fontSize: "0.7rem",
+                        fontWeight: typography.fontWeight.bold,
                       }}
                     >
-                      <span
-                        style={{
-                          backgroundColor: "#0284c7",
-                          color: "#fff",
-                          fontSize: "0.75rem",
-                          fontWeight: "bold",
-                          padding: "0.15rem 0.5rem",
-                          borderRadius: "10px",
-                          minWidth: "1.2rem",
-                          textAlign: "center",
-                        }}
-                      >
-                        {item.order}
+                      {index + 1}
+                    </span>
+                    <Badge variant="blue">{rec?.sessionCode ?? candidate?.code ?? item.sessionId}</Badge>
+                    <Badge variant={tierMeta.variant}>{tierMeta.label}</Badge>
+                    {rec && (
+                      <span style={{ fontSize: typography.fontSize.xs, color: colors.brand.blue, fontWeight: typography.fontWeight.semibold }}>
+                        {`relevancia ${(rec.relevanceScore * 100).toFixed(0)}%`}
                       </span>
-                      <strong style={{ fontSize: "1rem", color: "#111827" }}>
-                        {rec?.title ?? candidate?.title ?? item.sessionId}
-                      </strong>
-                      {(rec?.sessionCode ?? candidate?.code) && (
-                        <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
-                          ({rec?.sessionCode ?? candidate?.code})
-                        </span>
-                      )}
-                      <span
-                        data-testid="relevance-tier-badge"
-                        style={{
-                          fontSize: "0.75rem",
-                          backgroundColor: tierBadgeBg,
-                          color: tierBadgeColor,
-                          border: `1px solid ${tierBadgeBorder}`,
-                          padding: "1px 8px",
-                          borderRadius: "9999px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {tierLabel}
-                      </span>
-                    </div>
-
-                    {/* Fila de información operativa */}
-                    {(candidate || rec) && (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.5rem",
-                          alignItems: "center",
-                          marginBottom: "0.5rem",
-                          flexWrap: "wrap",
-                          fontSize: "0.75rem",
-                          color: "#475569",
-                        }}
-                      >
-                        {candidate?.level && (
-                          <span
-                            style={{
-                              backgroundColor: "#f1f5f9",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                            }}
-                          >
-                            {`Nivel ${candidate.level}`}
-                          </span>
-                        )}
-                        {candidate?.format && (
-                          <span
-                            style={{
-                              backgroundColor: "#f1f5f9",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                            }}
-                          >
-                            {candidate.format}
-                          </span>
-                        )}
-                        {candidate?.schedule && (
-                          <span
-                            style={{
-                              backgroundColor: "#f0fdf4",
-                              color: "#166534",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                            }}
-                          >
-                            {`📅 ${candidate.schedule.day} (${candidate.schedule.startTime} - ${candidate.schedule.endTime})`}
-                          </span>
-                        )}
-                        {candidate?.location && (
-                          <span
-                            style={{
-                              backgroundColor: "#f8fafc",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                            }}
-                          >
-                            {`📍 ${candidate.location.venue}${candidate.location.room ? ` · ${candidate.location.room}` : ""}`}
-                          </span>
-                        )}
-                        {candidate?.capacityRemaining !== undefined && (
-                          <span
-                            style={{
-                              backgroundColor:
-                                candidate.capacityRemaining > 0
-                                  ? "#ecfdf5"
-                                  : "#fef2f2",
-                              color:
-                                candidate.capacityRemaining > 0
-                                  ? "#065f46"
-                                  : "#991b1b",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                              fontWeight: 600,
-                            }}
-                          >
-                            {candidate.capacityRemaining > 0
-                              ? `🪑 ${candidate.capacityRemaining} cupos`
-                              : "🚫 Lleno / Lista de espera"}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Justificación visible */}
-                    {rec?.explanation && (
-                      <p
-                        style={{
-                          margin: "0 0 0.5rem 0",
-                          fontSize: "0.85rem",
-                          color: "#334155",
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        <strong style={{ color: "#0f172a" }}>💡 Justificación: </strong>
-                        {rec.explanation}
-                      </p>
-                    )}
-
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.8rem",
-                        flexWrap: "wrap",
-                        fontSize: "0.78rem",
-                        color: "#6b7280",
-                      }}
-                    >
-                      {rec && (
-                        <span>
-                          {`relevancia ${(rec.relevanceScore * 100).toFixed(0)}%`}
-                        </span>
-                      )}
-                      <span>
-                        <strong>Cubre:</strong> {item.targetGapIds.length} gap(s)
-                      </span>
-                      {relatedGaps.length > 0 && (
-                        <div
-                          style={{
-                            display: "inline-flex",
-                            gap: "4px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          {relatedGaps.map((g) => (
-                            <span
-                              key={g.id}
-                              style={{
-                                backgroundColor: "#e0f2fe",
-                                color: "#0369a1",
-                                padding: "1px 6px",
-                                borderRadius: "4px",
-                                fontSize: "0.72rem",
-                              }}
-                            >
-                              {g.topic}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {hasConflict && (
-                      <div
-                        style={{
-                          marginTop: "0.5rem",
-                          fontSize: "0.78rem",
-                          color: "#b45309",
-                          backgroundColor: "#fef3c7",
-                          padding: "4px 8px",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        ⚠ Conflicto de agenda:{" "}
-                        {itemConflicts
-                          .map((c) => `${c.reason} (${c.overlapMinutes} min)`)
-                          .join("; ")}
-                      </div>
                     )}
                   </div>
 
-                  {(() => {
-                    const isFavorite = favoriteSet.has(item.sessionId)
-                    const isReserved = reservedSet.has(item.sessionId)
-                    const isMutatingFavorite =
-                      favoriteMutationSessionId === item.sessionId
-                    const isMutatingReservation =
-                      reservationMutationSessionId === item.sessionId
-
-                    return (
-                      <div
+                  {/* Quick Action Buttons */}
+                  <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+                    {onToggleFavorite && (
+                      <Button
+                        variant={isFavorite ? "secondary" : "ghost"}
+                        size="sm"
+                        onClick={() => onToggleFavorite(item.sessionId, isFavorite)}
+                        disabled={isMutatingFavorite}
+                        title={isFavorite ? "Quitar de favoritas" : "Marcar como favorita"}
+                        leftIcon={<Bookmark size={13} />}
                         style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "0.4rem",
-                          alignItems: "flex-end",
-                          minWidth: "150px",
+                          color: isFavorite ? colors.brand.orange : colors.neutral.slate600,
+                          backgroundColor: isFavorite ? colors.brand.orangeMuted : undefined,
                         }}
                       >
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "0.3rem",
-                            alignItems: "center",
-                            flexWrap: "wrap",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          {onToggleFavorite && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                onToggleFavorite(item.sessionId, isFavorite)
-                              }
-                              disabled={isMutatingFavorite}
-                              title={
-                                isFavorite
-                                  ? "Quitar de tus favoritas"
-                                  : "Marcar como favorita"
-                              }
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "0.2rem",
-                                background: isFavorite ? "#fef9c3" : "#f8fafc",
-                                border: isFavorite
-                                  ? "1px solid #facc15"
-                                  : "1px solid #cbd5e1",
-                                borderRadius: "4px",
-                                color: isFavorite ? "#854d0e" : "#475569",
-                                cursor: isMutatingFavorite ? "wait" : "pointer",
-                                fontSize: "0.75rem",
-                                padding: "0.25rem 0.5rem",
-                                fontWeight: isFavorite ? "600" : "normal",
-                              }}
-                            >
-                              {isMutatingFavorite
-                                ? "…"
-                                : isFavorite
-                                  ? "★ Favorita"
-                                  : "☆ Favorita"}
-                            </button>
-                          )}
+                        {isFavorite ? "Favorita" : "Favorita"}
+                      </Button>
+                    )}
 
-                          {onToggleReservation && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                onToggleReservation(item.sessionId, isReserved)
-                              }
-                              disabled={isMutatingReservation}
-                              title={
-                                isReserved
-                                  ? "Cancelar tu reserva para esta sesión"
-                                  : "Reservar asiento en AWS Events"
-                              }
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "0.2rem",
-                                background: isReserved ? "#dcfce7" : "#f0f9ff",
-                                border: isReserved
-                                  ? "1px solid #86efac"
-                                  : "1px solid #bae6fd",
-                                borderRadius: "4px",
-                                color: isReserved ? "#166534" : "#0284c7",
-                                cursor: isMutatingReservation
-                                  ? "wait"
-                                  : "pointer",
-                                fontSize: "0.75rem",
-                                padding: "0.25rem 0.5rem",
-                                fontWeight: isReserved ? "600" : "normal",
-                              }}
-                            >
-                              {isMutatingReservation
-                                ? "…"
-                                : isReserved
-                                  ? "✓ Reservada"
-                                  : "🎟️ Reservar"}
-                            </button>
-                          )}
+                    {onToggleReservation && (
+                      <Button
+                        variant={isReserved ? "secondary" : "primary"}
+                        size="sm"
+                        onClick={() => onToggleReservation(item.sessionId, isReserved)}
+                        disabled={isMutatingReservation}
+                        leftIcon={<CheckCircle2 size={13} />}
+                      >
+                        {isReserved ? "Reservada" : "Reservar"}
+                      </Button>
+                    )}
 
-                          <button
-                            type="button"
-                            onClick={() => handleDiscard(item.sessionId)}
-                            title="Descartar esta sesión de tu ruta"
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "#9ca3af",
-                              cursor: "pointer",
-                              fontSize: "1.1rem",
-                              padding: "0 0.2rem",
-                              lineHeight: 1,
-                            }}
-                          >
-                            ×
-                          </button>
-                        </div>
+                    {onReflectionSubmit && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() =>
+                          setReflectingSessionId(
+                            reflectingSessionId === item.sessionId ? null : item.sessionId,
+                          )
+                        }
+                        leftIcon={<MessageSquare size={13} />}
+                      >
+                        Reflexionar
+                      </Button>
+                    )}
 
-                        {onReflectionSubmit && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setReflectingSessionId(
-                                reflectingSessionId === item.sessionId
-                                  ? null
-                                  : item.sessionId,
-                              )
-                            }
-                            title="Registrar reflexión tras asistir a esta sesión"
-                            style={{
-                              background: "none",
-                              border: "1px solid #cbd5e1",
-                              borderRadius: "4px",
-                              color: "#0284c7",
-                              cursor: "pointer",
-                              fontSize: "0.75rem",
-                              padding: "0.2rem 0.5rem",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {reflectingSessionId === item.sessionId
-                              ? "Cerrar"
-                              : "Reflexionar"}
-                          </button>
-                        )}
-                      </div>
-                    )
-                  })()}
+                    {onDiscardItem && (
+                      <button
+                        type="button"
+                        onClick={() => handleDiscard(item.sessionId)}
+                        aria-label={`Descartar sesión ${candidate?.title ?? item.sessionId}`}
+                        title="Descartar de la ruta"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          color: colors.neutral.slate400,
+                          cursor: "pointer",
+                          padding: "4px",
+                        }}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {onReflectionSubmit &&
-                  reflectingSessionId === item.sessionId && (
+                {/* Title */}
+                <h4 style={{ margin: "4px 0 8px 0", fontSize: typography.fontSize.base, color: colors.brand.navy, fontWeight: typography.fontWeight.bold }}>
+                  {rec?.title ?? candidate?.title ?? item.sessionId}
+                </h4>
+
+                {/* Logistics & Gap Tags */}
+                <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", fontSize: typography.fontSize.xs, color: colors.neutral.slate600, marginBottom: "8px" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <Clock size={13} />
+                    {formatScheduleTime(candidate?.schedule?.day, candidate?.schedule?.startTime, candidate?.schedule?.endTime)}
+                  </span>
+                  {candidate?.location && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <MapPin size={13} />
+                      {`${candidate.location.venue}${candidate.location.room ? ` · ${candidate.location.room}` : ""}`}
+                    </span>
+                  )}
+                  {candidate?.level && (
+                    <span>{`Nivel ${candidate.level}`}</span>
+                  )}
+                  {candidate?.format && (
+                    <span>{candidate.format}</span>
+                  )}
+                  {candidate?.capacityRemaining !== undefined && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      {candidate.capacityRemaining > 0
+                        ? `${candidate.capacityRemaining} cupos`
+                        : "Lleno / Lista de espera"}
+                    </span>
+                  )}
+                </div>
+
+                {/* Covered Knowledge Gaps */}
+                <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap", marginBottom: "8px" }}>
+                  <span style={{ fontSize: typography.fontSize.xs, fontWeight: typography.fontWeight.semibold, color: colors.neutral.slate500 }}>
+                    {`Cubre ${item.targetGapIds.length} gap(s):`}
+                  </span>
+                    {relatedGaps.map((g) => (
+                      <span
+                        key={g.id}
+                        style={{
+                          backgroundColor: colors.brand.blueMuted,
+                          color: colors.brand.blue,
+                          fontSize: "0.72rem",
+                          fontWeight: typography.fontWeight.medium,
+                          padding: "2px 8px",
+                          borderRadius: radii.sm,
+                        }}
+                      >
+                        {g.topic}
+                      </span>
+                    ))}
+                  </div>
+
+                {/* Schedule conflict alert */}
+                {hasConflict && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      backgroundColor: colors.semantic.warningBg,
+                      border: `1px solid ${colors.semantic.warningBorder}`,
+                      color: colors.semantic.warning,
+                      padding: "6px 10px",
+                      borderRadius: radii.sm,
+                      fontSize: typography.fontSize.xs,
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <AlertTriangle size={14} />
+                    <span>
+                      Conflicto de horario:{" "}
+                      {itemConflicts.map((c) => `${c.reason} (${c.overlapMinutes} min)`).join("; ")}
+                    </span>
+                  </div>
+                )}
+
+                {/* Visible Justification */}
+                {rec?.explanation && (
+                  <p
+                    style={{
+                      margin: "0 0 0.5rem 0",
+                      fontSize: typography.fontSize.xs,
+                      color: colors.neutral.slate700,
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    <strong style={{ color: colors.brand.navy }}>💡 Justificación: </strong>
+                    {rec.explanation}
+                  </p>
+                )}
+
+                {/* Toggle details disclosure */}
+                <div style={{ borderTop: `1px solid ${colors.neutral.slate100}`, paddingTop: "6px", marginTop: "6px" }}>
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(item.sessionId)}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: colors.brand.blue,
+                      cursor: "pointer",
+                      fontSize: typography.fontSize.xs,
+                      fontWeight: typography.fontWeight.semibold,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      padding: 0,
+                    }}
+                  >
+                    <span>{isExpanded ? "Ocultar justificación de IA y detalles" : "Ver justificación de IA y detalles técnicos"}</span>
+                    {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </button>
+
+                  {isExpanded && (
+                    <div style={{ marginTop: "8px", backgroundColor: colors.neutral.slate50, padding: "0.75rem", borderRadius: radii.md, border: `1px solid ${colors.neutral.slate200}` }}>
+                      {rec?.explanation && (
+                        <div style={{ marginBottom: "6px" }}>
+                          <strong style={{ fontSize: typography.fontSize.xs, color: colors.brand.navy, display: "flex", alignItems: "center", gap: "4px" }}>
+                            <Sparkles size={12} color={colors.brand.orange} /> Justificación Contextual:
+                          </strong>
+                          <p style={{ margin: "2px 0 0 0", fontSize: typography.fontSize.xs, color: colors.neutral.slate700, lineHeight: 1.5 }}>
+                            {rec.explanation}
+                          </p>
+                        </div>
+                      )}
+                      <p style={{ margin: "6px 0 0 0", fontSize: typography.fontSize.xs, color: colors.neutral.slate600, lineHeight: 1.4 }}>
+                        <strong>Descripción:</strong> {candidate?.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Formulario de Reflexión */}
+                {reflectingSessionId === item.sessionId && (
+                  <div style={{ marginTop: spacing.md, paddingTop: spacing.md, borderTop: `1px solid ${colors.neutral.slate200}` }}>
                     <ReflectionForm
                       sessionId={item.sessionId}
-                      sessionTitle={rec?.title ?? item.sessionId}
+                      sessionTitle={candidate?.title ?? item.sessionId}
                       userId={userId}
                       relatedGaps={relatedGaps}
                       onSubmit={handleReflectionSubmit}
                       onCancel={() => setReflectingSessionId(null)}
                     />
-                  )}
-              </React.Fragment>
+                  </div>
+                )}
+              </div>
             )
-          })}
-        </div>
-      )}
-    </div>
+          })
+        )}
+      </div>
+    </Card>
   )
 }

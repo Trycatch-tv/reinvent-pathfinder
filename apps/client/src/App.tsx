@@ -30,12 +30,13 @@ import {
   AwsEventsNotFoundError,
   AwsEventsThrottlingError,
   AwsEventsUnauthorizedError,
-  LocalStorageTokenStore,
+  SessionStorageTokenStore,
   SAMPLE_RAW_SESSIONS,
   type UserScheduleResult,
   normalizeAwsSession,
 } from "@pathfinder/events-client"
 import React, { useEffect, useMemo, useRef, useState } from "react"
+import { Lock } from "lucide-react"
 import { AITraceBadge } from "./components/AITraceBadge.js"
 import { AITracePanel } from "./components/AITracePanel.js"
 import { AppShell } from "./components/AppShell.js"
@@ -49,8 +50,10 @@ import { LearningPathView } from "./components/LearningPathView.js"
 import { LearningReportView } from "./components/LearningReportView.js"
 import { ModeSelector } from "./components/ModeSelector.js"
 import { Alert } from "./components/ui/Alert.js"
+import { Button } from "./components/ui/Button.js"
 import { SAMPLE_HEATMAP_AVAILABILITY } from "./fixtures/availability-heatmap.js"
 import { createPathfinderDataProvider } from "./providers/index.js"
+import { colors, radii, shadows } from "./theme/tokens.js"
 
 export function resolveAuthRedirectUri(
   envUri = import.meta.env.VITE_AUTH_REDIRECT_URI,
@@ -66,7 +69,7 @@ export function resolveAuthRedirectUri(
 // Catálogo demo normalizado (local-first; sin AWS). Decisión de alcance WI-013.
 const DEMO_SESSIONS: readonly SessionCandidate[] =
   SAMPLE_RAW_SESSIONS.map(normalizeAwsSession)
-const tokenStore = new LocalStorageTokenStore()
+const tokenStore = new SessionStorageTokenStore()
 const authClient = new AwsBuilderIdAuthClient({
   redirectUri: resolveAuthRedirectUri(),
   tokenStore,
@@ -191,6 +194,7 @@ export function describeReservationReconciliation(input: {
 
 export const LEGACY_JOURNEY_STORAGE_KEY = "pathfinder_journey_state"
 export const MODE_STORAGE_KEY = "pathfinder_experience_mode"
+export const HAS_CHOSEN_MODE_STORAGE_KEY = "pathfinder_mode_chosen"
 
 export function getJourneyStorageKey(mode: ExperienceMode): string {
   return `pathfinder_journey_state_${mode}`
@@ -237,6 +241,17 @@ export function loadSavedJourney(mode: ExperienceMode): Partial<SavedJourneyStat
     const parsed = JSON.parse(raw)
     if (typeof parsed !== "object" || parsed === null) return {}
     if (parsed.mode && parsed.mode !== mode) return {}
+    if (parsed.learningReport && !parsed.learningReport.reflectionsSummary) {
+      parsed.learningReport = {
+        ...parsed.learningReport,
+        reflectionsSummary: {
+          totalReflections: 0,
+          averageRating: 0,
+          items: [],
+          keyActionItems: [],
+        },
+      }
+    }
     return parsed
   } catch {
     return {}
@@ -269,6 +284,19 @@ export const App: React.FC = () => {
       }
     }
     return "demo"
+  })
+
+  const [hasChosenMode, setHasChosenMode] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedChosen = window.localStorage.getItem(HAS_CHOSEN_MODE_STORAGE_KEY)
+        if (storedChosen === "true") return true
+        if (window.localStorage.getItem(MODE_STORAGE_KEY)) return true
+      } catch {
+        // Ignore localStorage access errors
+      }
+    }
+    return false
   })
 
   const savedJourney = loadSavedJourney(mode)
@@ -340,8 +368,27 @@ export const App: React.FC = () => {
     }
   }, [mode, activeCatalog, traces, analysisResult, learningPath, recommendations, currentGaps, initialGaps, reflections, learningReport])
 
-  const handleSelectMode = (newMode: ExperienceMode) => {
-    if (newMode === mode) return
+  const handleSelectMode = (newMode: ExperienceMode, skipConfirm = false) => {
+    if (newMode === mode) {
+      setHasChosenMode(true)
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.setItem(HAS_CHOSEN_MODE_STORAGE_KEY, "true")
+        } catch {
+          // Ignore
+        }
+      }
+      return
+    }
+
+    if (!skipConfirm && (analysisResult || learningPath || currentGaps.length > 0)) {
+      if (typeof window !== "undefined") {
+        const ok = window.confirm(
+          `¿Deseas cambiar a Modo ${newMode === "live" ? "Live" : "Demo"}? El progreso actual en Modo ${mode === "live" ? "Live" : "Demo"} se mantendrá guardado de forma independiente.`,
+        )
+        if (!ok) return
+      }
+    }
 
     // 1. Persist current mode's journey before switching
     if (typeof window !== "undefined") {
@@ -365,10 +412,13 @@ export const App: React.FC = () => {
           )
         }
         window.localStorage.setItem(MODE_STORAGE_KEY, newMode)
+        window.localStorage.setItem(HAS_CHOSEN_MODE_STORAGE_KEY, "true")
       } catch {
         // Ignore localStorage access errors
       }
     }
+
+    setHasChosenMode(true)
 
     // 2. Load isolated target state
     const targetState = loadSavedJourney(newMode)
@@ -509,26 +559,35 @@ export const App: React.FC = () => {
     setIsLoading(true)
     setError(null)
     try {
-      // 1. Intentar llamar al backend con Amazon Bedrock AI real
       let result: AnalyzeContextResponse
-      let engine: "bedrock" | "heuristic" = "bedrock"
-      try {
-        const response = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(request),
-        })
-        if (response.ok) {
-          result = await response.json()
-        } else {
-          throw new Error(`API error ${response.status}`)
-        }
-      } catch {
-        engine = "heuristic"
-        // Fallback resiliente al analizador heurístico local
+      let engine: "bedrock" | "heuristic" = "heuristic"
+
+      if (mode === "demo") {
+        // En modo Demo se utiliza exclusivamente el motor heurístico local (sin red ni costos AWS)
         const analyzer = new HeuristicContextAnalyzer()
         result = await analyzer.analyze(request)
+        engine = "heuristic"
+      } else {
+        // En modo Live se invoca Amazon Bedrock real con fallback controlado
+        try {
+          const response = await fetch("/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(request),
+          })
+          if (response.ok) {
+            result = await response.json()
+            engine = "bedrock"
+          } else {
+            throw new Error(`API error ${response.status}`)
+          }
+        } catch {
+          engine = "heuristic"
+          const analyzer = new HeuristicContextAnalyzer()
+          result = await analyzer.analyze(request)
+        }
       }
+
       recordTrace({
         stage: "context_analysis",
         stageName: "Diagnóstico de Competencias",
@@ -537,7 +596,9 @@ export const App: React.FC = () => {
         summary:
           engine === "bedrock"
             ? `Inferencia generativa de Knowledge Profile con modelo ${result.modelId}`
-            : "Análisis heurístico local tras contingencia de red/API",
+            : mode === "demo"
+              ? "Diagnóstico heurístico local del modo Demo (sin llamadas externas a AWS Bedrock)"
+              : "Fallback heurístico local tras indisponibilidad temporal de Amazon Bedrock",
         executedAt: new Date().toISOString(),
       })
       setAnalysisResult(result)
@@ -572,29 +633,37 @@ export const App: React.FC = () => {
         }
       }
 
-      // 2. Rank recommendations: llamar a Bedrock AI real via API con fallback heurístico
+      // 2. Rank recommendations: Demo usa ranking heurístico; Live invoca Bedrock real
       let ranked: RankRecommendationsResponse
-      let rankEngine: "bedrock" | "heuristic" = "bedrock"
+      let rankEngine: "bedrock" | "heuristic" = "heuristic"
       const rankRequest: RankRecommendationsRequest = {
         projectContext: analysisResult.projectContext,
         knowledgeGaps: analysisResult.knowledgeGaps,
         candidateSessions: candidateSessionsToRank,
       }
-      try {
-        const response = await fetch("/api/recommendations/rank", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(rankRequest),
-        })
-        if (response.ok) {
-          ranked = await response.json()
-        } else {
-          throw new Error(`API error ${response.status}`)
-        }
-      } catch {
-        rankEngine = "heuristic"
+
+      if (mode === "demo") {
         const reranker = new HeuristicSessionReranker()
         ranked = await reranker.rank(rankRequest)
+        rankEngine = "heuristic"
+      } else {
+        try {
+          const response = await fetch("/api/recommendations/rank", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(rankRequest),
+          })
+          if (response.ok) {
+            ranked = await response.json()
+            rankEngine = "bedrock"
+          } else {
+            throw new Error(`API error ${response.status}`)
+          }
+        } catch {
+          rankEngine = "heuristic"
+          const reranker = new HeuristicSessionReranker()
+          ranked = await reranker.rank(rankRequest)
+        }
       }
 
       recordTrace({
@@ -605,7 +674,9 @@ export const App: React.FC = () => {
         summary:
           rankEngine === "bedrock"
             ? `Reranking semántico con Amazon Bedrock (${ranked.modelId})`
-            : "Reranker heurístico basado en coincidencia semántica de gaps",
+            : mode === "demo"
+              ? "Reranking heurístico local del modo Demo (aislado de AWS Bedrock)"
+              : "Fallback a ranking heurístico local tras contingencia de Bedrock",
         executedAt: new Date().toISOString(),
       })
 
@@ -998,11 +1069,13 @@ export const App: React.FC = () => {
         />
       ) : (
         <>
-          <ModeSelector
-            currentMode={mode}
-            onSelectMode={handleSelectMode}
-            isAuthenticated={isAuthenticated}
-          />
+          {!hasChosenMode && (
+            <ModeSelector
+              currentMode={mode}
+              onSelectMode={(m) => handleSelectMode(m, true)}
+              isAuthenticated={isAuthenticated}
+            />
+          )}
 
           {error && (
             <Alert
@@ -1017,26 +1090,45 @@ export const App: React.FC = () => {
           {mode === "live" && !isAuthenticated ? (
             <section
               style={{
-                backgroundColor: "#f8fafc",
-                padding: "3rem 2rem",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
+                backgroundColor: colors.neutral.white,
+                padding: "2.5rem 2rem",
+                borderRadius: radii.xl,
+                border: `1px solid ${colors.neutral.slate200}`,
                 textAlign: "center",
                 maxWidth: "600px",
-                margin: "3rem auto",
-                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+                margin: "2.5rem auto",
+                boxShadow: shadows.sm,
               }}
             >
-              <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔐</div>
+              <div
+                style={{
+                  width: "52px",
+                  height: "52px",
+                  borderRadius: radii.full,
+                  backgroundColor: colors.brand.orangeMuted,
+                  color: colors.brand.orange,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 1.25rem auto",
+                }}
+              >
+                <Lock size={26} strokeWidth={2.2} />
+              </div>
               <h2
-                style={{ marginTop: 0, fontSize: "1.5rem", color: "#0f172a" }}
+                style={{
+                  marginTop: 0,
+                  fontSize: "1.35rem",
+                  color: colors.brand.navy,
+                  fontWeight: 700,
+                }}
               >
                 Inicio de sesión requerido (Modo Live)
               </h2>
               <p
                 style={{
-                  color: "#475569",
-                  fontSize: "1rem",
+                  color: colors.neutral.slate600,
+                  fontSize: "0.95rem",
                   lineHeight: 1.6,
                   marginBottom: "2rem",
                 }}
@@ -1066,21 +1158,13 @@ export const App: React.FC = () => {
                     setScheduleMessage(null)
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => handleSelectMode("demo")}
-                  style={{
-                    backgroundColor: "#0284c7",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "4px",
-                    padding: "0.4rem 0.8rem",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                  }}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleSelectMode("demo", true)}
                 >
-                  🧪 Cambiar a Modo Demo
-                </button>
+                  Cambiar a Modo Demo
+                </Button>
               </div>
             </section>
           ) : !analysisResult ? (

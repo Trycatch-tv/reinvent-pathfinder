@@ -76,7 +76,8 @@ export function buildLearningPath(input: BuildLearningPathInput): LearningPath {
     const hasConflict = conflictSessionIds.has(rec.sessionId);
     let tier: RelevanceTier;
 
-    if (rec.relevanceScore < alternativeMin) {
+    const coversGaps = rec.coveredGapIds.length > 0;
+    if (rec.relevanceScore < alternativeMin || !coversGaps) {
       tier = 'exploratory';
     } else if (hasConflict || rec.relevanceScore < primaryMin) {
       tier = 'alternative';

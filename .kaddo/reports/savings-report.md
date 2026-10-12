@@ -1,6 +1,6 @@
 # Kaddo Estimated Savings Report
 
-Generated at: 2026-10-11T22:53:51.352Z
+Generated at: 2026-10-12T18:06:07.041Z
 Project: pathfinder
 Scope: all
 Currency: USD
@@ -11,8 +11,8 @@ These are evidence-based estimates, not exact ROI. Adjust assumptions with real 
 
 ## Executive Summary
 
-- Estimated time saved: 45.8 hours
-- Estimated value: 1832 USD
+- Estimated time saved: 56.14 hours
+- Estimated value: 2246 USD
 - Confidence: Medium
 - Using default assumptions. Run `kaddo savings init` to customize them.
 
@@ -29,12 +29,12 @@ These are evidence-based estimates, not exact ROI. Adjust assumptions with real 
 ## Evidence Used
 
 - Knowledge Impact Score: 91/100
-- Completed Work Items: 32
-- Ownership coverage: 97%
-- Work Items with Acceptance Criteria: 32/33
+- Completed Work Items: 40
+- Ownership coverage: 98%
+- Work Items with Acceptance Criteria: 40/42
 - Graph quality: partial
-- Graph nodes: 134
-- Graph edges: 236
+- Graph nodes: 170
+- Graph edges: 310
 - Context readiness: Very High
 - Guard history: not available
 
@@ -42,18 +42,18 @@ These are evidence-based estimates, not exact ROI. Adjust assumptions with real 
 
 ### Context Preparation
 
-- Formula: 32 Work Items × 30 min
-- Estimated: 16 h
+- Formula: 40 Work Items × 30 min
+- Estimated: 20 h
 
 ### Review Effort
 
-- Formula: 32 Work Items with ownership × 20 min
-- Estimated: 10.67 h
+- Formula: 41 Work Items with ownership × 20 min
+- Estimated: 13.67 h
 
 ### Clarification Reduction
 
-- Formula: 32 Work Items with Acceptance Criteria × 25 min
-- Estimated: 13.33 h
+- Formula: 40 Work Items with Acceptance Criteria × 25 min
+- Estimated: 16.67 h
 
 ### Onboarding
 
@@ -72,8 +72,8 @@ These are evidence-based estimates, not exact ROI. Adjust assumptions with real 
 
 ## Total
 
-- Estimated time saved: 45.8 h
-- Estimated value: 1832 USD
+- Estimated time saved: 56.14 h
+- Estimated value: 2246 USD
 
 ## Confidence
 

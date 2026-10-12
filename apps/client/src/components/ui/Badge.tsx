@@ -11,6 +11,9 @@ export type BadgeVariant =
   | 'live'
   | 'demo'
   | 'teal'
+  | 'blue'
+  | 'orange'
+  | 'gray'
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant
@@ -81,6 +84,24 @@ export function Badge({
       color: colors.brand.teal,
       border: 'rgba(15, 118, 110, 0.3)',
       dot: colors.brand.tealBright,
+    },
+    blue: {
+      bg: colors.brand.blueMuted,
+      color: colors.brand.blue,
+      border: 'rgba(2, 132, 199, 0.3)',
+      dot: colors.brand.blue,
+    },
+    orange: {
+      bg: colors.brand.orangeMuted,
+      color: colors.brand.orange,
+      border: 'rgba(234, 88, 12, 0.3)',
+      dot: colors.brand.orangeBright,
+    },
+    gray: {
+      bg: colors.neutral.slate100,
+      color: colors.neutral.slate700,
+      border: colors.neutral.slate200,
+      dot: colors.neutral.slate400,
     },
   }
 

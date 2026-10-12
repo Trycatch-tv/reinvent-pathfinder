@@ -1,8 +1,9 @@
-import React from "react"
-import {
-  type ExperienceMode,
-  EXPERIENCE_MODE_POLICIES,
-} from "@pathfinder/domain"
+import React from 'react'
+import type { ExperienceMode } from '@pathfinder/domain'
+import { Terminal, Cloud, ArrowRight, ShieldCheck } from 'lucide-react'
+import { colors, radii, shadows, spacing, typography } from '../theme/tokens.js'
+import { Button } from './ui/Button.js'
+import { Badge } from './ui/Badge.js'
 
 export interface ModeSelectorProps {
   readonly currentMode: ExperienceMode | null
@@ -16,184 +17,202 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
   isAuthenticated,
 }) => {
   return (
-    <div
+    <section
+      aria-label="Selección de modo de experiencia"
       style={{
-        background: "#0f172a",
-        border: "1px solid #1e293b",
-        borderRadius: "12px",
-        padding: "24px",
-        marginBottom: "32px",
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.4)",
+        backgroundColor: colors.neutral.white,
+        border: `1px solid ${colors.neutral.slate200}`,
+        borderRadius: radii.xl,
+        padding: spacing.xl,
+        marginBottom: spacing.xl,
+        boxShadow: shadows.sm,
       }}
     >
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <h2 style={{ fontSize: "1.3rem", fontWeight: 700, margin: "0 0 8px 0", color: "#f8fafc" }}>
-          Elige tu Modo de Experiencia
+      <div style={{ textAlign: 'center', maxWidth: '680px', margin: '0 auto 1.5rem auto' }}>
+        <h2
+          style={{
+            fontSize: typography.fontSize.xl,
+            fontWeight: typography.fontWeight.bold,
+            color: colors.brand.navy,
+            margin: '0 0 0.4rem 0',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          Bienvenido a re:Invent Pathfinder
         </h2>
-        <p style={{ margin: 0, color: "#94a3b8", fontSize: "0.95rem" }}>
-          Define cómo Pathfinder obtendrá los datos, ejecutará el ciclo adaptativo y gestionará tus acciones.
+        <p
+          style={{
+            margin: 0,
+            color: colors.neutral.slate600,
+            fontSize: typography.fontSize.sm,
+            lineHeight: typography.lineHeight.normal,
+          }}
+        >
+          Elige cómo deseas experimentar el companion. Ambas opciones mantienen tus rutas y progresos aislados de forma independiente.
         </p>
       </div>
 
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "16px",
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+          gap: spacing.lg,
+          maxWidth: '850px',
+          margin: '0 auto',
         }}
       >
-        {/* Tarjeta Modo Demo */}
+        {/* Opción Demo */}
         <div
-          onClick={() => onSelectMode("demo")}
+          onClick={() => onSelectMode('demo')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              onSelectMode("demo")
-            }
+            if (e.key === 'Enter' || e.key === ' ') onSelectMode('demo')
           }}
           style={{
-            cursor: "pointer",
-            background: currentMode === "demo" ? "rgba(56, 189, 248, 0.08)" : "#1e293b",
-            border: currentMode === "demo" ? "2px solid #38bdf8" : "1px solid #334155",
-            borderRadius: "10px",
-            padding: "20px",
-            transition: "all 0.2s ease",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
+            border: currentMode === 'demo' ? `2px solid ${colors.brand.blue}` : `1px solid ${colors.neutral.slate200}`,
+            borderRadius: radii.lg,
+            padding: '1.25rem',
+            backgroundColor: currentMode === 'demo' ? colors.semantic.infoBg : colors.neutral.slate50,
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            transition: 'all 0.15s ease',
           }}
         >
           <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-              <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#38bdf8" }}>
-                🧪 {EXPERIENCE_MODE_POLICIES.demo.label}
-              </span>
-              {currentMode === "demo" && (
-                <span
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div
                   style={{
-                    background: "#0284c7",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    padding: "2px 8px",
-                    borderRadius: "9999px",
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: radii.md,
+                    backgroundColor: colors.brand.blueMuted,
+                    color: colors.brand.blue,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  ACTIVO
-                </span>
+                  <Terminal size={18} />
+                </div>
+                <strong style={{ fontSize: typography.fontSize.base, color: colors.brand.navy }}>
+                  Modo Demo
+                </strong>
+              </div>
+              {currentMode === 'demo' && (
+                <Badge variant="blue">ACTIVO</Badge>
               )}
             </div>
-            <p style={{ margin: "0 0 12px 0", color: "#cbd5e1", fontSize: "0.9rem", lineHeight: 1.5 }}>
-              {EXPERIENCE_MODE_POLICIES.demo.description}
+            <p style={{ fontSize: typography.fontSize.xs, color: colors.neutral.slate600, lineHeight: 1.5, margin: '0 0 0.8rem 0' }}>
+              Explora todas las capacidades en modo local-first. Sin credenciales ni llamadas reales a AWS.
             </p>
-            <ul style={{ margin: 0, paddingLeft: "18px", color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.6 }}>
-              <li>Sin credenciales ni llamadas reales a AWS</li>
-              <li>12 sesiones y disponibilidad de muestra</li>
-              <li>Favoritos y reservas simuladas en memoria</li>
-              <li>Diagnóstico y ruta adaptativa inmediatos</li>
+            <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: typography.fontSize.xs, color: colors.neutral.slate500, lineHeight: 1.6 }}>
+              <li>Catálogo representativo con 12 sesiones</li>
+              <li>Diagnóstico y ranking heurístico local</li>
+              <li>Simulación de agenda y detección de conflictos</li>
             </ul>
           </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              onSelectMode("demo")
-            }}
-            style={{
-              marginTop: "16px",
-              background: currentMode === "demo" ? "#0284c7" : "#334155",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "6px",
-              padding: "10px 16px",
-              fontWeight: 600,
-              cursor: "pointer",
-              width: "100%",
-            }}
-          >
-            {currentMode === "demo" ? "✓ Explorando en Demo" : "Comenzar en Demo"}
-          </button>
+
+          <div style={{ marginTop: '1.2rem' }}>
+            <Button
+              variant={currentMode === 'demo' ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectMode('demo')
+              }}
+              style={{ width: '100%', justifyContent: 'center' }}
+              rightIcon={<ArrowRight size={14} />}
+            >
+              {currentMode === 'demo' ? '✓ Explorando en Demo' : 'Explorar Demo'}
+            </Button>
+          </div>
         </div>
 
-        {/* Tarjeta Modo Live */}
+        {/* Opción Live */}
         <div
-          onClick={() => onSelectMode("live")}
+          onClick={() => onSelectMode('live')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              onSelectMode("live")
-            }
+            if (e.key === 'Enter' || e.key === ' ') onSelectMode('live')
           }}
           style={{
-            cursor: "pointer",
-            background: currentMode === "live" ? "rgba(249, 115, 22, 0.08)" : "#1e293b",
-            border: currentMode === "live" ? "2px solid #f97316" : "1px solid #334155",
-            borderRadius: "10px",
-            padding: "20px",
-            transition: "all 0.2s ease",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
+            border: currentMode === 'live' ? `2px solid ${colors.brand.orange}` : `1px solid ${colors.neutral.slate200}`,
+            borderRadius: radii.lg,
+            padding: '1.25rem',
+            backgroundColor: currentMode === 'live' ? colors.semantic.warningBg : colors.neutral.slate50,
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            transition: 'all 0.15s ease',
           }}
         >
           <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-              <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#f97316" }}>
-                🔴 {EXPERIENCE_MODE_POLICIES.live.label}
-              </span>
-              {currentMode === "live" && (
-                <span
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div
                   style={{
-                    background: "#ea580c",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    padding: "2px 8px",
-                    borderRadius: "9999px",
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: radii.md,
+                    backgroundColor: colors.brand.orangeMuted,
+                    color: colors.brand.orange,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  ACTIVO
+                  <Cloud size={18} />
+                </div>
+                <strong style={{ fontSize: typography.fontSize.base, color: colors.brand.navy }}>
+                  Modo Live (re:Invent)
+                </strong>
+              </div>
+              {currentMode === 'live' ? (
+                <Badge variant="orange">ACTIVO</Badge>
+              ) : isAuthenticated ? (
+                <span style={{ fontSize: typography.fontSize.xs, color: colors.semantic.success, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  <ShieldCheck size={12} /> Conectado
                 </span>
-              )}
+              ) : null}
             </div>
-            <p style={{ margin: "0 0 12px 0", color: "#cbd5e1", fontSize: "0.9rem", lineHeight: 1.5 }}>
-              {EXPERIENCE_MODE_POLICIES.live.description}
+            <p style={{ fontSize: typography.fontSize.xs, color: colors.neutral.slate600, lineHeight: 1.5, margin: '0 0 0.8rem 0' }}>
+              Conéctate a la API oficial de AWS Events mediante Builder ID e inferencia real en Amazon Bedrock.
             </p>
-            <ul style={{ margin: 0, paddingLeft: "18px", color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.6 }}>
+            <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: typography.fontSize.xs, color: colors.neutral.slate500, lineHeight: 1.6 }}>
               <li>Requiere autenticación con AWS Builder ID</li>
-              <li>Consulta disponibilidad oficial de AWS Events</li>
-              <li>Sincroniza tu agenda personal real</li>
-              <li>Reservas y favoritos confirmados en tiempo real</li>
+              <li>Catálogo y cupos reales de AWS re:Invent</li>
+              <li>Reconciliación con tu agenda personal y favoritos</li>
+              <li>Inferencia generativa en Bedrock (Nova/Claude)</li>
             </ul>
           </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              onSelectMode("live")
-            }}
-            style={{
-              marginTop: "16px",
-              background: currentMode === "live" ? "#ea580c" : "#334155",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "6px",
-              padding: "10px 16px",
-              fontWeight: 600,
-              cursor: "pointer",
-              width: "100%",
-            }}
-          >
-            {currentMode === "live"
-              ? isAuthenticated
-                ? "✓ Conectado a Live"
-                : "🔴 Activo (Iniciar Builder ID)"
-              : "Iniciar en Live"}
-          </button>
+
+          <div style={{ marginTop: '1.2rem' }}>
+            <Button
+              variant={currentMode === 'live' ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectMode('live')
+              }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                backgroundColor: currentMode === 'live' ? colors.brand.orange : undefined,
+                borderColor: currentMode === 'live' ? colors.brand.orange : undefined,
+              }}
+              rightIcon={<ArrowRight size={14} />}
+            >
+              Conectar con Builder ID
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

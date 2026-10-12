@@ -1,16 +1,17 @@
 # Kaddo Knowledge Impact Report
 
-Generated at: 2026-10-11T22:53:50.620Z
+Generated at: 2026-10-12T18:06:03.983Z
 Project: pathfinder
 Scope: all
 Knowledge Impact Score: 91/100
+Scope note: Impact reports use `all` by default to measure accumulated knowledge impact.
 
 ## Executive Summary
 
-- 32/33 Work Items include code ownership.
-- The knowledge graph is partial with 134 nodes and 236 edges (all scope).
-- 17 graph hint(s) are open.
-- Delivery: 33 materialized, 0 roadmap candidate(s) remaining.
+- 41/42 Work Items include code ownership.
+- The knowledge graph is partial with 170 nodes and 310 edges (all scope).
+- 18 graph hint(s) are open.
+- Delivery: 42 materialized, 0 roadmap candidate(s) remaining.
 - Context readiness: Very High.
 
 ## Knowledge Health
@@ -26,33 +27,33 @@ Knowledge Impact Score: 91/100
 
 ## Knowledge Coverage
 
-- Work Items with ownership: 32/33
-- Work Items with source: 31/33
-- Work Items with initiative: 31/33
-- Work Items with acceptance criteria: 32/33
-- Work Items with Definition of Done: 20/33
-- Work Items with knowledge level: 32/33
+- Work Items with ownership: 41/42
+- Work Items with source: 39/42
+- Work Items with initiative: 40/42
+- Work Items with acceptance criteria: 40/42
+- Work Items with Definition of Done: 20/42
+- Work Items with knowledge level: 41/42
 
 ## Ownership Coverage
 
-- Coverage: 97%
-- Work Items with code ownership: 32/33
-- Owned code paths: 121
+- Coverage: 98%
+- Work Items with code ownership: 41/42
+- Owned code paths: 178
 - Broad globs detected: 15
-- Ownership overlaps: 21
+- Ownership overlaps: 27
 
 ## Traceability
 
 - Roadmap candidates: 0
-- Materialized Work Items: 33
+- Materialized Work Items: 42
 - Remaining candidates: 0
-- Completed Work Items: 32
-- Work Items connected to roadmap: 31/33
-- Work Items connected to code: 32/33
+- Completed Work Items: 40
+- Work Items connected to roadmap: 40/42
+- Work Items connected to code: 41/42
 - Graph quality: partial
-- Graph nodes: 134
-- Graph edges: 236
-- Graph hints: 17
+- Graph nodes: 170
+- Graph edges: 310
+- Graph hints: 18
 
 ## Context Readiness
 
@@ -70,20 +71,20 @@ Reason:
 
 - Draft: 1
 - Ready: 0
-- In Progress: 0
+- In Progress: 1
 - Blocked: 0
-- Completed: 32
+- Completed: 40
 - Ready quality: not applicable
 
 ## Graph Quality
 
 - Scope: all
 - Quality: partial
-- Nodes: 134
-- Edges: 236
-- Hints: 17
+- Nodes: 170
+- Edges: 310
+- Hints: 18
 - Reason: All supported Work Item statuses are included.
-- Last exported: 2026-10-11T22:53:50.620Z
+- Last exported: 2026-10-12T18:06:03.983Z
 
 ## Guard Activity
 
@@ -108,6 +109,9 @@ Reason:
   - Suggested action: Add `source` or `source_id` if this Work Item came from the roadmap.
 - WI-026 — Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery
   - Path: knowledge/delivery/work-items/draft/WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md
+  - Suggested action: Add `source` or `source_id` if this Work Item came from the roadmap.
+- WI-041 — Estabilización funcional y refinamiento UX/UI de re:Invent Pathfinder
+  - Path: knowledge/delivery/work-items/in-progress/WI-041-estabilizaci-n-funcional-y-refinamiento-ux-ui-de-reinvent-pathfinder.md
   - Suggested action: Add `source` or `source_id` if this Work Item came from the roadmap.
 
 ### Work Items missing initiative
@@ -135,6 +139,9 @@ Reason:
 
 - WI-026 — Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery
   - Path: knowledge/delivery/work-items/draft/WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md
+  - Suggested action: Add an `## Acceptance Criteria` section.
+- WI-041 — Estabilización funcional y refinamiento UX/UI de re:Invent Pathfinder
+  - Path: knowledge/delivery/work-items/in-progress/WI-041-estabilizaci-n-funcional-y-refinamiento-ux-ui-de-reinvent-pathfinder.md
   - Suggested action: Add an `## Acceptance Criteria` section.
 
 ### Work Items missing Definition of Done
@@ -175,14 +182,44 @@ Reason:
 - WI-032 — Selección inicial y orquestación global de Demo y Live
   - Path: knowledge/delivery/work-items/completed/WI-032-selecci-n-inicial-y-orquestaci-n-global-de-demo-y-.md
   - Suggested action: Add a `## Definition of Done` section.
+- WI-033 — Providers aislados para ejecución Demo y Live
+  - Path: knowledge/delivery/work-items/completed/WI-033-providers-aislados-para-ejecuci-n-demo-y-live.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-034 — Carga automática de disponibilidad, catálogo y agenda
+  - Path: knowledge/delivery/work-items/completed/WI-034-carga-autom-tica-de-disponibilidad-cat-logo-y-agen.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-035 — Consistencia del pipeline de IA y trazabilidad por etapa
+  - Path: knowledge/delivery/work-items/completed/WI-035-consistencia-del-pipeline-de-ia-y-trazabilidad-por.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-036 — Refinamiento de Learning Path, relevancia y agenda
+  - Path: knowledge/delivery/work-items/completed/WI-036-refinamiento-de-learning-path-relevancia-y-agenda.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-037 — Rediseño de reflexión adaptativa y Learning Report
+  - Path: knowledge/delivery/work-items/completed/WI-037-redise-o-de-reflexi-n-adaptativa-y-learning-report.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-038 — Identidad visual unificada, Design System y App Shell
+  - Path: knowledge/delivery/work-items/completed/WI-038-identidad-visual-unificada-design-system-y-app-she.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-039 — Persistencia, aislamiento de sesiones y seguridad del estado
+  - Path: knowledge/delivery/work-items/completed/WI-039-persistencia-aislamiento-de-sesiones-y-seguridad-d.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-040 — Validación E2E, accesibilidad y consistencia de despliegues
+  - Path: knowledge/delivery/work-items/completed/WI-040-validaci-n-e2e-accesibilidad-y-consistencia-de-des.md
+  - Suggested action: Add a `## Definition of Done` section.
 - WI-026 — Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery
   - Path: knowledge/delivery/work-items/draft/WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md
+  - Suggested action: Add a `## Definition of Done` section.
+- WI-041 — Estabilización funcional y refinamiento UX/UI de re:Invent Pathfinder
+  - Path: knowledge/delivery/work-items/in-progress/WI-041-estabilizaci-n-funcional-y-refinamiento-ux-ui-de-reinvent-pathfinder.md
   - Suggested action: Add a `## Definition of Done` section.
 
 ### Work Items missing validation
 
 - WI-026 — Simplificar el modo POC eliminando Bootstrap del happy path y priorizando Tech + Delivery
   - Path: knowledge/delivery/work-items/draft/WI-026-simplificar-el-modo-poc-eliminando-bootstrap-del-h.md
+  - Suggested action: Add a `## How to test it` (validation) section.
+- WI-041 — Estabilización funcional y refinamiento UX/UI de re:Invent Pathfinder
+  - Path: knowledge/delivery/work-items/in-progress/WI-041-estabilizaci-n-funcional-y-refinamiento-ux-ui-de-reinvent-pathfinder.md
   - Suggested action: Add a `## How to test it` (validation) section.
 
 ### Broad ownership globs
@@ -305,19 +342,19 @@ Reason:
   - Owned by: WI-015, WI-016
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `packages/domain/src/index.ts`
-  - Owned by: WI-015, WI-016
+  - Owned by: WI-015, WI-016, WI-035, WI-036
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `packages/domain/src/domain.test.ts`
-  - Owned by: WI-015, WI-016, WI-019
+  - Owned by: WI-015, WI-016, WI-019, WI-035, WI-036, WI-037
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `apps/client/src/App.tsx`
-  - Owned by: WI-017, WI-018, WI-019, WI-020, WI-021, WI-022, WI-024, WI-031, WI-032
+  - Owned by: WI-017, WI-018, WI-019, WI-020, WI-021, WI-022, WI-024, WI-031, WI-032, WI-033, WI-034, WI-035, WI-036, WI-037, WI-038, WI-039, WI-041
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `apps/client/src/components/AvailabilityHeatmap.tsx`
-  - Owned by: WI-017, WI-019, WI-020, WI-021, WI-023, WI-024
+  - Owned by: WI-017, WI-019, WI-020, WI-021, WI-023, WI-024, WI-041
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `apps/client/src/client.test.ts`
-  - Owned by: WI-017, WI-018, WI-019, WI-020, WI-021, WI-023, WI-024, WI-032
+  - Owned by: WI-017, WI-018, WI-019, WI-020, WI-021, WI-023, WI-024, WI-032, WI-033, WI-034, WI-035, WI-036, WI-037, WI-038, WI-039, WI-040, WI-041
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `packages/events-client/src/client/aws-events-client.ts`
   - Owned by: WI-019, WI-020, WI-021
@@ -326,7 +363,7 @@ Reason:
   - Owned by: WI-019, WI-020, WI-021
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `apps/client/vite.config.ts`
-  - Owned by: WI-019, WI-022
+  - Owned by: WI-019, WI-022, WI-041
   - Suggested action: Review whether the overlap is expected or should be narrowed.
 - `packages/events-client/src/types/user-schedule.ts`
   - Owned by: WI-020, WI-021
@@ -343,6 +380,24 @@ Reason:
 - `apps/client/src/components/`
   - Owned by: WI-031, WI-032
   - Suggested action: Review whether the overlap is expected or should be narrowed.
+- `apps/client/src/components/AITraceBadge.tsx`
+  - Owned by: WI-035, WI-041
+  - Suggested action: Review whether the overlap is expected or should be narrowed.
+- `apps/client/src/components/AITracePanel.tsx`
+  - Owned by: WI-035, WI-041
+  - Suggested action: Review whether the overlap is expected or should be narrowed.
+- `apps/client/src/components/LearningPathView.tsx`
+  - Owned by: WI-036, WI-041
+  - Suggested action: Review whether the overlap is expected or should be narrowed.
+- `apps/client/src/components/LearningReportView.tsx`
+  - Owned by: WI-037, WI-041
+  - Suggested action: Review whether the overlap is expected or should be narrowed.
+- `apps/client/src/theme/tokens.ts`
+  - Owned by: WI-038, WI-041
+  - Suggested action: Review whether the overlap is expected or should be narrowed.
+- `apps/client/src/components/AppShell.tsx`
+  - Owned by: WI-038, WI-041
+  - Suggested action: Review whether the overlap is expected or should be narrowed.
 
 ## Score Breakdown
 
@@ -356,11 +411,11 @@ Reason:
 ## Suggested Actions
 
 1. Add `code:` ownership to WI-026.
-2. Add `source`/`source_id` to WI-012, WI-026.
+2. Add `source`/`source_id` to WI-012, WI-026, WI-041.
 3. Add an `initiative` to WI-012, WI-026.
-4. Add Acceptance Criteria to WI-026.
-5. Add a Definition of Done to 13 Work Items: WI-002, WI-003, WI-004, …
-6. Add a validation (How to test it) section to WI-026.
+4. Add Acceptance Criteria to WI-026, WI-041.
+5. Add a Definition of Done to 22 Work Items: WI-002, WI-003, WI-004, …
+6. Add a validation (How to test it) section to WI-026, WI-041.
 7. Narrow 30 broad ownership glob(s) into specific paths.
 8. Review graph hints (`kaddo://graph-hints` or `.kaddo/graph-hints.md`).
 9. Run `kaddo guard` before committing to catch knowledge drift.

@@ -4,6 +4,8 @@ import {
   type StageExecutionTrace,
   STAGE_DESCRIPTIONS,
 } from "@pathfinder/domain"
+import { Activity, ChevronDown, ChevronUp, Clock } from "lucide-react"
+import { colors, radii, spacing, typography } from "../theme/tokens.js"
 import { AITraceBadge } from "./AITraceBadge.js"
 
 export interface AITracePanelProps {
@@ -24,17 +26,16 @@ export const AITracePanel: React.FC<AITracePanelProps> = ({
   defaultExpanded = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
-
   const executedCount = Object.keys(traces).length
 
   return (
     <div
       style={{
-        marginTop: "2rem",
-        marginBottom: "2rem",
-        backgroundColor: "#f8fafc",
-        border: "1px solid #e2e8f0",
-        borderRadius: "8px",
+        marginTop: spacing.xl,
+        marginBottom: spacing.xl,
+        backgroundColor: colors.neutral.white,
+        border: `1px solid ${colors.neutral.slate200}`,
+        borderRadius: radii.lg,
         overflow: "hidden",
       }}
     >
@@ -47,83 +48,100 @@ export const AITracePanel: React.FC<AITracePanelProps> = ({
           justifyContent: "space-between",
           alignItems: "center",
           padding: "0.75rem 1rem",
-          backgroundColor: "#f1f5f9",
+          backgroundColor: colors.neutral.slate50,
           border: "none",
           cursor: "pointer",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          color: "#334155",
+          fontSize: typography.fontSize.sm,
+          fontWeight: typography.fontWeight.semibold,
+          color: colors.neutral.slate700,
           textAlign: "left",
         }}
       >
         <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>🔍 Trazabilidad de Pipeline e IA</span>
+          <Activity size={16} color={colors.brand.blue} />
+          <span>Trazabilidad de Pipeline e IA</span>
           <span
             style={{
-              fontSize: "0.75rem",
-              backgroundColor: "#e2e8f0",
-              color: "#475569",
-              padding: "2px 8px",
-              borderRadius: "9999px",
+              fontSize: typography.fontSize.xs,
+              backgroundColor: colors.neutral.slate200,
+              color: colors.neutral.slate700,
+              padding: "1px 8px",
+              borderRadius: radii.full,
+              fontWeight: typography.fontWeight.normal,
             }}
           >
             {`${executedCount} / ${STAGES.length} etapas registradas`}
           </span>
         </span>
-        <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
-          {isExpanded ? "▲ Ocultar auditoría" : "▼ Ver auditoría"}
+        <span style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: typography.fontSize.xs, color: colors.neutral.slate500 }}>
+          <span>{isExpanded ? "Ocultar" : "Expandir observabilidad"}</span>
+          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </span>
       </button>
 
       {isExpanded && (
-        <div style={{ padding: "1rem" }}>
-          <p style={{ margin: "0 0 1rem 0", fontSize: "0.85rem", color: "#64748b" }}>
-            Auditabilidad transparente de qué etapas utilizan inferencia generativa con Amazon Bedrock,
-            cuáles usan heurísticas locales de contingencia y cuáles son reglas determinísticas.
+        <div style={{ padding: "1rem", backgroundColor: colors.neutral.white }}>
+          <p
+            style={{
+              margin: "0 0 1rem 0",
+              fontSize: typography.fontSize.xs,
+              color: colors.neutral.slate600,
+              lineHeight: 1.5,
+            }}
+          >
+            Observabilidad técnica de los motores de inferencia ejecutados por etapa del Journey. Garantiza transparencia entre ejecución heurística y modelos reales de Amazon Bedrock.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {STAGES.map((stage) => {
-              const info = STAGE_DESCRIPTIONS[stage]
-              const trace = traces[stage]
-              const isExecuted = Boolean(trace)
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+            {STAGES.map((stageKey) => {
+              const trace = traces[stageKey]
+              const info = STAGE_DESCRIPTIONS[stageKey]
 
               return (
                 <div
-                  key={stage}
+                  key={stageKey}
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "flex-start",
-                    padding: "10px 12px",
-                    backgroundColor: isExecuted ? "#ffffff" : "rgba(241, 245, 249, 0.5)",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "6px",
-                    gap: "12px",
+                    gap: "0.75rem",
+                    padding: "0.6rem 0.8rem",
+                    backgroundColor: trace ? colors.neutral.slate50 : colors.neutral.white,
+                    border: `1px solid ${trace ? colors.neutral.slate200 : colors.neutral.slate100}`,
+                    borderRadius: radii.md,
+                    flexWrap: "wrap",
                   }}
                 >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                      <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "#0f172a" }}>
+                  <div style={{ flex: "1 1 240px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <strong style={{ fontSize: typography.fontSize.xs, color: colors.brand.navy }}>
                         {info.name}
+                      </strong>
+                      <span style={{ fontSize: "0.7rem", color: colors.neutral.slate400 }}>
+                        {`(${stageKey})`}
                       </span>
-                      {trace ? (
-                        <AITraceBadge trace={trace} />
-                      ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>(Pendiente de ejecución)</span>
-                      )}
                     </div>
-                    <p style={{ margin: 0, fontSize: "0.8rem", color: "#64748b" }}>
-                      {trace ? trace.summary : info.description}
+                    <p
+                      style={{
+                        margin: "3px 0 0 0",
+                        fontSize: "0.72rem",
+                        color: colors.neutral.slate600,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {trace?.summary ?? info.description}
                     </p>
                   </div>
 
-                  {trace && (
-                    <div style={{ textAlign: "right", fontSize: "0.75rem", color: "#94a3b8", whiteSpace: "nowrap" }}>
-                      {trace.durationMs !== undefined && <div>{`${trace.durationMs}ms`}</div>}
-                      <div>{new Date(trace.executedAt).toLocaleTimeString()}</div>
-                    </div>
-                  )}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+                    <AITraceBadge trace={trace} />
+                    {trace?.executedAt && (
+                      <span style={{ fontSize: "0.68rem", color: colors.neutral.slate400, display: "flex", alignItems: "center", gap: "3px" }}>
+                        <Clock size={10} />
+                        {new Date(trace.executedAt).toLocaleTimeString()}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )
             })}

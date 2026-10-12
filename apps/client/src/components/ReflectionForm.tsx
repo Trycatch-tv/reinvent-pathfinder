@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import type {
   Reflection,
   GapUpdateIntent,
   KnowledgeGap,
   KnowledgeGapStatus,
-} from '@pathfinder/domain';
+} from '@pathfinder/domain'
+import { Star, Check, Rocket } from 'lucide-react'
+import { colors, radii, spacing, typography } from '../theme/tokens.js'
+import { Button } from './ui/Button.js'
+import { Input } from './ui/Input.js'
 
 export interface ReflectionFormProps {
-  readonly sessionId: string;
-  readonly sessionTitle: string;
-  readonly userId: string;
-  /** Gaps que esta sesión podía cubrir (para marcarlos como abordados). */
-  readonly relatedGaps: readonly KnowledgeGap[];
-  readonly onSubmit: (reflection: Reflection) => void;
-  readonly onCancel?: () => void;
+  readonly sessionId: string
+  readonly sessionTitle: string
+  readonly userId: string
+  readonly relatedGaps: readonly KnowledgeGap[]
+  readonly onSubmit: (reflection: Reflection) => void
+  readonly onCancel?: () => void
 }
 
 export const ReflectionForm: React.FC<ReflectionFormProps> = ({
@@ -24,29 +27,28 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [rating, setRating] = useState(4);
-  const [takeaways, setTakeaways] = useState('');
-  const [actionItem, setActionItem] = useState('');
-  // gapId -> nuevo status elegido por el usuario (solo los que cambie).
-  const [gapChoices, setGapChoices] = useState<Record<string, KnowledgeGapStatus>>({});
+  const [rating, setRating] = useState(4)
+  const [takeaways, setTakeaways] = useState('')
+  const [actionItem, setActionItem] = useState('')
+  const [gapChoices, setGapChoices] = useState<Record<string, KnowledgeGapStatus>>({})
 
   const handleGapToggle = (gapId: string, status: KnowledgeGapStatus) => {
     setGapChoices((prev) => {
-      const next = { ...prev };
+      const next = { ...prev }
       if (next[gapId] === status) {
-        delete next[gapId];
+        delete next[gapId]
       } else {
-        next[gapId] = status;
+        next[gapId] = status
       }
-      return next;
-    });
-  };
+      return next
+    })
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     const gapUpdates: GapUpdateIntent[] = Object.entries(gapChoices).map(
       ([gapId, newStatus]) => ({ gapId, newStatus }),
-    );
+    )
 
     const reflection: Reflection = {
       id: `refl-${sessionId}-${Date.now()}`,
@@ -57,35 +59,35 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
       actionItem: actionItem.trim() || undefined,
       gapUpdates,
       createdAt: new Date().toISOString(),
-    };
-    onSubmit(reflection);
-  };
+    }
+    onSubmit(reflection)
+  }
 
   return (
     <form
       onSubmit={handleSubmit}
       style={{
-        backgroundColor: '#f8fafc',
-        border: '1px solid #cbd5e1',
-        borderRadius: '8px',
-        padding: '1.2rem',
-        marginTop: '0.8rem',
+        backgroundColor: colors.neutral.slate50,
+        border: `1px solid ${colors.neutral.slate200}`,
+        borderRadius: radii.lg,
+        padding: spacing.md,
+        marginTop: spacing.sm,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-        <h4 style={{ margin: 0, fontSize: '1rem', color: '#0f172a' }}>
-          Reflexión post-sesión: {sessionTitle}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md }}>
+        <h4 style={{ margin: 0, fontSize: typography.fontSize.sm, color: colors.brand.navy, fontWeight: typography.fontWeight.bold }}>
+          {`Reflexión post-sesión: ${sessionTitle}`}
         </h4>
-        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+        <span style={{ fontSize: typography.fontSize.xs, color: colors.neutral.slate500 }}>
           Captura lo aprendido y adapta tu ruta
         </span>
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', display: 'block', marginBottom: '0.3rem', color: '#1e293b' }}>
-          ¿Qué tan útil fue? ({rating}/5)
+      <div style={{ marginBottom: spacing.md }}>
+        <label style={{ fontSize: typography.fontSize.xs, fontWeight: typography.fontWeight.semibold, display: 'block', marginBottom: '0.3rem', color: colors.neutral.slate700, textTransform: 'uppercase' }}>
+          {`¿Qué tan útil fue? (${rating} / 5)`}
         </label>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
@@ -95,17 +97,17 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '1.3rem',
-                color: star <= rating ? '#f59e0b' : '#cbd5e1',
-                padding: '0 2px',
-                lineHeight: 1,
+                color: star <= rating ? '#f59e0b' : colors.neutral.slate300,
+                padding: '2px',
+                display: 'inline-flex',
+                alignItems: 'center',
               }}
               title={`${star} estrellas`}
             >
-              ★
+              <Star size={18} fill={star <= rating ? '#f59e0b' : 'none'} strokeWidth={1.5} />
             </button>
           ))}
-          <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: '0.3rem' }}>
+          <span style={{ fontSize: typography.fontSize.xs, color: colors.neutral.slate600, marginLeft: '0.4rem' }}>
             {rating === 5 ? '¡Excelente!' : rating >= 4 ? 'Muy útil' : rating === 3 ? 'Aceptable' : 'Poco útil'}
           </span>
         </div>
@@ -116,12 +118,12 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
           value={rating}
           onChange={(e) => setRating(Number(e.target.value))}
           aria-label="rating"
-          style={{ width: '100%' }}
+          style={{ width: '100%', accentColor: colors.brand.orange }}
         />
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', display: 'block', marginBottom: '0.3rem', color: '#1e293b' }}>
+      <div style={{ marginBottom: spacing.md }}>
+        <label style={{ fontSize: typography.fontSize.xs, fontWeight: typography.fontWeight.semibold, display: 'block', marginBottom: '0.3rem', color: colors.neutral.slate700, textTransform: 'uppercase' }}>
           ¿Qué aprendiste?
         </label>
         <textarea
@@ -131,43 +133,33 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
           rows={3}
           style={{
             width: '100%',
-            padding: '0.6rem',
-            borderRadius: '6px',
-            border: '1px solid #cbd5e1',
-            fontFamily: 'inherit',
-            fontSize: '0.85rem',
+            padding: '0.6rem 0.75rem',
+            borderRadius: radii.md,
+            border: `1px solid ${colors.neutral.slate300}`,
+            fontFamily: typography.fontFamily,
+            fontSize: typography.fontSize.sm,
             boxSizing: 'border-box',
+            outline: 'none',
           }}
         />
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', display: 'block', marginBottom: '0.3rem', color: '#1e293b' }}>
-          🚀 ¿Qué acción implementarás en tu proyecto?
-        </label>
-        <input
-          type="text"
+      <div style={{ marginBottom: spacing.md }}>
+        <Input
+          label="¿Qué acción implementarás en tu proyecto?"
           value={actionItem}
           onChange={(e) => setActionItem(e.target.value)}
           placeholder="ej. Probar DynamoDB Single-Table en staging, configurar Bedrock Guardrails..."
-          style={{
-            width: '100%',
-            padding: '0.55rem',
-            borderRadius: '6px',
-            border: '1px solid #cbd5e1',
-            fontFamily: 'inherit',
-            fontSize: '0.85rem',
-            boxSizing: 'border-box',
-          }}
+          leftIcon={<Rocket size={14} />}
         />
       </div>
 
       {relatedGaps.length > 0 && (
-        <div style={{ marginBottom: '1.2rem' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 'bold', display: 'block', marginBottom: '0.4rem', color: '#1e293b' }}>
+        <div style={{ marginBottom: spacing.md }}>
+          <span style={{ fontSize: typography.fontSize.xs, fontWeight: typography.fontWeight.semibold, display: 'block', marginBottom: '0.4rem', color: colors.neutral.slate700, textTransform: 'uppercase' }}>
             ¿Esta sesión cubrió alguna de tus brechas?
           </span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             {relatedGaps.map((gap) => (
               <div
                 key={gap.id}
@@ -176,24 +168,24 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '6px 10px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '6px',
-                  fontSize: '0.85rem',
+                  backgroundColor: colors.neutral.white,
+                  border: `1px solid ${colors.neutral.slate200}`,
+                  borderRadius: radii.md,
+                  fontSize: typography.fontSize.xs,
                 }}
               >
-                <span style={{ fontWeight: 500, color: '#334155' }}>{gap.topic}</span>
+                <span style={{ fontWeight: typography.fontWeight.medium, color: colors.neutral.slate800 }}>{gap.topic}</span>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button
                     type="button"
                     onClick={() => handleGapToggle(gap.id, 'addressed')}
                     style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '0.75rem',
-                      border: gapChoices[gap.id] === 'addressed' ? '1px solid #f59e0b' : '1px solid #e2e8f0',
-                      backgroundColor: gapChoices[gap.id] === 'addressed' ? '#fef3c7' : '#ffffff',
-                      color: gapChoices[gap.id] === 'addressed' ? '#b45309' : '#64748b',
+                      padding: '3px 8px',
+                      borderRadius: radii.sm,
+                      fontSize: '0.72rem',
+                      border: gapChoices[gap.id] === 'addressed' ? `1px solid ${colors.semantic.warning}` : `1px solid ${colors.neutral.slate200}`,
+                      backgroundColor: gapChoices[gap.id] === 'addressed' ? colors.semantic.warningBg : colors.neutral.white,
+                      color: gapChoices[gap.id] === 'addressed' ? colors.semantic.warning : colors.neutral.slate600,
                       cursor: 'pointer',
                       fontWeight: gapChoices[gap.id] === 'addressed' ? 600 : 400,
                     }}
@@ -204,17 +196,18 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
                     type="button"
                     onClick={() => handleGapToggle(gap.id, 'closed')}
                     style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '0.75rem',
-                      border: gapChoices[gap.id] === 'closed' ? '1px solid #10b981' : '1px solid #e2e8f0',
-                      backgroundColor: gapChoices[gap.id] === 'closed' ? '#dcfce7' : '#ffffff',
-                      color: gapChoices[gap.id] === 'closed' ? '#15803d' : '#64748b',
+                      padding: '3px 8px',
+                      borderRadius: radii.sm,
+                      fontSize: '0.72rem',
+                      border: gapChoices[gap.id] === 'closed' ? `1px solid ${colors.semantic.success}` : `1px solid ${colors.neutral.slate200}`,
+                      backgroundColor: gapChoices[gap.id] === 'closed' ? colors.semantic.successBg : colors.neutral.white,
+                      color: gapChoices[gap.id] === 'closed' ? colors.semantic.success : colors.neutral.slate600,
                       cursor: 'pointer',
                       fontWeight: gapChoices[gap.id] === 'closed' ? 600 : 400,
                     }}
                   >
-                    ✓ Cerrado
+                    <Check size={11} style={{ display: 'inline', marginRight: '3px' }} />
+                    Cerrado
                   </button>
                 </div>
               </div>
@@ -223,40 +216,16 @@ export const ReflectionForm: React.FC<ReflectionFormProps> = ({
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
         {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#fff',
-              border: '1px solid #cbd5e1',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              color: '#475569',
-            }}
-          >
+          <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
             Cancelar
-          </button>
+          </Button>
         )}
-        <button
-          type="submit"
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#0284c7',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-          }}
-        >
+        <Button type="submit" variant="primary" size="sm">
           Guardar reflexión y adaptar ruta
-        </button>
+        </Button>
       </div>
     </form>
-  );
-};
+  )
+}

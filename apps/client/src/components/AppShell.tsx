@@ -1,5 +1,16 @@
 import React from 'react'
 import type { ExperienceMode } from '@pathfinder/domain'
+import {
+  Compass,
+  Home,
+  Flame,
+  Info,
+  Check,
+  ChevronRight,
+  Radio,
+  ShieldCheck,
+  RefreshCw,
+} from 'lucide-react'
 import { colors, radii, shadows, spacing, typography } from '../theme/tokens.js'
 import { Badge } from './ui/Badge.js'
 import { Button } from './ui/Button.js'
@@ -17,12 +28,12 @@ export interface AppShellProps {
   activeStep?: JourneyStepId
 }
 
-const JOURNEY_STEPS: { id: JourneyStepId; label: string; icon: string }[] = [
-  { id: 'context', label: '1. Contexto', icon: '🎯' },
-  { id: 'diagnosis', label: '2. Diagnóstico', icon: '🔍' },
-  { id: 'path', label: '3. Learning Path', icon: '🗺️' },
-  { id: 'reflection', label: '4. Reflexión', icon: '💡' },
-  { id: 'report', label: '5. Learning Report', icon: '📊' },
+const JOURNEY_STEPS: { id: JourneyStepId; label: string; number: number }[] = [
+  { id: 'context', label: 'Contexto', number: 1 },
+  { id: 'diagnosis', label: 'Diagnóstico', number: 2 },
+  { id: 'path', label: 'Learning Path', number: 3 },
+  { id: 'reflection', label: 'Reflexión', number: 4 },
+  { id: 'report', label: 'Learning Report', number: 5 },
 ]
 
 export function AppShell({
@@ -102,11 +113,11 @@ export function AppShell({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.3rem',
+                  color: colors.neutral.white,
                   boxShadow: shadows.sm,
                 }}
               >
-                🧭
+                <Compass size={22} strokeWidth={2.2} />
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -122,7 +133,7 @@ export function AppShell({
                     re:Invent Pathfinder
                   </h1>
                   <Badge variant="teal" style={{ fontSize: '0.7rem' }}>
-                    v0.8
+                    v0.21.0
                   </Badge>
                 </div>
                 <p
@@ -148,20 +159,41 @@ export function AppShell({
             >
               <Badge
                 variant={mode === 'live' ? 'live' : 'demo'}
-                withDot
                 style={{
                   fontSize: typography.fontSize.xs,
                   padding: '4px 10px',
-                  fontWeight: typography.fontWeight.bold,
+                  fontWeight: typography.fontWeight.semibold,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
                 }}
               >
-                {mode === 'live' ? '🔴 Modo Live' : '🧪 Modo Demo'}
+                <Radio size={13} strokeWidth={2.5} />
+                <span>{mode === 'live' ? 'Modo Live' : 'Modo Demo'}</span>
               </Badge>
+
+              {mode === 'live' && (
+                <span
+                  style={{
+                    fontSize: typography.fontSize.xs,
+                    color: colors.neutral.slate300,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span style={{ fontSize: '0.75rem', opacity: 0.85 }}>Live (AWS Events + Bedrock)</span>
+                  <Badge variant={isAuthenticated ? 'teal' : 'warning'} style={{ fontSize: '0.7rem' }}>
+                    {isAuthenticated ? 'Builder ID autenticado' : 'Sin autenticar'}
+                  </Badge>
+                </span>
+              )}
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onSelectMode(mode === 'live' ? 'demo' : 'live')}
+                leftIcon={<RefreshCw size={13} />}
                 style={{
                   color: colors.neutral.slate300,
                   backgroundColor: 'rgba(255, 255, 255, 0.08)',
@@ -180,7 +212,7 @@ export function AppShell({
             aria-label="Navegación principal"
             style={{
               display: 'flex',
-              gap: '1rem',
+              gap: '0.75rem',
               marginTop: spacing.md,
               borderTop: '1px solid rgba(255, 255, 255, 0.1)',
               paddingTop: spacing.sm,
@@ -209,7 +241,7 @@ export function AppShell({
                 gap: '6px',
               }}
             >
-              <span>🏠</span>
+              <Home size={15} />
               <span>Journey Pathfinder</span>
             </a>
 
@@ -232,7 +264,7 @@ export function AppShell({
                   gap: '6px',
                 }}
               >
-                <span>🔥</span>
+                <Flame size={15} />
                 <span>Ver disponibilidad de sesiones</span>
               </a>
             )}
@@ -256,7 +288,7 @@ export function AppShell({
                   gap: '6px',
                 }}
               >
-                <span>ℹ️</span>
+                <Info size={15} />
                 <span>Qué es Pathfinder</span>
               </a>
             )}
@@ -285,7 +317,7 @@ export function AppShell({
               paddingBottom: '2px',
             }}
           >
-            {JOURNEY_STEPS.map((step, idx) => {
+            {JOURNEY_STEPS.map((step) => {
               const isActive = step.id === activeStep
               const stepIndex = JOURNEY_STEPS.findIndex((s) => s.id === step.id)
               const activeIndex = JOURNEY_STEPS.findIndex((s) => s.id === activeStep)
@@ -312,8 +344,8 @@ export function AppShell({
                 >
                   <span
                     style={{
-                      width: '20px',
-                      height: '20px',
+                      width: '22px',
+                      height: '22px',
                       borderRadius: '50%',
                       backgroundColor: isActive
                         ? colors.brand.orange
@@ -324,23 +356,22 @@ export function AppShell({
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '0.65rem',
+                      fontSize: '0.7rem',
                       fontWeight: typography.fontWeight.bold,
                     }}
                   >
-                    {isPast ? '✓' : idx + 1}
+                    {isPast ? <Check size={13} strokeWidth={3} /> : step.number}
                   </span>
-                  <span>{step.label}</span>
-                  {idx < JOURNEY_STEPS.length - 1 && (
-                    <span
+                  <span>{`${step.number}. ${step.label}`}</span>
+                  {step.number < JOURNEY_STEPS.length && (
+                    <ChevronRight
+                      size={14}
                       style={{
                         color: colors.neutral.slate300,
-                        marginLeft: '0.5rem',
+                        marginLeft: '0.4rem',
                       }}
                       aria-hidden="true"
-                    >
-                      →
-                    </span>
+                    />
                   )}
                 </div>
               )
@@ -390,8 +421,8 @@ export function AppShell({
               re:Invent Pathfinder
             </strong>{' '}
             — AI companion adaptativo y trazable para AWS re:Invent.
-            <div style={{ marginTop: '4px' }}>
-              Modo activo:{' '}
+            <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span>Modo activo:</span>
               <span
                 style={{
                   color: mode === 'live' ? colors.brand.orangeBright : colors.brand.blueBright,
@@ -400,10 +431,11 @@ export function AppShell({
               >
                 {mode === 'live' ? 'Live (AWS Events + Bedrock)' : 'Demo (Local-First)'}
               </span>
-              {' · '}
-              Estado de sesión:{' '}
-              <span style={{ color: isAuthenticated ? colors.semantic.success : colors.neutral.slate400 }}>
-                {isAuthenticated ? 'Builder ID autenticado' : 'Sin autenticación'}
+              <span>·</span>
+              <span>Estado:</span>
+              <span style={{ color: isAuthenticated ? colors.semantic.success : colors.neutral.slate400, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                {isAuthenticated ? <ShieldCheck size={13} /> : null}
+                {isAuthenticated ? 'Builder ID conectado' : 'Sin autenticación'}
               </span>
             </div>
           </div>
