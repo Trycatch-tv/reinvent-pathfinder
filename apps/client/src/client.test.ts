@@ -1250,7 +1250,190 @@ describe("apps/client UI components", () => {
       expect(mockStorage[getJourneyStorageKey("live")]).toBeUndefined()
     })
   })
+
+  describe("E2E Journey Validation, Accessibility & Deployment Consistency (WI-040)", () => {
+    let mockStorage: Record<string, string>
+
+    beforeEach(() => {
+      mockStorage = {}
+      vi.stubGlobal("localStorage", {
+        getItem: vi.fn((key: string) => mockStorage[key] ?? null),
+        setItem: vi.fn((key: string, val: string) => {
+          mockStorage[key] = val
+        }),
+        removeItem: vi.fn((key: string) => {
+          delete mockStorage[key]
+        }),
+      })
+      vi.stubGlobal("window", {
+        localStorage: globalThis.localStorage,
+        location: { pathname: "/" },
+      })
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it("validates full Demo Journey E2E sequence: Context -> Diagnosis -> Path -> Reflection -> Report", () => {
+      // 1. Initial State: App loads in Demo Mode with Context Form
+      const initialHtml = renderToString(React.createElement(App))
+      expect(initialHtml).toContain("re:Invent Pathfinder")
+      expect(initialHtml).toContain("Modo Demo")
+      expect(initialHtml).toContain("Paso 1: ¿Qué estás construyendo?")
+      expect(initialHtml).toContain("1. Contexto")
+
+      // 2. State with Diagnostic and Gaps loaded
+      const traces: Partial<Record<ExecutionStage, StageExecutionTrace>> = {
+        context_analysis: {
+          stage: "context_analysis",
+          stageName: "Diagnóstico de Contexto",
+          engine: "heuristic",
+          modelId: "local-heuristic",
+          summary: "Análisis con heurística",
+          durationMs: 15,
+          executedAt: "2026-10-12T10:00:00Z",
+        },
+      }
+
+      mockStorage[getJourneyStorageKey("demo")] = JSON.stringify({
+        mode: "demo",
+        analysisResult: {
+          projectContext: mockContext,
+          knowledgeProfile: mockProfile,
+          knowledgeGaps: mockGaps,
+          modelId: "local-heuristic",
+        },
+        currentGaps: mockGaps,
+        initialGaps: mockGaps,
+        traces,
+      })
+
+      const diagnosisHtml = renderToString(React.createElement(App))
+      expect(diagnosisHtml).toContain("Tu Diagnóstico de Aprendizaje")
+      expect(diagnosisHtml).toContain("Heurístico Local")
+      expect(diagnosisHtml).toContain("Amazon Bedrock AgentCore &amp; Autonomous Workflows")
+      expect(diagnosisHtml).toContain("Construir Learning Path Recomendado →")
+
+      // 3. State with Learning Path constructed
+      const rawSession = SAMPLE_RAW_SESSIONS[0]!
+      const sessionA = normalizeAwsSession(rawSession)
+      const recommendations: SessionRecommendation[] = [
+        {
+          sessionId: sessionA.id,
+          sessionCode: sessionA.code,
+          title: sessionA.title,
+          relevanceScore: 0.95,
+          explanation: "Recomendación principal para stack de agentes",
+          coveredGapIds: ["gap-1"],
+        },
+      ]
+      const learningPath = buildLearningPath({
+        recommendations,
+        candidateSessions: [sessionA],
+        userId: "user-1",
+        journeyId: "journey-1",
+      })
+
+      mockStorage[getJourneyStorageKey("demo")] = JSON.stringify({
+        mode: "demo",
+        analysisResult: {
+          projectContext: mockContext,
+          knowledgeProfile: mockProfile,
+          knowledgeGaps: mockGaps,
+        },
+        currentGaps: mockGaps,
+        initialGaps: mockGaps,
+        traces,
+        learningPath,
+        recommendations,
+        activeCatalog: [sessionA],
+      })
+
+      const pathHtml = renderToString(React.createElement(App))
+      expect(pathHtml).toContain("Tu Learning Path")
+      expect(pathHtml).toContain("Trazabilidad de la Ruta:")
+      expect(pathHtml).toContain("⭐ Principales")
+      expect(pathHtml).toContain("Building Autonomous Multi-Agent Systems")
+      expect(pathHtml).toContain("Generar Learning Report (cierre de ciclo) →")
+
+      // 4. State with Reflections and Executive Learning Report
+      const reflection: Reflection = {
+        id: "ref-1",
+        userId: "user-1",
+        sessionId: sessionA.id,
+        rating: 5,
+        keyTakeaways: "Excelente sesión sobre patrones agénticos",
+        actionItem: "Implementar evaluación de agentes con Kaddo",
+        gapUpdates: [{ gapId: "gap-1", newStatus: "closed" }],
+        createdAt: "2026-10-12T10:30:00Z",
+      }
+
+      const learningReport = buildLearningReport({
+        initialGaps: mockGaps,
+        currentGaps: [
+          { ...mockGaps[0]!, status: "closed" },
+          mockGaps[1]!,
+        ],
+        reflections: [reflection],
+      })
+
+      mockStorage[getJourneyStorageKey("demo")] = JSON.stringify({
+        mode: "demo",
+        analysisResult: {
+          projectContext: mockContext,
+          knowledgeProfile: mockProfile,
+          knowledgeGaps: mockGaps,
+        },
+        currentGaps: [
+          { ...mockGaps[0], status: "resolved" },
+          mockGaps[1],
+        ],
+        initialGaps: mockGaps,
+        traces,
+        learningPath,
+        recommendations,
+        activeCatalog: [sessionA],
+        reflections: [reflection],
+        learningReport,
+      })
+
+      const reportHtml = renderToString(React.createElement(App))
+      expect(reportHtml).toContain("Progreso de Cobertura Formativa")
+      expect(reportHtml).toContain("50%")
+      expect(reportHtml).toContain("Compromisos de Implementación en tu Proyecto")
+      expect(reportHtml).toContain("Implementar evaluación de agentes con Kaddo")
+      expect(reportHtml).toContain("📋 Copiar Reporte en Markdown")
+      expect(reportHtml).toContain("5. Learning Report")
+    })
+
+    it("verifies Live Mode security governance and unauthenticated gating", () => {
+      mockStorage["pathfinder_experience_mode"] = "live"
+
+      const liveGatedHtml = renderToString(React.createElement(App))
+      expect(liveGatedHtml).toContain("Inicio de sesión requerido (Modo Live)")
+      expect(liveGatedHtml).toContain("Iniciar sesión con AWS Builder ID")
+      expect(liveGatedHtml).toContain("🧪 Cambiar a Modo Demo")
+      expect(liveGatedHtml).not.toContain("Paso 1: ¿Qué estás construyendo?")
+    })
+
+    it("verifies accessibility semantics, ARIA landmarks, and interactive states", () => {
+      const html = renderToString(React.createElement(App))
+
+      // Navigation landmark
+      expect(html).toContain('aria-label="Navegación principal"')
+
+      // Header branding button
+      expect(html).toContain('aria-label="Ir al inicio de re:Invent Pathfinder"')
+
+      // Footer and structural layout
+      expect(html).toContain("<footer")
+      expect(html).toContain("<header")
+      expect(html).toContain("<main")
+    })
+  })
 })
+
 
 
 

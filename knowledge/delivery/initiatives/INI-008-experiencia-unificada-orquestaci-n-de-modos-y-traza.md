@@ -2,7 +2,7 @@
 type: initiative
 id: INI-008
 title: 'Experiencia unificada, orquestación de modos y trazabilidad de IA'
-status: planned
+status: completed
 knowledge_level: K2
 domains:
   - product
@@ -150,8 +150,10 @@ candidates:
       Incorporar pruebas de journey, regresión, responsive, accesibilidad y
       estados de error. Documentar explícitamente qué puede ejecutarse de forma
       real en cada entorno.
+    materialized_as: WI-040
 horizon: now
 priority: high
+completed_at: '2026-10-12'
 ---
 
 # Experiencia unificada, orquestación de modos y trazabilidad de IA

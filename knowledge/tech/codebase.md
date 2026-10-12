@@ -291,6 +291,17 @@ desarrollar la experiencia local-first.
   solo se consulta con `VITE_AWS_EVENT_ID` + sesión Builder ID.
 - **Git:** ver la estrategia de Git del proyecto (no se repite aquí).
 
+## Matriz de Entornos y Despliegues (INI-008 / WI-040)
+
+| Capacidad / Flujo | Desarrollo Local (Modo Demo) | Desarrollo Local (Modo Live) | Preview Público / Estático (Netlify) | Producción Cloud AWS |
+|---|---|---|---|---|
+| **Catálogo de Sesiones** | Fixtures sintéticos normalizados (`SAMPLE_RAW_SESSIONS`) | API AWS Events proxificada en Vite (`/aws-events/v1`) | Modo Demo: fixtures. Modo Live: `api.awsevents.com` (CORS/Proxy) | REST API directa de AWS Events |
+| **Autenticación** | Ninguna (no requiere Builder ID) | AWS Builder ID OAuth 2.0 PKCE (`/callback`) | AWS Builder ID OAuth 2.0 PKCE | AWS Builder ID OAuth 2.0 PKCE |
+| **Pipeline de IA** | Heurística local determinística (`HeuristicContextAnalyzer`, `HeuristicSessionReranker`) | Inferencia remota opcional Bedrock Nova/Claude con fallback heurístico trazado | Heurística local o Bedrock mediante API Gateway | Amazon Bedrock invocación directa |
+| **Disponibilidad & Agenda** | Snapshot local sintético con reconciliación determinística | API AWS Events real (`/events/{id}/sessions`, `/users/me/schedule`) | Igual que Local según modo | API AWS Events en tiempo real |
+| **Reflexión & Reporte** | 100% determinístico en cliente, local-first | 100% determinístico en cliente, local-first | 100% determinístico en cliente, local-first | 100% determinístico en cliente, local-first |
+| **Almacenamiento** | `localStorage` aislado (`pathfinder_journey_state_demo`) | `localStorage` aislado (`pathfinder_journey_state_live`) + `tokenStore` | `localStorage` aislado | Local + opcional DynamoDB (`packages/data`) |
+
 ## Minimum criteria to start development
 
 - Node según `.node-version` (24) y `pnpm`.
